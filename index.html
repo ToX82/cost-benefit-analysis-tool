@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strumento di Analisi Costi-Benefici</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen p-4">
+    <div class="container mx-auto bg-white rounded-xl shadow-lg p-4 max-w-6xl">
+        <h1 class="text-2xl font-bold mb-4 text-indigo-700 text-center">Strumento di Analisi Costi-Benefici</h1>
+
+        <!-- Sezione di input -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Costi -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold mb-2 text-indigo-600">Costi</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700" for="business-model">Modello di Business<br><span class="text-xs text-gray-500">Seleziona il tipo di progetto</span></label>
+                    <select id="business-model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                        <option value="saas">SaaS</option>
+                        <option value="commissioned">Commissionato</option>
+                        <option value="mixed">Misto (SaaS + Commissionato)</option>
+                    </select>
+
+                    <label class="block text-sm font-medium text-gray-700" for="direct-costs">Costi Diretti (€)<br><span class="text-xs text-gray-500">Costi diretti come stipendi e licenze</span></label>
+                    <input type="number" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1000">
+
+                    <label class="block text-sm font-medium text-gray-700" for="indirect-costs">Costi Indiretti su 12 mesi (€)<br><span class="text-xs text-gray-500">Spese per hardware, software, marketing</span></label>
+                    <input type="number" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 500">
+                </div>
+            </div>
+
+            <!-- Ricavi -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold mb-2 text-indigo-600">Ricavi</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700" for="upfront-payment">Pagamento Iniziale (€)<br><span class="text-xs text-gray-500">Anticipo alla firma del contratto</span></label>
+                    <input type="number" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 2000">
+
+                    <label class="block text-sm font-medium text-gray-700" for="final-payment">Pagamento a Saldo (€)<br><span class="text-xs text-gray-500">Saldo finale alla consegna del progetto</span></label>
+                    <input type="number" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 3000">
+
+                    <label class="block text-sm font-medium text-gray-700" for="recurring-revenue">Ricavo Mensile (€)<br><span class="text-xs text-gray-500">Canone mensile per utente</span></label>
+                    <input type="number" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
+                </div>
+            </div>
+
+            <!-- Tempo e Risorse -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold mb-2 text-indigo-600">Tempo e Risorse</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700" for="dev-weeks">Settimane Sviluppo<br><span class="text-xs text-gray-500">Durata dello sviluppo in settimane</span></label>
+                    <input type="number" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 8">
+
+                    <label class="block text-sm font-medium text-gray-700" for="dev-occupation">Occupazione (%)<br><span class="text-xs text-gray-500">Saturazione % dei programmatori</span></label>
+                    <input type="number" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 80" min="0" max="100" value="80">
+                </div>
+            </div>
+
+            <!-- Utenti e Rischio -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold mb-2 text-indigo-600">Utenti e Rischio</h2>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700" for="expected-users">Utenti Previsti<br><span class="text-xs text-gray-500">Stima del numero di utenti del software</span></label>
+                    <input type="number" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
+
+                    <label class="block text-sm font-medium text-gray-700" for="optimistic-multiplier">Moltiplicatore Ottimistico<br><span class="text-xs text-gray-500">Scenario positivo per il numero di utenti</span></label>
+                    <input type="number" id="optimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1.2" value="1.2">
+
+                    <label class="block text-sm font-medium text-gray-700" for="pessimistic-multiplier">Moltiplicatore Pessimistico<br><span class="text-xs text-gray-500">Scenario negativo per il numero di utenti</span></label>
+                    <input type="number" id="pessimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 0.8" value="0.8">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione dei risultati -->
+        <div class="mt-6">
+            <h2 class="text-xl font-bold mb-3 text-indigo-700 text-center">Risultati dell'Analisi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-100">
+                    <h3 class="text-lg font-bold text-green-700 mb-2">ROI su 12 mesi (Ritorno sull'Investimento)</h3>
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <p id="roi" class="text-2xl font-bold text-green-600">€0.00</p>
+                            <p id="roi-evaluation" class="mt-1 text-sm text-gray-700"></p>
+                        </div>
+                        <div class="border-l border-green-200 pl-4">
+                            <p class="text-xs font-medium text-green-700">Rapporto Costi/Benefici</p>
+                            <p id="cost-benefit-ratio" class="text-xl font-bold text-green-600"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg shadow-sm border border-blue-100">
+                    <h3 class="text-lg font-bold text-blue-700 mb-2">Tempo di Pareggio</h3>
+                    <p id="breakeven" class="text-2xl font-bold text-blue-600">0 mesi</p>
+                </div>
+
+                <div class="p-3 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg shadow-sm border border-purple-100">
+                    <h3 class="text-lg font-bold text-purple-700 mb-2">Scenari Utenti</h3>
+                    <p id="users-scenarios" class="text-sm text-gray-700"></p>
+                </div>
+
+                <div class="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-amber-100">
+                    <h3 class="text-lg font-bold text-amber-700 mb-2">Valutazione Complessiva</h3>
+                    <p id="overall-evaluation" class="text-sm text-gray-700"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione dettagli finanziari -->
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-3 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg shadow-sm border border-red-100">
+                <h3 class="text-base font-bold text-red-700 mb-1">Totale Costi</h3>
+                <p id="total-costs-detail" class="text-xl font-bold text-red-600">€0.00</p>
+                <p class="text-xs text-gray-600">Include costi diretti e indiretti con fattore di occupazione</p>
+            </div>
+
+            <div class="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg shadow-sm border border-emerald-100">
+                <h3 class="text-base font-bold text-emerald-700 mb-1">Totale Ricavi Diretti</h3>
+                <p id="direct-revenue-detail" class="text-xl font-bold text-emerald-600">€0.00</p>
+                <p class="text-xs text-gray-600">Somma del pagamento iniziale e del saldo finale</p>
+            </div>
+
+            <div class="p-3 bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg shadow-sm border border-violet-100">
+                <h3 class="text-base font-bold text-violet-700 mb-1">Proiezione Ricavi Annuali</h3>
+                <p id="yearly-revenue-detail" class="text-xl font-bold text-violet-600">€0.00</p>
+                <p class="text-xs text-gray-600">Ricavi mensili proiettati su 12 mesi</p>
+            </div>
+        </</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -4,7 +4,11 @@ import { UIManager } from '../managers/UIManager.js';
 import { StorageManager } from '../managers/StorageManager.js';
 import { EvaluationManager } from '../managers/EvaluationManager.js';
 import { RiskAnalyzer } from './RiskAnalyzer.js';
+import { __ } from '../utils/I18n.js';
 
+/**
+ * Main analyzer for cost-benefit calculations
+ */
 export class CostBenefitAnalyzer {
     constructor() {
         this.initializeEventListeners();
@@ -13,13 +17,23 @@ export class CostBenefitAnalyzer {
     }
 
     initializeEventListeners() {
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('change', () => this.handleInputChange());
-        });
+        try {
+            document.querySelectorAll('input, select').forEach(element => {
+                element.addEventListener('change', () => this.handleInputChange());
+            });
 
-        document.getElementById('business-model').addEventListener('change', () => {
-            this.handleBusinessModelChange();
-        });
+            const businessModelSelect = document.getElementById('business-model');
+            if (!businessModelSelect) {
+                throw new Error('Business model select element not found');
+            }
+
+            businessModelSelect.addEventListener('change', () => {
+                this.handleBusinessModelChange();
+            });
+        } catch (e) {
+            console.error('Failed to initialize event listeners:', e);
+            UIManager.displayError(__('initialization-error'));
+        }
     }
 
     loadSavedData() {
@@ -27,17 +41,18 @@ export class CostBenefitAnalyzer {
             StorageManager.loadFromStorage();
             this.calculateResults();
         } catch (e) {
-            console.error('Errore nell\'inizializzazione:', e);
-            UIManager.displayError('Si è verificato un errore nell\'inizializzazione dell\'applicazione.');
+            console.error('Initialization error:', e);
+            UIManager.displayError(__('initialization-error'));
         }
     }
 
     handleInputChange() {
         try {
             this.calculateResults();
+            StorageManager.saveToStorage();
         } catch (e) {
-            console.error('Errore nel calcolo dei risultati:', e);
-            UIManager.displayError('Si è verificato un errore nel calcolo. Verificare i dati inseriti.');
+            console.error('Error calculating results:', e);
+            UIManager.displayError(__('calculation-error'));
         }
     }
 
@@ -45,25 +60,49 @@ export class CostBenefitAnalyzer {
         const inputs = this.getValidatedInputs();
         if (!inputs) return;
 
-        const costs = this.calculateCosts(inputs);
-        const revenues = this.calculateRevenues(inputs);
-        const userScenarios = this.calculateUserScenarios(inputs);
-        const roi = this.calculateROI(costs, revenues);
-        const breakeven = this.calculateBreakeven(costs, revenues, inputs);
-        const evaluation = this.calculateEvaluation(roi, breakeven, inputs);
-        const riskIndex = this.calculateRiskIndex(inputs, costs);
+        try {
+            const costs = this.calculateCosts(inputs);
+            const revenues = this.calculateRevenues(inputs);
+            const userScenarios = this.calculateUserScenarios(inputs);
+            const roi = this.calculateROI(costs, revenues);
+            const breakeven = this.calculateBreakeven(costs, revenues, inputs);
+            const evaluation = this.calculateEvaluation(roi, breakeven, inputs);
+            const riskIndex = this.calculateRiskIndex(inputs, costs);
 
-        this.updateUI(costs, revenues, userScenarios, roi, breakeven, evaluation, riskIndex);
-        StorageManager.saveToStorage();
+            this.updateUI(costs, revenues, userScenarios, roi, breakeven, evaluation, riskIndex);
+        } catch (e) {
+            console.error('Error in calculations:', e);
+            UIManager.displayError(__('calculation-error'));
+        }
     }
 
     getValidatedInputs() {
         const inputs = InputManager.collectInputs();
-        if (inputs.directCosts + inputs.indirectCosts === 0) {
-            UIManager.displayError('Inserire almeno un costo per procedere con l\'analisi');
+
+        if (!this.validateInputs(inputs)) {
             return null;
         }
+
         return inputs;
+    }
+
+    validateInputs(inputs) {
+        if (inputs.directCosts + inputs.indirectCosts === 0) {
+            UIManager.displayError(__('costs-required'));
+            return false;
+        }
+
+        if (inputs.devWeeks < CONFIG.MIN_DEV_WEEKS) {
+            UIManager.displayError(__('invalid-dev-weeks'));
+            return false;
+        }
+
+        if (inputs.devOccupation < 0 || inputs.devOccupation > 100) {
+            UIManager.displayError(__('invalid-occupation'));
+            return false;
+        }
+
+        return true;
     }
 
     calculateCosts(inputs) {
@@ -159,23 +198,50 @@ export class CostBenefitAnalyzer {
     }
 
     handleBusinessModelChange() {
-        const businessModel = document.getElementById('business-model').value;
-        const usersCard = document.querySelector('[data-category="users"]');
+        try {
+            const businessModel = document.getElementById('business-model')?.value;
+            const usersCard = document.querySelector('[data-category="users"]');
 
-        if (usersCard) {
-            if (businessModel === 'commissioned') {
-                usersCard.classList.add('hidden');
-                document.getElementById('expected-users').value = '1';
-                document.getElementById('optimistic-multiplier').value = '1';
-                document.getElementById('pessimistic-multiplier').value = '1';
-            } else {
-                usersCard.classList.remove('hidden');
-                if (document.getElementById('expected-users').value === '1') {
-                    document.getElementById('optimistic-multiplier').value = '1.2';
-                    document.getElementById('pessimistic-multiplier').value = '0.8';
-                }
+            if (!businessModel || !usersCard) {
+                throw new Error('Required elements not found');
             }
+
+            if (businessModel === 'commissioned') {
+                this.setCommissionedMode(usersCard);
+            } else {
+                this.setSaaSMode(usersCard);
+            }
+
             this.calculateResults();
+        } catch (e) {
+            console.error('Error handling business model change:', e);
+            UIManager.displayError(__('business-model-error'));
         }
+    }
+
+    setCommissionedMode(usersCard) {
+        usersCard.classList.add('hidden');
+        this.setInputValue('expected-users', '1');
+        this.setInputValue('optimistic-multiplier', '1');
+        this.setInputValue('pessimistic-multiplier', '1');
+    }
+
+    setSaaSMode(usersCard) {
+        usersCard.classList.remove('hidden');
+        if (this.getInputValue('expected-users') === '1') {
+            this.setInputValue('optimistic-multiplier', '1.2');
+            this.setInputValue('pessimistic-multiplier', '0.8');
+        }
+    }
+
+    setInputValue(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = value;
+        }
+    }
+
+    getInputValue(id) {
+        return document.getElementById(id)?.value || '';
     }
 }

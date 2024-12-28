@@ -1,38 +1,44 @@
 /**
- * Classe per la gestione delle traduzioni
+ * Handles internationalization and translations for the application
  */
 class I18n {
     constructor() {
         this.translations = {};
-        //this.currentLang = navigator.language.split('-')[0] || 'it';
-        this.currentLang = 'en';
+        this.currentLang = navigator.language.split('-')[0] || 'en';
     }
 
     /**
-     * Carica le traduzioni dal file JSON
+     * Loads translations from the JSON file
+     * @throws {Error} If translations cannot be loaded
      */
     async loadTranslations() {
         try {
             const response = await fetch('lang/translations.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             this.translations = await response.json();
         } catch (error) {
             console.error('Error loading translations:', error);
+            throw new Error('Failed to load translations');
         }
     }
 
     /**
-     * Traduce una stringa nella lingua corrente
-     * @param {string} key - La chiave da tradurre
-     * @returns {string} La stringa tradotta o la chiave originale se non trovata
+     * Translates a key to the current language
+     * @param {string} key - The translation key
+     * @param {...any} args - Arguments to replace placeholders
+     * @returns {string} The translated string or the original key if not found
      */
     translate(key, ...args) {
-        if (!this.translations[key]) {
+        const translation = this.translations[key];
+        if (!translation) {
+            console.warn(`Translation missing for key: ${key}`);
             return key;
         }
 
-        let text = this.translations[key][this.currentLang] || this.translations[key]['it'] || key;
+        let text = translation[this.currentLang] || translation['en'] || key;
 
-        // Sostituisce i placeholder {0}, {1}, ecc. con i valori forniti
         args.forEach((arg, i) => {
             text = text.replace(`{${i}}`, arg);
         });
@@ -41,6 +47,5 @@ class I18n {
     }
 }
 
-// Esporta sia la classe che un'istanza singleton
 export const i18n = new I18n();
 export const __ = (key, ...args) => i18n.translate(key, ...args);

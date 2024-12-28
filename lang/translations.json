@@ -267,14 +267,6 @@
         "it": "Analisi AI",
         "en": "AI Analysis"
     },
-    "optimistic": {
-        "it": "Ottimistico",
-        "en": "Optimistic"
-    },
-    "pessimistic": {
-        "it": "Pessimistico",
-        "en": "Pessimistic"
-    },
     "currency-format": {
         "it": "€ {0}",
         "en": "€ {0}"
@@ -283,45 +275,9 @@
         "it": "{0}%",
         "en": "{0}%"
     },
-    "initialization-error": {
-        "it": "Si è verificato un errore nell'inizializzazione dell'applicazione.",
-        "en": "An error occurred during application initialization."
-    },
-    "calculation-error": {
-        "it": "Si è verificato un errore nel calcolo. Verificare i dati inseriti.",
-        "en": "An error occurred during calculation. Please verify the input data."
-    },
     "enter-costs": {
         "it": "Inserire almeno un costo per procedere con l'analisi",
         "en": "Enter at least one cost to proceed with the analysis"
-    },
-    "base-scenario": {
-        "it": "Scenario Base",
-        "en": "Base Scenario"
-    },
-    "optimistic-scenario": {
-        "it": "Scenario Ottimistico",
-        "en": "Optimistic Scenario"
-    },
-    "pessimistic-scenario": {
-        "it": "Scenario Pessimistico",
-        "en": "Pessimistic Scenario"
-    },
-    "users": {
-        "it": "utenti",
-        "en": "users"
-    },
-    "months": {
-        "it": "mesi",
-        "en": "months"
-    },
-    "not-reachable": {
-        "it": "Non raggiungibile",
-        "en": "Not reachable"
-    },
-    "risk-index": {
-        "it": "Indice di Rischio",
-        "en": "Risk Index"
     },
     "risk-level-very-high": {
         "it": "Molto Alto",
@@ -587,18 +543,6 @@
         "it": "I ricavi ricorrenti sono bassi rispetto ai pagamenti una tantum. Valutare strategie per aumentare il valore ricorrente.",
         "en": "Recurring revenues are low compared to one-time payments. Consider strategies to increase recurring value."
     },
-    "storage-save-error": {
-        "it": "Errore nel salvataggio di {0}",
-        "en": "Error saving {0}"
-    },
-    "storage-load-error": {
-        "it": "Errore nel caricamento di {0}",
-        "en": "Error loading {0}"
-    },
-    "currency-format-error": {
-        "it": "Errore nella formattazione della valuta",
-        "en": "Error formatting currency"
-    },
     "translations-load-error": {
         "it": "Errore nel caricamento delle traduzioni",
         "en": "Error loading translations"
@@ -634,5 +578,81 @@
     "cost-benefit-recommendations": {
         "it": "Raccomandazioni per ottimizzare il rapporto costi-benefici",
         "en": "Recommendations to optimize the cost-benefit ratio"
+    },
+    "costs-required": {
+        "it": "Inserire almeno un costo per procedere con l'analisi",
+        "en": "Enter at least one cost to proceed with the analysis"
+    },
+    "invalid-dev-weeks": {
+        "it": "Il numero di settimane di sviluppo non è valido",
+        "en": "Invalid number of development weeks"
+    },
+    "invalid-occupation": {
+        "it": "La percentuale di occupazione deve essere tra 0 e 100",
+        "en": "Occupation percentage must be between 0 and 100"
+    },
+    "business-model-error": {
+        "it": "Errore nella gestione del modello di business",
+        "en": "Error handling business model"
+    },
+    "initialization-error": {
+        "it": "Si è verificato un errore nell'inizializzazione dell'applicazione",
+        "en": "An error occurred during application initialization"
+    },
+    "calculation-error": {
+        "it": "Si è verificato un errore nel calcolo. Verificare i dati inseriti",
+        "en": "An error occurred during calculation. Please check the input data"
+    },
+    "currency-format-error": {
+        "it": "Errore nella formattazione della valuta",
+        "en": "Error formatting currency"
+    },
+    "storage-save-error": {
+        "it": "Errore nel salvataggio dei dati",
+        "en": "Error saving data"
+    },
+    "storage-load-error": {
+        "it": "Errore nel caricamento dei dati",
+        "en": "Error loading data"
+    },
+    "storage-clear-error": {
+        "it": "Errore nella pulizia dei dati salvati",
+        "en": "Error clearing saved data"
+    },
+    "base-scenario": {
+        "it": "Scenario base",
+        "en": "Base scenario"
+    },
+    "optimistic-scenario": {
+        "it": "Scenario ottimistico",
+        "en": "Optimistic scenario"
+    },
+    "pessimistic-scenario": {
+        "it": "Scenario pessimistico",
+        "en": "Pessimistic scenario"
+    },
+    "users": {
+        "it": "utenti",
+        "en": "users"
+    },
+    "optimistic": {
+        "it": "Ottimistico",
+        "en": "Optimistic"
+    },
+    "pessimistic": {
+        "it": "Pessimistico",
+        "en": "Pessimistic"
+    },
+    "months": {
+        "it": "mesi",
+        "en": "months"
+    },
+    "not-reachable": {
+        "it": "Non raggiungibile",
+        "en": "Not reachable"
+    },
+    "risk-index": {
+        "it": "Indice di rischio",
+        "en": "Risk index"
     }
 }

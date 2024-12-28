@@ -1,0 +1,606 @@
+{
+    "tool-title": {
+        "it": "Strumento di Analisi Costi-Benefici",
+        "en": "Cost Benefit Analysis Tool"
+    },
+    "costs": {
+        "it": "Costi",
+        "en": "Costs"
+    },
+    "business-model": {
+        "it": "Modello di Business",
+        "en": "Business Model"
+    },
+    "select-project-type": {
+        "it": "Seleziona il tipo di progetto",
+        "en": "Select project type"
+    },
+    "saas": {
+        "it": "SaaS",
+        "en": "SaaS"
+    },
+    "commissioned": {
+        "it": "Commissionato",
+        "en": "Commissioned"
+    },
+    "mixed": {
+        "it": "Misto (SaaS + Commissionato)",
+        "en": "Mixed (SaaS + Commissioned)"
+    },
+    "direct-costs": {
+        "it": "Costi Diretti (€)",
+        "en": "Direct Costs (€)"
+    },
+    "direct-costs-help": {
+        "it": "Costi diretti come stipendi e licenze",
+        "en": "Direct costs like salaries and licenses"
+    },
+    "example-1000": {
+        "it": "Es: 1000",
+        "en": "Ex: 1000"
+    },
+    "indirect-costs": {
+        "it": "Costi Indiretti su 12 mesi (€)",
+        "en": "Indirect Costs over 12 months (€)"
+    },
+    "indirect-costs-help": {
+        "it": "Altre spese non direttamente collegate allo sviluppo",
+        "en": "Other expenses not directly related to development"
+    },
+    "example-500": {
+        "it": "Es: 500",
+        "en": "Ex: 500"
+    },
+    "revenues": {
+        "it": "Ricavi",
+        "en": "Revenues"
+    },
+    "upfront-payment": {
+        "it": "Pagamento Iniziale (€)",
+        "en": "Upfront Payment (€)"
+    },
+    "upfront-payment-help": {
+        "it": "Anticipo alla firma del contratto",
+        "en": "Advance payment at contract signing"
+    },
+    "example-2000": {
+        "it": "Es: 2000",
+        "en": "Ex: 2000"
+    },
+    "final-payment": {
+        "it": "Pagamento a Saldo (€)",
+        "en": "Final Payment (€)"
+    },
+    "final-payment-help": {
+        "it": "Saldo finale alla consegna del progetto",
+        "en": "Final payment at project delivery"
+    },
+    "example-3000": {
+        "it": "Es: 3000",
+        "en": "Ex: 3000"
+    },
+    "recurring-revenue": {
+        "it": "Ricavo Mensile (€)",
+        "en": "Monthly Revenue (€)"
+    },
+    "recurring-revenue-help": {
+        "it": "Canone mensile per utente",
+        "en": "Monthly fee per user"
+    },
+    "example-100": {
+        "it": "Es: 100",
+        "en": "Ex: 100"
+    },
+    "time-resources": {
+        "it": "Tempo e Risorse",
+        "en": "Time and Resources"
+    },
+    "dev-weeks": {
+        "it": "Settimane Sviluppo",
+        "en": "Development Weeks"
+    },
+    "dev-weeks-help": {
+        "it": "Durata dello sviluppo in settimane",
+        "en": "Development duration in weeks"
+    },
+    "example-8": {
+        "it": "Es: 8",
+        "en": "Ex: 8"
+    },
+    "dev-occupation": {
+        "it": "Occupazione (%)",
+        "en": "Occupation (%)"
+    },
+    "dev-occupation-help": {
+        "it": "Saturazione % della forza lavoro",
+        "en": "Workforce saturation %"
+    },
+    "example-80": {
+        "it": "Es: 80",
+        "en": "Ex: 80"
+    },
+    "expected-users-title": {
+        "it": "Utenti previsti",
+        "en": "Expected Users"
+    },
+    "expected-users": {
+        "it": "Utenti Previsti",
+        "en": "Expected Users"
+    },
+    "expected-users-help": {
+        "it": "Stima del numero di utenti del software",
+        "en": "Estimated number of software users"
+    },
+    "optimistic-multiplier": {
+        "it": "Moltiplicatore Ottimistico",
+        "en": "Optimistic Multiplier"
+    },
+    "optimistic-multiplier-help": {
+        "it": "Scenario positivo per il numero di utenti",
+        "en": "Positive scenario for number of users"
+    },
+    "example-1.2": {
+        "it": "Es: 1.2",
+        "en": "Ex: 1.2"
+    },
+    "pessimistic-multiplier": {
+        "it": "Moltiplicatore Pessimistico",
+        "en": "Pessimistic Multiplier"
+    },
+    "pessimistic-multiplier-help": {
+        "it": "Scenario negativo per il numero di utenti",
+        "en": "Negative scenario for number of users"
+    },
+    "example-0.8": {
+        "it": "Es: 0.8",
+        "en": "Ex: 0.8"
+    },
+    "analysis-results": {
+        "it": "Risultati dell'Analisi",
+        "en": "Analysis Results"
+    },
+    "roi-12-months": {
+        "it": "ROI su 12 mesi",
+        "en": "12-month ROI"
+    },
+    "breakeven-time": {
+        "it": "Tempo di Pareggio",
+        "en": "Break-even Time"
+    },
+    "zero-months": {
+        "it": "0 mesi",
+        "en": "0 months"
+    },
+    "financial-details": {
+        "it": "Dettagli Finanziari",
+        "en": "Financial Details"
+    },
+    "direct-revenues": {
+        "it": "Ricavi diretti",
+        "en": "Direct Revenues"
+    },
+    "recurring-annual-revenues": {
+        "it": "Ricavi annuali ricorrenti",
+        "en": "Recurring Annual Revenues"
+    },
+    "overall-evaluation": {
+        "it": "Valutazione Complessiva",
+        "en": "Overall Evaluation"
+    },
+    "ai-configuration": {
+        "it": "Configurazione AI",
+        "en": "AI Configuration"
+    },
+    "ai-provider": {
+        "it": "Provider AI",
+        "en": "AI Provider"
+    },
+    "select-provider": {
+        "it": "Seleziona il provider da utilizzare",
+        "en": "Select provider to use"
+    },
+    "perplexity-ai": {
+        "it": "Perplexity AI",
+        "en": "Perplexity AI"
+    },
+    "openai": {
+        "it": "OpenAI",
+        "en": "OpenAI"
+    },
+    "perplexity-api-key": {
+        "it": "Chiave API Perplexity",
+        "en": "Perplexity API Key"
+    },
+    "perplexity-api-key-help": {
+        "it": "La tua chiave API di Perplexity.ai",
+        "en": "Your Perplexity.ai API key"
+    },
+    "enter-api-key": {
+        "it": "Inserisci la tua chiave API",
+        "en": "Enter your API key"
+    },
+    "perplexity-model": {
+        "it": "Modello Perplexity",
+        "en": "Perplexity Model"
+    },
+    "select-model": {
+        "it": "Seleziona il modello da utilizzare",
+        "en": "Select model to use"
+    },
+    "llama-small": {
+        "it": "llama-3.1-sonar-small-128k-online (Veloce)",
+        "en": "llama-3.1-sonar-small-128k-online (Fast)"
+    },
+    "llama-large": {
+        "it": "llama-3.1-sonar-large-128k-online (Potente)",
+        "en": "llama-3.1-sonar-large-128k-online (Powerful)"
+    },
+    "llama-huge": {
+        "it": "llama-3.1-sonar-huge-128k-online (Molto potente)",
+        "en": "llama-3.1-sonar-huge-128k-online (Very powerful)"
+    },
+    "openai-api-key": {
+        "it": "Chiave API OpenAI",
+        "en": "OpenAI API Key"
+    },
+    "openai-api-key-help": {
+        "it": "La tua chiave API di OpenAI",
+        "en": "Your OpenAI API key"
+    },
+    "openai-model": {
+        "it": "Modello OpenAI",
+        "en": "OpenAI Model"
+    },
+    "gpt4-mini": {
+        "it": "gpt-4o-mini (Veloce)",
+        "en": "gpt-4o-mini (Fast)"
+    },
+    "gpt4": {
+        "it": "gpt-4o (Potente)",
+        "en": "gpt-4o (Powerful)"
+    },
+    "request-ai-analysis": {
+        "it": "Richiedi analisi AI",
+        "en": "Request AI Analysis"
+    },
+    "ai-analysis": {
+        "it": "Analisi AI",
+        "en": "AI Analysis"
+    },
+    "optimistic": {
+        "it": "Ottimistico",
+        "en": "Optimistic"
+    },
+    "pessimistic": {
+        "it": "Pessimistico",
+        "en": "Pessimistic"
+    },
+    "currency-format": {
+        "it": "€ {0}",
+        "en": "€ {0}"
+    },
+    "percentage-format": {
+        "it": "{0}%",
+        "en": "{0}%"
+    },
+    "initialization-error": {
+        "it": "Si è verificato un errore nell'inizializzazione dell'applicazione.",
+        "en": "An error occurred during application initialization."
+    },
+    "calculation-error": {
+        "it": "Si è verificato un errore nel calcolo. Verificare i dati inseriti.",
+        "en": "An error occurred during calculation. Please verify the input data."
+    },
+    "enter-costs": {
+        "it": "Inserire almeno un costo per procedere con l'analisi",
+        "en": "Enter at least one cost to proceed with the analysis"
+    },
+    "base-scenario": {
+        "it": "Scenario Base",
+        "en": "Base Scenario"
+    },
+    "optimistic-scenario": {
+        "it": "Scenario Ottimistico",
+        "en": "Optimistic Scenario"
+    },
+    "pessimistic-scenario": {
+        "it": "Scenario Pessimistico",
+        "en": "Pessimistic Scenario"
+    },
+    "users": {
+        "it": "utenti",
+        "en": "users"
+    },
+    "months": {
+        "it": "mesi",
+        "en": "months"
+    },
+    "not-reachable": {
+        "it": "Non raggiungibile",
+        "en": "Not reachable"
+    },
+    "risk-index": {
+        "it": "Indice di Rischio",
+        "en": "Risk Index"
+    },
+    "risk-level-very-high": {
+        "it": "Molto Alto",
+        "en": "Very High"
+    },
+    "risk-level-high": {
+        "it": "Alto",
+        "en": "High"
+    },
+    "risk-level-medium": {
+        "it": "Medio",
+        "en": "Medium"
+    },
+    "risk-level-low": {
+        "it": "Basso",
+        "en": "Low"
+    },
+    "high-team-saturation": {
+        "it": "Alto rischio di saturazione team ({0}% occupazione)",
+        "en": "High team saturation risk ({0}% occupation)"
+    },
+    "add-team-resources": {
+        "it": "Considerare l'aggiunta di risorse al team",
+        "en": "Consider adding resources to the team"
+    },
+    "critical-project-duration": {
+        "it": "Durata progetto critica ({0} settimane)",
+        "en": "Critical project duration ({0} weeks)"
+    },
+    "high-project-duration": {
+        "it": "Durata progetto elevata ({0} settimane)",
+        "en": "High project duration ({0} weeks)"
+    },
+    "split-project-phases": {
+        "it": "Suddividere il progetto in fasi indipendenti",
+        "en": "Split the project into independent phases"
+    },
+    "implement-incremental": {
+        "it": "Implementare un approccio incrementale con rilasci frequenti",
+        "en": "Implement an incremental approach with frequent releases"
+    },
+    "increase-client-checks": {
+        "it": "Aumentare la frequenza delle verifiche con il cliente",
+        "en": "Increase frequency of client checks"
+    },
+    "plan-milestones": {
+        "it": "Pianificare milestone intermedie di verifica",
+        "en": "Plan intermediate verification milestones"
+    },
+    "define-phase-objectives": {
+        "it": "Definire chiaramente gli obiettivi di ogni fase",
+        "en": "Clearly define objectives for each phase"
+    },
+    "high-breakeven-time": {
+        "it": "Tempo di recupero investimento elevato ({0} mesi)",
+        "en": "High investment recovery time ({0} months)"
+    },
+    "consider-user-acquisition": {
+        "it": "Considerare strategie di acquisizione utenti più aggressive",
+        "en": "Consider more aggressive user acquisition strategies"
+    },
+    "evaluate-price-increase": {
+        "it": "Valutare un aumento del prezzo per utente",
+        "en": "Consider increasing price per user"
+    },
+    "low-upfront-ratio": {
+        "it": "Basso anticipo rispetto ai costi ({0}%)",
+        "en": "Low upfront payment relative to costs ({0}%)"
+    },
+    "negotiate-milestones": {
+        "it": "Negoziare pagamenti intermedi basati su milestone",
+        "en": "Negotiate intermediate payments based on milestones"
+    },
+    "revenue-balance-not-optimal": {
+        "it": "Bilanciamento ricavi non ottimale",
+        "en": "Revenue balance not optimal"
+    },
+    "consider-hybrid-pricing": {
+        "it": "Considerare un modello di pricing ibrido con setup fee",
+        "en": "Consider a hybrid pricing model with setup fee"
+    },
+    "high-user-variability": {
+        "it": "Alta variabilità nelle stime utenti (±{0}%)",
+        "en": "High variability in user estimates (±{0}%)"
+    },
+    "conduct-market-tests": {
+        "it": "Effettuare test di mercato preliminari",
+        "en": "Conduct preliminary market tests"
+    },
+    "commissioned-recurring-warning": {
+        "it": "Il progetto è commissionato ma include ricavi ricorrenti. Valutare se ha senso per questo tipo di progetto",
+        "en": "The project is commissioned but includes recurring revenue. Evaluate if this makes sense for this type of project"
+    },
+    "consider-one-time-payment": {
+        "it": "Considerare un modello di pricing basato su pagamento unico invece che ricorrente",
+        "en": "Consider a one-time payment pricing model instead of recurring"
+    },
+    "low-user-base": {
+        "it": "Base utenti iniziale sotto la soglia ottimale di {0} utenti ({1} utenti)",
+        "en": "Initial user base below optimal threshold of {0} users ({1} users)"
+    },
+    "project-loss": {
+        "it": "Progetto in perdita ({0}% di margine negativo)",
+        "en": "Project at a loss ({0}% negative margin)"
+    },
+    "review-costs-revenues": {
+        "it": "Rivedere urgentemente i costi e/o aumentare i ricavi",
+        "en": "Urgently review costs and/or increase revenues"
+    },
+    "consider-contract-renegotiation": {
+        "it": "Considerare la rinegoziazione del contratto",
+        "en": "Consider contract renegotiation"
+    },
+    "very-low-margin": {
+        "it": "Margine molto basso ({0}%)",
+        "en": "Very low margin ({0}%)"
+    },
+    "identify-cost-optimization": {
+        "it": "Identificare opportunità di ottimizzazione dei costi",
+        "en": "Identify cost optimization opportunities"
+    },
+    "evaluate-revenue-increase": {
+        "it": "Valutare possibili aumenti dei ricavi",
+        "en": "Evaluate possible revenue increases"
+    },
+    "below-average-margin": {
+        "it": "Margine sotto la media ({0}%)",
+        "en": "Below average margin ({0}%)"
+    },
+    "monitor-costs": {
+        "it": "Monitorare attentamente i costi durante l'esecuzione",
+        "en": "Carefully monitor costs during execution"
+    },
+    "ai-config-load-error": {
+        "it": "Errore nel caricamento della configurazione AI",
+        "en": "Error loading AI configuration"
+    },
+    "ai-config-save-error": {
+        "it": "Errore nel salvataggio della configurazione AI",
+        "en": "Error saving AI configuration"
+    },
+    "ai-analysis-error": {
+        "it": "Si è verificato un errore durante l'analisi. Riprova più tardi.",
+        "en": "An error occurred during analysis. Please try again later."
+    },
+    "roi-excellent": {
+        "it": "Eccellente ritorno sull'investimento",
+        "en": "Excellent return on investment"
+    },
+    "roi-good": {
+        "it": "Buon ritorno sull'investimento",
+        "en": "Good return on investment"
+    },
+    "roi-moderate": {
+        "it": "Ritorno sull'investimento moderato",
+        "en": "Moderate return on investment"
+    },
+    "roi-low": {
+        "it": "Ritorno sull'investimento basso",
+        "en": "Low return on investment"
+    },
+    "roi-loss": {
+        "it": "Investimento in perdita",
+        "en": "Investment at a loss"
+    },
+    "project-loss-warning": {
+        "it": "⚠️ Il progetto è in perdita",
+        "en": "⚠️ The project is at a loss"
+    },
+    "project-loss-detail": {
+        "it": "Con un ROI negativo del {0}%, si consiglia di rivedere la struttura dei costi o aumentare i ricavi.",
+        "en": "With a negative ROI of {0}%, it is recommended to review the cost structure or increase revenues."
+    },
+    "high-breakeven-warning": {
+        "it": "⚠️ Tempo di pareggio elevato",
+        "en": "⚠️ High breakeven time"
+    },
+    "high-breakeven-detail": {
+        "it": "Il progetto richiederà {0} mesi per raggiungere il break-even. Considerare strategie per accelerare il ritorno dell'investimento.",
+        "en": "The project will require {0} months to reach break-even. Consider strategies to accelerate investment return."
+    },
+    "excellent-profitability": {
+        "it": "✓ Redditività eccellente",
+        "en": "✓ Excellent profitability"
+    },
+    "excellent-profitability-detail": {
+        "it": "Con un ROI del {0}% il progetto mostra ottime prospettive di ritorno economico.",
+        "en": "With a ROI of {0}% the project shows excellent economic return prospects."
+    },
+    "good-profitability": {
+        "it": "✓ Buona redditività",
+        "en": "✓ Good profitability"
+    },
+    "good-profitability-detail": {
+        "it": "Con un ROI del {0}% il progetto mostra buone prospettive di ritorno economico.",
+        "en": "With a ROI of {0}% the project shows good economic return prospects."
+    },
+    "moderate-profitability": {
+        "it": "ℹ️ Redditività moderata",
+        "en": "ℹ️ Moderate profitability"
+    },
+    "moderate-profitability-detail": {
+        "it": "Il ROI del {0}% indica un progetto con discrete prospettive di ritorno.",
+        "en": "The ROI of {0}% indicates a project with fair return prospects."
+    },
+    "low-profitability": {
+        "it": "⚠️ Redditività bassa",
+        "en": "⚠️ Low profitability"
+    },
+    "low-profitability-detail": {
+        "it": "Il ROI del {0}% indica margini di guadagno limitati. Valutare possibili ottimizzazioni.",
+        "en": "The ROI of {0}% indicates limited profit margins. Consider possible optimizations."
+    },
+    "critical-profitability": {
+        "it": "⚠️ Redditività critica",
+        "en": "⚠️ Critical profitability"
+    },
+    "critical-profitability-detail": {
+        "it": "Il ROI del {0}% è molto basso. Si consiglia di rivedere attentamente il modello di business.",
+        "en": "The ROI of {0}% is very low. It is recommended to carefully review the business model."
+    },
+    "timeline": {
+        "it": "⏱️ Timeline",
+        "en": "⏱️ Timeline"
+    },
+    "long-development": {
+        "it": "La durata dello sviluppo ({0} settimane) è significativa. Assicurati di pianificare attentamente il lavoro per evitare ritardi.",
+        "en": "The development duration ({0} weeks) is significant. Make sure to carefully plan the work to avoid delays."
+    },
+    "short-development": {
+        "it": "La stima di {0} settimane potrebbe essere ottimistica. Verificare attentamente la pianificazione.",
+        "en": "The estimate of {0} weeks might be optimistic. Carefully verify the planning."
+    },
+    "resource-saturation-risk": {
+        "it": "⚠️ Rischio saturazione risorse",
+        "en": "⚠️ Resource saturation risk"
+    },
+    "resource-saturation-detail": {
+        "it": "L'occupazione al {0}% potrebbe causare ritardi e stress del team. Considerare l'aggiunta di risorse o una redistribuzione del carico.",
+        "en": "The {0}% occupation might cause delays and team stress. Consider adding resources or redistributing the workload."
+    },
+    "low-allocation-warning": {
+        "it": "⚠️ Bassa allocazione",
+        "en": "⚠️ Low allocation"
+    },
+    "low-allocation-detail": {
+        "it": "Un'occupazione al {0}% potrebbe indicare scarsa priorità o rischi di dilatazione dei tempi.",
+        "en": "A {0}% occupation might indicate low priority or risks of time dilation."
+    },
+    "payment-structure": {
+        "it": "💰 Struttura pagamenti",
+        "en": "💰 Payment structure"
+    },
+    "low-upfront-detail": {
+        "it": "L'anticipo è basso ({0}%). Considerare milestone intermedie per migliorare il flusso di cassa.",
+        "en": "The upfront payment is low ({0}%). Consider intermediate milestones to improve cash flow."
+    },
+    "revenue-mix": {
+        "it": "📈 Mix ricavi",
+        "en": "📈 Revenue mix"
+    },
+    "low-recurring-revenue": {
+        "it": "I ricavi ricorrenti sono bassi rispetto ai pagamenti una tantum. Valutare strategie per aumentare il valore ricorrente.",
+        "en": "Recurring revenues are low compared to one-time payments. Consider strategies to increase recurring value."
+    },
+    "storage-save-error": {
+        "it": "Errore nel salvataggio di {0}",
+        "en": "Error saving {0}"
+    },
+    "storage-load-error": {
+        "it": "Errore nel caricamento di {0}",
+        "en": "Error loading {0}"
+    },
+    "currency-format-error": {
+        "it": "Errore nella formattazione della valuta",
+        "en": "Error formatting currency"
+    },
+    "translations-load-error": {
+        "it": "Errore nel caricamento delle traduzioni",
+        "en": "Error loading translations"
+    }
+}

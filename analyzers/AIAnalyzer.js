@@ -1,3 +1,5 @@
+import { __ } from '../utils/I18n.js';
+
 export class AIAnalyzer {
     constructor(analyzer) {
         this.analyzer = analyzer;
@@ -66,7 +68,7 @@ export class AIAnalyzer {
             }
 
         } catch (e) {
-            console.error('Errore nel caricamento della configurazione AI:', e);
+            console.error(__('ai-config-load-error'), e);
         }
     }
 
@@ -83,7 +85,7 @@ export class AIAnalyzer {
             localStorage.setItem('aiConfig', JSON.stringify(config));
             this.validateAndUpdateButton();
         } catch (e) {
-            console.error('Errore nel salvataggio della configurazione AI:', e);
+            console.error(__('ai-config-save-error'), e);
         }
     }
 
@@ -118,7 +120,7 @@ export class AIAnalyzer {
             const config = this.getProviderConfig(provider);
             const data = this.prepareAnalysisData();
 
-            const response = await fetch('/api/analyze', {
+            const response = await fetch('ai.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -133,8 +135,8 @@ export class AIAnalyzer {
             const result = await response.json();
             this.showResult(result);
         } catch (e) {
-            this.showError('Si è verificato un errore durante l\'analisi. Riprova più tardi.');
-            console.error('Errore nell\'analisi AI:', e);
+            this.showError(__('ai-analysis-error'));
+            console.error(__('ai-analysis-error'), e);
         } finally {
             this.isAnalyzing = false;
             this.updateUIState(false);

@@ -1,4 +1,5 @@
 import { CONFIG } from '../config.js';
+import { __ } from '../utils/I18n.js';
 
 export class RiskAnalyzer {
     constructor(inputs, costs) {
@@ -35,8 +36,8 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > RISK_THRESHOLD) {
-            this.details.push(`Alto rischio di saturazione team (${this.inputs.devOccupation}% occupazione)`);
-            this.mitigations.push('Considerare l\'aggiunta di risorse al team');
+            this.details.push(__('high-team-saturation', this.inputs.devOccupation));
+            this.mitigations.push(__('add-team-resources'));
         }
     }
 
@@ -55,14 +56,14 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > HIGH_RISK) {
-            this.details.push(`Durata progetto critica (${this.inputs.devWeeks} settimane)`);
-            this.mitigations.push('Suddividere il progetto in fasi indipendenti');
-            this.mitigations.push('Implementare un approccio incrementale con rilasci frequenti');
-            this.mitigations.push('Aumentare la frequenza delle verifiche con il cliente');
+            this.details.push(__('critical-project-duration', this.inputs.devWeeks));
+            this.mitigations.push(__('split-project-phases'));
+            this.mitigations.push(__('implement-incremental'));
+            this.mitigations.push(__('increase-client-checks'));
         } else if (risk > MEDIUM_RISK) {
-            this.details.push(`Durata progetto elevata (${this.inputs.devWeeks} settimane)`);
-            this.mitigations.push('Pianificare milestone intermedie di verifica');
-            this.mitigations.push('Definire chiaramente gli obiettivi di ogni fase');
+            this.details.push(__('high-project-duration', this.inputs.devWeeks));
+            this.mitigations.push(__('plan-milestones'));
+            this.mitigations.push(__('define-phase-objectives'));
         }
     }
 
@@ -91,9 +92,9 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > RISK_THRESHOLD) {
-            this.details.push(`Tempo di recupero investimento elevato (${Math.round(monthsToBreakeven)} mesi)`);
-            this.mitigations.push('Considerare strategie di acquisizione utenti più aggressive');
-            this.mitigations.push('Valutare un aumento del prezzo per utente');
+            this.details.push(__('high-breakeven-time', Math.round(monthsToBreakeven)));
+            this.mitigations.push(__('consider-user-acquisition'));
+            this.mitigations.push(__('evaluate-price-increase'));
         }
     }
 
@@ -108,8 +109,8 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > RISK_THRESHOLD) {
-            this.details.push(`Basso anticipo rispetto ai costi (${(upfrontRatio * 100).toFixed(1)}%)`);
-            this.mitigations.push('Negoziare pagamenti intermedi basati su milestone');
+            this.details.push(__('low-upfront-ratio', (upfrontRatio * 100).toFixed(1)));
+            this.mitigations.push(__('negotiate-milestones'));
         }
     }
 
@@ -128,8 +129,8 @@ export class RiskAnalyzer {
         this.riskScore += totalRisk;
 
         if (upfrontRisk > RISK_THRESHOLD || recurringRisk > RISK_THRESHOLD) {
-            this.details.push('Bilanciamento ricavi non ottimale');
-            this.mitigations.push('Considerare un modello di pricing ibrido con setup fee');
+            this.details.push(__('revenue-balance-not-optimal'));
+            this.mitigations.push(__('consider-hybrid-pricing'));
         }
     }
 
@@ -145,8 +146,8 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > RISK_THRESHOLD) {
-            this.details.push(`Alta variabilità nelle stime utenti (±${(userVariability * 100).toFixed(1)}%)`);
-            this.mitigations.push('Effettuare test di mercato preliminari');
+            this.details.push(__('high-user-variability', (userVariability * 100).toFixed(1)));
+            this.mitigations.push(__('conduct-market-tests'));
         }
     }
 
@@ -157,8 +158,8 @@ export class RiskAnalyzer {
 
         if (this.inputs.businessModel === 'commissioned') {
             if (this.inputs.recurringRevenue > 0) {
-                this.details.push('Il progetto è commissionato ma include ricavi ricorrenti. Valutare se ha senso per questo tipo di progetto');
-                this.mitigations.push('Considerare un modello di pricing basato su pagamento unico invece che ricorrente');
+                this.details.push(__('commissioned-recurring-warning'));
+                this.mitigations.push(__('consider-one-time-payment'));
                 this.riskScore += BASE_RISK_COMMISSIONED;
             }
             return;
@@ -176,7 +177,7 @@ export class RiskAnalyzer {
         this.riskScore += risk;
 
         if (risk > RISK_THRESHOLD) {
-            this.details.push(`Base utenti iniziale sotto la soglia ottimale di ${THRESHOLDS.low} utenti (${expectedUsers} utenti)`);
+            this.details.push(__('low-user-base', THRESHOLDS.low, expectedUsers));
         }
     }
 
@@ -190,31 +191,28 @@ export class RiskAnalyzer {
         let risk = 0;
 
         if (margin < 0) {
-            // Progetto in perdita
-            risk = 35; // Rischio molto alto
-            this.details.push(`Progetto in perdita (${marginPercentage.toFixed(1)}% di margine negativo)`);
-            this.mitigations.push('Rivedere urgentemente i costi e/o aumentare i ricavi');
-            this.mitigations.push('Considerare la rinegoziazione del contratto');
+            risk = 35;
+            this.details.push(__('project-loss', marginPercentage.toFixed(1)));
+            this.mitigations.push(__('review-costs-revenues'));
+            this.mitigations.push(__('consider-contract-renegotiation'));
         } else if (marginPercentage < 15) {
-            // Margine basso
-            risk = 25; // Rischio alto
-            this.details.push(`Margine molto basso (${marginPercentage.toFixed(1)}%)`);
-            this.mitigations.push('Identificare opportunità di ottimizzazione dei costi');
-            this.mitigations.push('Valutare possibili aumenti dei ricavi');
+            risk = 25;
+            this.details.push(__('very-low-margin', marginPercentage.toFixed(1)));
+            this.mitigations.push(__('identify-cost-optimization'));
+            this.mitigations.push(__('evaluate-revenue-increase'));
         } else if (marginPercentage < 30) {
-            // Margine medio-basso
             risk = 15;
-            this.details.push(`Margine sotto la media (${marginPercentage.toFixed(1)}%)`);
-            this.mitigations.push('Monitorare attentamente i costi durante l\'esecuzione');
+            this.details.push(__('below-average-margin', marginPercentage.toFixed(1)));
+            this.mitigations.push(__('monitor-costs'));
         }
 
         this.riskScore += risk;
     }
 
     determineRiskLevel() {
-        if (this.riskScore > CONFIG.RISK_THRESHOLDS.VERY_HIGH) return 'Molto Alto';
-        if (this.riskScore > CONFIG.RISK_THRESHOLDS.HIGH) return 'Alto';
-        if (this.riskScore > CONFIG.RISK_THRESHOLDS.MEDIUM) return 'Medio';
-        return 'Basso';
+        if (this.riskScore > CONFIG.RISK_THRESHOLDS.VERY_HIGH) return __('risk-level-very-high');
+        if (this.riskScore > CONFIG.RISK_THRESHOLDS.HIGH) return __('risk-level-high');
+        if (this.riskScore > CONFIG.RISK_THRESHOLDS.MEDIUM) return __('risk-level-medium');
+        return __('risk-level-low');
     }
 }

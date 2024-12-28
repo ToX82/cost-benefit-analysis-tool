@@ -1,17 +1,18 @@
 import { CONFIG } from '../config.js';
+import { __ } from '../utils/I18n.js';
 
 export class EvaluationManager {
     static getROIEvaluation(roiPercentage) {
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.EXCELLENT) {
-            return 'Eccellente ritorno sull\'investimento';
+            return __('roi-excellent');
         } else if (roiPercentage >= CONFIG.ROI_THRESHOLDS.GOOD) {
-            return 'Buon ritorno sull\'investimento';
+            return __('roi-good');
         } else if (roiPercentage >= CONFIG.ROI_THRESHOLDS.MODERATE) {
-            return 'Ritorno sull\'investimento moderato';
+            return __('roi-moderate');
         } else if (roiPercentage >= CONFIG.ROI_THRESHOLDS.LOW) {
-            return 'Ritorno sull\'investimento basso';
+            return __('roi-low');
         }
-        return 'Investimento in perdita';
+        return __('roi-loss');
     }
 
     static addOverallEvaluation(evaluation, roi, breakeven, inputs) {
@@ -30,75 +31,64 @@ export class EvaluationManager {
         const roiPercentage = roi.base.percentage;
 
         if (roiValue <= 0) {
-            return `<span class="text-red-600 font-semibold">⚠️ Il progetto è in perdita</span>.
-                    Con un ROI negativo del ${roiPercentage.toFixed(1)}%, si consiglia di rivedere
-                    la struttura dei costi o aumentare i ricavi.`;
+            return `<span class="text-red-600 font-semibold">${__('project-loss-warning')}</span>.
+                    ${__('project-loss-detail', roiPercentage.toFixed(1))}`;
         }
 
         if (breakeven > 24) {
-            return `<span class="text-yellow-600 font-semibold">⚠️ Tempo di pareggio elevato</span>.
-                    Il progetto richiederà ${Math.ceil(breakeven)} mesi per raggiungere il break-even.
-                    Considerare strategie per accelerare il ritorno dell'investimento.`;
+            return `<span class="text-yellow-600 font-semibold">${__('high-breakeven-warning')}</span>.
+                    ${__('high-breakeven-detail', Math.ceil(breakeven))}`;
         }
 
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.EXCELLENT) {
-            return `<span class="text-green-600 font-semibold">✓ Redditività eccellente</span>.
-                    Con un ROI del ${roiPercentage.toFixed(1)}% il progetto mostra ottime prospettive
-                    di ritorno economico.`;
+            return `<span class="text-green-600 font-semibold">${__('excellent-profitability')}</span>.
+                    ${__('excellent-profitability-detail', roiPercentage.toFixed(1))}`;
         }
 
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.GOOD) {
-            return `<span class="text-green-600 font-semibold">✓ Buona redditività</span>.
-                    Con un ROI del ${roiPercentage.toFixed(1)}% il progetto mostra buone
-                    prospettive di ritorno economico.`;
+            return `<span class="text-green-600 font-semibold">${__('good-profitability')}</span>.
+                    ${__('good-profitability-detail', roiPercentage.toFixed(1))}`;
         }
 
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.MODERATE) {
-            return `<span class="text-blue-600 font-semibold">ℹ️ Redditività moderata</span>.
-                    Il ROI del ${roiPercentage.toFixed(1)}% indica un progetto con discrete
-                    prospettive di ritorno.`;
+            return `<span class="text-blue-600 font-semibold">${__('moderate-profitability')}</span>.
+                    ${__('moderate-profitability-detail', roiPercentage.toFixed(1))}`;
         }
 
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.LOW) {
-            return `<span class="text-yellow-600 font-semibold">⚠️ Redditività bassa</span>.
-                    Il ROI del ${roiPercentage.toFixed(1)}% indica margini di guadagno limitati.
-                    Valutare possibili ottimizzazioni.`;
+            return `<span class="text-yellow-600 font-semibold">${__('low-profitability')}</span>.
+                    ${__('low-profitability-detail', roiPercentage.toFixed(1))}`;
         }
 
-        return `<span class="text-red-600 font-semibold">⚠️ Redditività critica</span>.
-                Il ROI del ${roiPercentage.toFixed(1)}% è molto basso.
-                Si consiglia di rivedere attentamente il modello di business.`;
+        return `<span class="text-red-600 font-semibold">${__('critical-profitability')}</span>.
+                ${__('critical-profitability-detail', roiPercentage.toFixed(1))}`;
     }
 
     static evaluateTimeline(inputs) {
         const warnings = [];
 
         if (inputs.devWeeks > 16) {
-            warnings.push(`La durata dello sviluppo (${inputs.devWeeks} settimane) è significativa.
-                         Assicurati di pianificare attentamente il lavoro per evitare ritardi.`);
+            warnings.push(__('long-development', inputs.devWeeks));
         }
 
         if (inputs.devWeeks < 4) {
-            warnings.push(`La stima di ${inputs.devWeeks} settimane potrebbe essere ottimistica.
-                         Verificare attentamente la pianificazione.`);
+            warnings.push(__('short-development', inputs.devWeeks));
         }
 
         return warnings.length ?
-            `<span class="text-yellow-600 font-semibold">⏱️ Timeline:</span><br>` +
+            `<span class="text-yellow-600 font-semibold">${__('timeline')}:</span><br>` +
             warnings.join('<br>') : '';
     }
 
     static evaluateResources(inputs) {
         if (inputs.devOccupation > 80) {
-            return `<span class="text-red-600 font-semibold">⚠️ Rischio saturazione risorse</span>.
-                    L'occupazione al ${inputs.devOccupation}% potrebbe causare ritardi e stress del team.
-                    Considerare l'aggiunta di risorse o una redistribuzione del carico.`;
+            return `<span class="text-red-600 font-semibold">${__('resource-saturation-risk')}</span>.
+                    ${__('resource-saturation-detail', inputs.devOccupation)}`;
         }
 
         if (inputs.devOccupation < 30) {
-            return `<span class="text-yellow-600 font-semibold">⚠️ Bassa allocazione</span>.
-                    Un'occupazione al ${inputs.devOccupation}% potrebbe indicare scarsa priorità
-                    o rischi di dilatazione dei tempi.`;
+            return `<span class="text-yellow-600 font-semibold">${__('low-allocation-warning')}</span>.
+                    ${__('low-allocation-detail', inputs.devOccupation)}`;
         }
 
         return '';
@@ -109,18 +99,16 @@ export class EvaluationManager {
             const upfrontRatio = inputs.upfrontPayment / (inputs.directCosts + inputs.indirectCosts);
 
             if (upfrontRatio < 0.3) {
-                return `<span class="text-yellow-600 font-semibold">💰 Struttura pagamenti</span>:
-                        L'anticipo è basso (${(upfrontRatio * 100).toFixed(1)}%).
-                        Considerare milestone intermedie per migliorare il flusso di cassa.`;
+                return `<span class="text-yellow-600 font-semibold">${__('payment-structure')}</span>:
+                        ${__('low-upfront-detail', (upfrontRatio * 100).toFixed(1))}`;
             }
         } else {
             const recurringRatio = (inputs.recurringRevenue * inputs.expectedUsers * 12) /
                                  (inputs.upfrontPayment + inputs.finalPayment);
 
             if (recurringRatio < 0.5) {
-                return `<span class="text-yellow-600 font-semibold">📈 Mix ricavi</span>:
-                        I ricavi ricorrenti sono bassi rispetto ai pagamenti una tantum.
-                        Valutare strategie per aumentare il valore ricorrente.`;
+                return `<span class="text-yellow-600 font-semibold">${__('revenue-mix')}</span>:
+                        ${__('low-recurring-revenue')}`;
             }
         }
 

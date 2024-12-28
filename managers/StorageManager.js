@@ -1,3 +1,5 @@
+import { __ } from '../utils/I18n.js';
+
 export class StorageManager {
     static saveToStorage() {
         const inputs = document.querySelectorAll('input, select');
@@ -5,7 +7,7 @@ export class StorageManager {
             try {
                 localStorage.setItem(input.id, input.value);
             } catch (e) {
-                console.error(`Errore nel salvataggio di ${input.id}:`, e);
+                console.error(__('storage-save-error', input.id), e);
             }
         });
     }
@@ -19,7 +21,7 @@ export class StorageManager {
                     input.value = savedValue;
                 }
             } catch (e) {
-                console.error(`Errore nel caricamento di ${input.id}:`, e);
+                console.error(__('storage-load-error', input.id), e);
             }
         });
     }

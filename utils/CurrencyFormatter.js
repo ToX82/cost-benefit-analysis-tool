@@ -1,3 +1,5 @@
+import { __ } from './I18n.js';
+
 export class CurrencyFormatter {
     static format(value) {
         try {
@@ -6,7 +8,7 @@ export class CurrencyFormatter {
                 currency: 'EUR'
             }).format(value);
         } catch (e) {
-            console.error('Errore nella formattazione della valuta:', e);
+            console.error(__('currency-format-error'), e);
             return `€${value.toFixed(2)}`;
         }
     }

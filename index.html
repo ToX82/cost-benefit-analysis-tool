@@ -5,71 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strumento di Analisi Costi-Benefici</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
+
+    <style>
+    h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #4f46e5;
+        margin-top: 1rem;
+    }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen p-4">
     <div class="container mx-auto bg-white rounded-xl shadow-lg p-4 max-w-6xl">
         <h1 class="text-2xl font-bold mb-4 text-indigo-700 text-center">Strumento di Analisi Costi-Benefici</h1>
 
         <!-- Sezione di input -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="analysis-form">
             <!-- Costi -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="costs">
                 <h2 class="text-lg font-bold mb-2 text-indigo-600">Costi</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="business-model">Modello di Business<br><span class="text-xs text-gray-500">Seleziona il tipo di progetto</span></label>
-                    <select id="business-model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                    <select name="businessModel" id="business-model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
                         <option value="saas">SaaS</option>
                         <option value="commissioned">Commissionato</option>
                         <option value="mixed">Misto (SaaS + Commissionato)</option>
                     </select>
 
                     <label class="block text-sm font-medium text-gray-700" for="direct-costs">Costi Diretti (€)<br><span class="text-xs text-gray-500">Costi diretti come stipendi e licenze</span></label>
-                    <input type="number" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1000">
+                    <input type="number" name="directCosts" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1000">
 
-                    <label class="block text-sm font-medium text-gray-700" for="indirect-costs">Costi Indiretti su 12 mesi (€)<br><span class="text-xs text-gray-500">Spese per hardware, software, marketing</span></label>
-                    <input type="number" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 500">
+                    <label class="block text-sm font-medium text-gray-700" for="indirect-costs">Costi Indiretti su 12 mesi (€)<br><span class="text-xs text-gray-500">Altre spese non direttamente collegate allo sviluppo</span></label>
+                    <input type="number" name="indirectCosts" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 500">
                 </div>
             </div>
 
             <!-- Ricavi -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="revenues">
                 <h2 class="text-lg font-bold mb-2 text-indigo-600">Ricavi</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="upfront-payment">Pagamento Iniziale (€)<br><span class="text-xs text-gray-500">Anticipo alla firma del contratto</span></label>
-                    <input type="number" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 2000">
+                    <input type="number" name="upfrontPayment" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 2000">
 
                     <label class="block text-sm font-medium text-gray-700" for="final-payment">Pagamento a Saldo (€)<br><span class="text-xs text-gray-500">Saldo finale alla consegna del progetto</span></label>
-                    <input type="number" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 3000">
+                    <input type="number" name="finalPayment" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 3000">
 
                     <label class="block text-sm font-medium text-gray-700" for="recurring-revenue">Ricavo Mensile (€)<br><span class="text-xs text-gray-500">Canone mensile per utente</span></label>
-                    <input type="number" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
+                    <input type="number" name="recurringRevenue" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
                 </div>
             </div>
 
             <!-- Tempo e Risorse -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="resources">
                 <h2 class="text-lg font-bold mb-2 text-indigo-600">Tempo e Risorse</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="dev-weeks">Settimane Sviluppo<br><span class="text-xs text-gray-500">Durata dello sviluppo in settimane</span></label>
-                    <input type="number" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 8">
+                    <input type="number" name="devWeeks" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 8">
 
-                    <label class="block text-sm font-medium text-gray-700" for="dev-occupation">Occupazione (%)<br><span class="text-xs text-gray-500">Saturazione % dei programmatori</span></label>
-                    <input type="number" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 80" min="0" max="100" value="80">
+                    <label class="block text-sm font-medium text-gray-700" for="dev-occupation">Occupazione (%)<br><span class="text-xs text-gray-500">Saturazione % della forza lavoro</span></label>
+                    <input type="number" name="devOccupation" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 80" min="0" max="100" value="80">
                 </div>
             </div>
 
-            <!-- Utenti e Rischio -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600">Utenti e Rischio</h2>
+            <!-- Utenti previsti -->
+            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="users">
+                <h2 class="text-lg font-bold mb-2 text-indigo-600">Utenti previsti</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="expected-users">Utenti Previsti<br><span class="text-xs text-gray-500">Stima del numero di utenti del software</span></label>
-                    <input type="number" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
+                    <input type="number" name="expectedUsers" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 100">
 
                     <label class="block text-sm font-medium text-gray-700" for="optimistic-multiplier">Moltiplicatore Ottimistico<br><span class="text-xs text-gray-500">Scenario positivo per il numero di utenti</span></label>
-                    <input type="number" id="optimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1.2" value="1.2">
+                    <input type="number" name="optimisticMultiplier" id="optimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 1.2" value="1.2">
 
                     <label class="block text-sm font-medium text-gray-700" for="pessimistic-multiplier">Moltiplicatore Pessimistico<br><span class="text-xs text-gray-500">Scenario negativo per il numero di utenti</span></label>
-                    <input type="number" id="pessimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 0.8" value="0.8">
+                    <input type="number" name="pessimisticMultiplier" id="pessimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" placeholder="Es: 0.8" value="0.8">
                 </div>
             </div>
         </div>
@@ -77,19 +86,10 @@
         <!-- Sezione dei risultati -->
         <div class="mt-6">
             <h2 class="text-xl font-bold mb-3 text-indigo-700 text-center">Risultati dell'Analisi</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-100">
-                    <h3 class="text-lg font-bold text-green-700 mb-2">ROI su 12 mesi (Ritorno sull'Investimento)</h3>
-                    <div class="flex items-center gap-4">
-                        <div>
-                            <p id="roi" class="text-2xl font-bold text-green-600">€0.00</p>
-                            <p id="roi-evaluation" class="mt-1 text-sm text-gray-700"></p>
-                        </div>
-                        <div class="border-l border-green-200 pl-4">
-                            <p class="text-xs font-medium text-green-700">Rapporto Costi/Benefici</p>
-                            <p id="cost-benefit-ratio" class="text-xl font-bold text-green-600"></p>
-                        </div>
-                    </div>
+                    <h3 class="text-lg font-bold text-green-700 mb-2">ROI su 12 mesi</h3>
+                    <div id="roi" class="text-2xl font-bold text-green-600">€0.00</div>
                 </div>
 
                 <div class="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg shadow-sm border border-blue-100">
@@ -97,40 +97,120 @@
                     <p id="breakeven" class="text-2xl font-bold text-blue-600">0 mesi</p>
                 </div>
 
-                <div class="p-3 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg shadow-sm border border-purple-100">
-                    <h3 class="text-lg font-bold text-purple-700 mb-2">Scenari Utenti</h3>
-                    <p id="users-scenarios" class="text-sm text-gray-700"></p>
+                <div class="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-amber-100">
+                    <h3 class="text-lg font-bold text-amber-700 mb-2">Dettagli Finanziari</h3>
+                    <div class="text-sm space-y-1">
+                        <p>Costi: <span id="total-costs-detail" class="font-semibold">€0.00</span></p>
+                        <p>Ricavi diretti: <span id="direct-revenue-detail" class="font-semibold">€0.00</span></p>
+                        <p>Ricavi annuali ricorrenti: <span id="yearly-revenue-detail" class="font-semibold">€0.00</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valutazione Complessiva -->
+            <div class="mt-4 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-100">
+                <h3 class="text-lg font-bold text-indigo-700 mb-3">Valutazione Complessiva</h3>
+                <div id="overall-evaluation" class="prose prose-indigo max-w-none"></div>
+            </div>
+        </div>
+
+        <!-- Configurazione AI -->
+        <div class="mt-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+            <h2 class="text-lg font-bold mb-3 text-indigo-600">Configurazione AI</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700" for="ai-provider">
+                        Provider AI<br>
+                        <span class="text-xs text-gray-500">Seleziona il provider da utilizzare</span>
+                    </label>
+                    <select id="ai-provider"
+                            class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                        <option value="">Seleziona un provider</option>
+                        <option value="perplexity">Perplexity AI</option>
+                        <option value="openai">OpenAI</option>
+                    </select>
                 </div>
 
-                <div class="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-amber-100">
-                    <h3 class="text-lg font-bold text-amber-700 mb-2">Valutazione Complessiva</h3>
-                    <p id="overall-evaluation" class="text-sm text-gray-700"></p>
+                <!-- Configurazione Perplexity -->
+                <div id="perplexity-config" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="perplexity-key">
+                                Chiave API Perplexity<br>
+                                <span class="text-xs text-gray-500">La tua chiave API di Perplexity.ai</span>
+                            </label>
+                            <input type="password" id="perplexity-key"
+                                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                                   placeholder="Inserisci la tua chiave API">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="perplexity-model">
+                                Modello Perplexity<br>
+                                <span class="text-xs text-gray-500">Seleziona il modello da utilizzare</span>
+                            </label>
+                            <select id="perplexity-model"
+                                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                                <option value="" disabled selected>Seleziona un modello</option>
+                                <option value="llama-3.1-sonar-small-128k-online">llama-3.1-sonar-small-128k-online (Veloce)</option>
+                                <option value="llama-3.1-sonar-large-128k-online">llama-3.1-sonar-large-128k-online (Potente)</option>
+                                <option value="llama-3.1-sonar-huge-128k-online">llama-3.1-sonar-huge-128k-online (Molto potente)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurazione OpenAI -->
+                <div id="openai-config" class="hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="openai-key">
+                                Chiave API OpenAI<br>
+                                <span class="text-xs text-gray-500">La tua chiave API di OpenAI</span>
+                            </label>
+                            <input type="password" id="openai-key"
+                                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                                   placeholder="Inserisci la tua chiave API">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700" for="openai-model">
+                                Modello OpenAI<br>
+                                <span class="text-xs text-gray-500">Seleziona il modello da utilizzare</span>
+                            </label>
+                            <select id="openai-model"
+                                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
+                                <option value="" disabled selected>Seleziona un modello</option>
+                                <option value="gpt-4o-mini">gpt-4o-mini (Veloce)</option>
+                                <option value="chatgpt-4o-latest">gpt-4o (Potente)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sezione dettagli finanziari -->
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-3 bg-gradient-to-br from-red-50 to-pink-50 rounded-lg shadow-sm border border-red-100">
-                <h3 class="text-base font-bold text-red-700 mb-1">Totale Costi</h3>
-                <p id="total-costs-detail" class="text-xl font-bold text-red-600">€0.00</p>
-                <p class="text-xs text-gray-600">Include costi diretti e indiretti con fattore di occupazione</p>
+        <!-- Sezione Analisi AI -->
+        <div class="mt-6">
+            <div class="flex justify-center mb-4">
+                <button id="ai-analysis-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    <span>Richiedi analisi AI</span>
+                    <div id="ai-spinner" class="hidden">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                </button>
             </div>
 
-            <div class="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg shadow-sm border border-emerald-100">
-                <h3 class="text-base font-bold text-emerald-700 mb-1">Totale Ricavi Diretti</h3>
-                <p id="direct-revenue-detail" class="text-xl font-bold text-emerald-600">€0.00</p>
-                <p class="text-xs text-gray-600">Somma del pagamento iniziale e del saldo finale</p>
+            <div id="ai-analysis-section" class="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-100 hidden">
+                <h3 class="text-lg font-bold text-indigo-700 mb-2">Analisi AI</h3>
+                <div id="ai-error" class="text-red-600 text-sm mb-2 hidden"></div>
+                <div id="ai-result" class="text-gray-700 prose prose-indigo max-w-none"></div>
             </div>
-
-            <div class="p-3 bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg shadow-sm border border-violet-100">
-                <h3 class="text-base font-bold text-violet-700 mb-1">Proiezione Ricavi Annuali</h3>
-                <p id="yearly-revenue-detail" class="text-xl font-bold text-violet-600">€0.00</p>
-                <p class="text-xs text-gray-600">Ricavi mensili proiettati su 12 mesi</p>
-            </div>
-        </</div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@15/lib/marked.umd.min.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

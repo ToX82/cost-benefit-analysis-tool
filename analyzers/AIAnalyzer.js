@@ -5,167 +5,91 @@ export class AIAnalyzer {
         this.analyzer = analyzer;
         this.button = document.getElementById('ai-analysis-btn');
         this.spinner = document.getElementById('ai-spinner');
-        this.section = document.getElementById('ai-analysis-section');
-        this.error = document.getElementById('ai-error');
-        this.result = document.getElementById('ai-result');
         this.isAnalyzing = false;
-        this.lastAnalyzedData = null;
-
-        this.providerSelect = document.getElementById('ai-provider');
-        this.perplexityConfig = document.getElementById('perplexity-config');
-        this.openaiConfig = document.getElementById('openai-config');
-        this.perplexityKeyInput = document.getElementById('perplexity-key');
-        this.perplexityModelSelect = document.getElementById('perplexity-model');
-        this.openaiKeyInput = document.getElementById('openai-key');
-        this.openaiModelSelect = document.getElementById('openai-model');
 
         this.initializeEventListeners();
-        this.loadAIConfig();
-        this.validateAndUpdateButton();
     }
 
     initializeEventListeners() {
         this.button.addEventListener('click', () => this.requestAnalysis());
-
-        document.querySelectorAll('input, select').forEach(element => {
-            element.addEventListener('change', () => this.validateAndUpdateButton());
-        });
-
-        this.providerSelect.addEventListener('change', () => {
-            this.updateProviderConfig();
-            this.saveAIConfig();
-        });
-
-        [this.perplexityKeyInput, this.perplexityModelSelect,
-         this.openaiKeyInput, this.openaiModelSelect].forEach(element => {
-            element.addEventListener('change', () => this.saveAIConfig());
-        });
-    }
-
-    loadAIConfig() {
-        try {
-            const config = JSON.parse(localStorage.getItem('aiConfig') || '{}');
-
-            if (config.provider) {
-                this.providerSelect.value = config.provider;
-                this.updateProviderConfig();
-            }
-
-            if (config.perplexityKey) {
-                this.perplexityKeyInput.value = config.perplexityKey;
-            }
-
-            if (config.perplexityModel) {
-                this.perplexityModelSelect.value = config.perplexityModel;
-            }
-
-            if (config.openaiKey) {
-                this.openaiKeyInput.value = config.openaiKey;
-            }
-
-            if (config.openaiModel) {
-                this.openaiModelSelect.value = config.openaiModel;
-            }
-
-        } catch (e) {
-            console.error(__('ai-config-load-error'), e);
-        }
-    }
-
-    saveAIConfig() {
-        try {
-            const config = {
-                provider: this.providerSelect.value,
-                perplexityKey: this.perplexityKeyInput.value,
-                perplexityModel: this.perplexityModelSelect.value,
-                openaiKey: this.openaiKeyInput.value,
-                openaiModel: this.openaiModelSelect.value
-            };
-
-            localStorage.setItem('aiConfig', JSON.stringify(config));
-            this.validateAndUpdateButton();
-        } catch (e) {
-            console.error(__('ai-config-save-error'), e);
-        }
-    }
-
-    updateProviderConfig() {
-        const provider = this.providerSelect.value;
-        this.perplexityConfig.classList.toggle('hidden', provider !== 'perplexity');
-        this.openaiConfig.classList.toggle('hidden', provider !== 'openai');
-        this.validateAndUpdateButton();
-    }
-
-    validateAndUpdateButton() {
-        const provider = this.providerSelect.value;
-        let isValid = false;
-
-        if (provider === 'perplexity') {
-            isValid = this.perplexityKeyInput.value && this.perplexityModelSelect.value;
-        } else if (provider === 'openai') {
-            isValid = this.openaiKeyInput.value && this.openaiModelSelect.value;
-        }
-
-        this.button.disabled = !isValid || this.isAnalyzing;
     }
 
     async requestAnalysis() {
         if (this.isAnalyzing) return;
 
-        this.isAnalyzing = true;
-        this.updateUIState(true);
-
         try {
-            const provider = this.providerSelect.value;
-            const config = this.getProviderConfig(provider);
+            this.isAnalyzing = true;
+            this.updateUIState(true);
+
             const data = this.prepareAnalysisData();
+            const query = this.buildPerplexityQuery(data);
 
-            const response = await fetch('ai.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    provider,
-                    config,
-                    data
-                })
-            });
+            // Apri una nuova finestra con la richiesta GET a Perplexity
+            window.open(`https://www.perplexity.ai/?q=${encodeURIComponent(query)}`, '_blank');
 
-            const result = await response.json();
-            this.showResult(result);
-        } catch (e) {
-            this.showError(__('ai-analysis-error'));
-            console.error(__('ai-analysis-error'), e);
+        } catch (error) {
+            console.error('Errore durante l\'analisi AI:', error);
         } finally {
             this.isAnalyzing = false;
             this.updateUIState(false);
         }
     }
 
-    getProviderConfig(provider) {
-        if (provider === 'perplexity') {
-            return {
-                apiKey: this.perplexityKeyInput.value,
-                model: this.perplexityModelSelect.value
-            };
-        } else if (provider === 'openai') {
-            return {
-                apiKey: this.openaiKeyInput.value,
-                model: this.openaiModelSelect.value
-            };
-        }
-        return null;
+    buildPerplexityQuery(data) {
+        // Costruisci una query strutturata per l'analisi
+        let query = __('analyze-software-project') + '\n\n';
+
+        // Aggiungi informazioni sul modello di business
+        query += `${__('business-model')}: ${data.costs.businessModel.value}\n\n`;
+
+        // Aggiungi informazioni sui costi
+        query += __('costs').toUpperCase() + ':\n';
+        query += `- ${__('direct-costs')}: €${data.costs.directCosts.value}\n`;
+        query += `- ${__('indirect-costs')}: €${data.costs.indirectCosts.value}\n\n`;
+
+        // Aggiungi informazioni sui ricavi
+        query += __('revenues').toUpperCase() + ':\n';
+        query += `- ${__('upfront-payment')}: €${data.revenues.upfrontPayment.value}\n`;
+        query += `- ${__('final-payment')}: €${data.revenues.finalPayment.value}\n`;
+        query += `- ${__('recurring-revenue')}: €${data.revenues.recurringRevenue.value}\n\n`;
+
+        // Aggiungi informazioni sullo sviluppo
+        query += __('development').toUpperCase() + ':\n';
+        query += `- ${__('dev-weeks')}: ${data.resources.devWeeks.value}\n`;
+        query += `- ${__('dev-occupation')}: ${data.resources.devOccupation.value}%\n\n`;
+
+        // Aggiungi informazioni sugli utenti
+        query += __('users').toUpperCase() + ':\n';
+        query += `- ${__('expected-users')}: ${data.users.expectedUsers.value}\n`;
+        query += `- ${__('optimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.optimisticMultiplier.value)} ${__('users').toLowerCase()}\n`;
+        query += `- ${__('pessimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.pessimisticMultiplier.value)} ${__('users').toLowerCase()}\n\n`;
+
+        query += __('provide-detailed-analysis') + ':\n';
+        query += `1. ${__('economic-sustainability')}\n`;
+        query += `2. ${__('roi-analysis')}\n`;
+        query += `3. ${__('breakeven-estimate')}\n`;
+        query += `4. ${__('risks-and-mitigations')}\n`;
+        query += `5. ${__('cost-benefit-recommendations')}`;
+
+        return query;
     }
 
     prepareAnalysisData() {
-        // Raccogli tutti i dati necessari per l'analisi
-        const inputs = document.querySelectorAll('input, select');
+        const form = document.getElementById('analysis-form');
         const data = {};
 
-        inputs.forEach(input => {
-            if (input.type === 'password') return; // Salta i campi password
-            data[input.id] = input.value;
+        // Raggruppa i campi per categoria
+        form.querySelectorAll('[data-category]').forEach(category => {
+            const categoryName = category.dataset.category;
+            data[categoryName] = {};
+
+            category.querySelectorAll('input, select').forEach(field => {
+                const fieldName = field.name.replace(/[^a-zA-Z]/g, '');
+                data[categoryName][fieldName] = {
+                    value: field.type === 'number' ? parseFloat(field.value) || 0 : field.value,
+                    description: field.previousElementSibling?.firstChild?.textContent || field.name
+                };
+            });
         });
 
         return data;
@@ -174,38 +98,5 @@ export class AIAnalyzer {
     updateUIState(isLoading) {
         this.button.disabled = isLoading;
         this.spinner.classList.toggle('hidden', !isLoading);
-        if (!isLoading) {
-            this.validateAndUpdateButton();
-        }
-    }
-
-    showResult(result) {
-        this.error.classList.add('hidden');
-        this.section.classList.remove('hidden');
-
-        if (result.error) {
-            this.showError(result.error);
-            return;
-        }
-
-        const renderer = new marked.Renderer();
-
-        marked.setOptions({
-            renderer: renderer,
-            gfm: true,
-            breaks: true,
-        });
-
-        this.result.innerHTML = marked.parse(result.result);
-
-        this.lastAnalyzedData = null;
-        this.validateAndUpdateButton();
-    }
-
-    showError(message) {
-        this.error.textContent = message;
-        this.error.classList.remove('hidden');
-        this.section.classList.remove('hidden');
-        this.result.innerHTML = '';
     }
 }

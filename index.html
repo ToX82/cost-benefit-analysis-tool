@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="tool-title">Strumento di Analisi Costi-Benefici</title>
+    <title data-i18n="tool-title">Cost-Benefit Analysis Tool</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
 
     <style>
@@ -17,215 +17,141 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen p-4">
     <div class="container mx-auto bg-white rounded-xl shadow-lg p-4 max-w-6xl">
-        <h1 class="text-2xl font-bold mb-4 text-indigo-700 text-center" data-i18n="tool-title">Strumento di Analisi Costi-Benefici</h1>
+        <h1 class="text-2xl font-bold mb-4 text-indigo-700 text-center" data-i18n="tool-title">Cost-Benefit Analysis Tool</h1>
 
-        <!-- Sezione di input -->
+        <!-- Input Section -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="analysis-form">
-            <!-- Costi -->
+            <!-- Costs -->
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="costs">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="costs">Costi</h2>
+                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="costs">Costs</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="business-model">
-                        <span data-i18n="business-model">Modello di Business</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="select-project-type">Seleziona il tipo di progetto</span>
+                        <span data-i18n="business-model">Business Model</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="select-project-type">Select project type</span>
                     </label>
                     <select name="businessModel" id="business-model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
                         <option value="saas" data-i18n="saas">SaaS</option>
-                        <option value="commissioned" data-i18n="commissioned">Commissionato</option>
-                        <option value="mixed" data-i18n="mixed">Misto (SaaS + Commissionato)</option>
+                        <option value="commissioned" data-i18n="commissioned">Commissioned</option>
+                        <option value="mixed" data-i18n="mixed">Mixed (SaaS + Commissioned)</option>
                     </select>
 
                     <label class="block text-sm font-medium text-gray-700" for="direct-costs">
-                        <span data-i18n="direct-costs">Costi Diretti (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="direct-costs-help">Costi diretti come stipendi e licenze</span>
+                        <span data-i18n="direct-costs">Direct Costs (€)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="direct-costs-help">Direct costs like salaries and licenses</span>
                     </label>
-                    <input type="number" name="directCosts" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-1000" placeholder="Es: 1000">
+                    <input type="number" name="directCosts" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-1000" placeholder="Ex: 1000">
 
                     <label class="block text-sm font-medium text-gray-700" for="indirect-costs">
-                        <span data-i18n="indirect-costs">Costi Indiretti su 12 mesi (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="indirect-costs-help">Altre spese non direttamente collegate allo sviluppo</span>
+                        <span data-i18n="indirect-costs">Indirect Costs over 12 months (€)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="indirect-costs-help">Other expenses not directly related to development</span>
                     </label>
-                    <input type="number" name="indirectCosts" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-500" placeholder="Es: 500">
+                    <input type="number" name="indirectCosts" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-500" placeholder="Ex: 500">
                 </div>
             </div>
 
-            <!-- Ricavi -->
+            <!-- Revenues -->
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="revenues">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="revenues">Ricavi</h2>
+                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="revenues">Revenues</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="upfront-payment">
-                        <span data-i18n="upfront-payment">Pagamento Iniziale (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="upfront-payment-help">Anticipo alla firma del contratto</span>
+                        <span data-i18n="upfront-payment">Upfront Payment (€)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="upfront-payment-help">Advance payment at contract signing</span>
                     </label>
-                    <input type="number" name="upfrontPayment" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-2000" placeholder="Es: 2000">
+                    <input type="number" name="upfrontPayment" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-2000" placeholder="Ex: 2000">
 
                     <label class="block text-sm font-medium text-gray-700" for="final-payment">
-                        <span data-i18n="final-payment">Pagamento a Saldo (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="final-payment-help">Saldo finale alla consegna del progetto</span>
+                        <span data-i18n="final-payment">Final Payment (€)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="final-payment-help">Final balance at project delivery</span>
                     </label>
-                    <input type="number" name="finalPayment" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-3000" placeholder="Es: 3000">
+                    <input type="number" name="finalPayment" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-3000" placeholder="Ex: 3000">
 
                     <label class="block text-sm font-medium text-gray-700" for="recurring-revenue">
-                        <span data-i18n="recurring-revenue">Ricavo Mensile (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="recurring-revenue-help">Canone mensile per utente</span>
+                        <span data-i18n="recurring-revenue">Monthly Revenue (€)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="recurring-revenue-help">Monthly fee per user</span>
                     </label>
-                    <input type="number" name="recurringRevenue" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Es: 100">
+                    <input type="number" name="recurringRevenue" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Ex: 100">
                 </div>
             </div>
 
-            <!-- Tempo e Risorse -->
+            <!-- Time and Resources -->
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="resources">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="time-resources">Tempo e Risorse</h2>
+                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="time-resources">Time and Resources</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="dev-weeks">
-                        <span data-i18n="dev-weeks">Settimane Sviluppo</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="dev-weeks-help">Durata dello sviluppo in settimane</span>
+                        <span data-i18n="dev-weeks">Development Weeks</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="dev-weeks-help">Development duration in weeks</span>
                     </label>
-                    <input type="number" name="devWeeks" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-8" placeholder="Es: 8">
+                    <input type="number" name="devWeeks" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-8" placeholder="Ex: 8">
 
                     <label class="block text-sm font-medium text-gray-700" for="dev-occupation">
-                        <span data-i18n="dev-occupation">Occupazione (%)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="dev-occupation-help">Saturazione % della forza lavoro</span>
+                        <span data-i18n="dev-occupation">Occupation (%)</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="dev-occupation-help">Workforce saturation %</span>
                     </label>
-                    <input type="number" name="devOccupation" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-80" placeholder="Es: 80" min="0" max="100" value="80">
+                    <input type="number" name="devOccupation" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-80" placeholder="Ex: 80" min="0" max="100" value="80">
                 </div>
             </div>
 
-            <!-- Utenti previsti -->
+            <!-- Expected Users -->
             <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="users">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="expected-users-title">Utenti previsti</h2>
+                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="expected-users-title">Expected Users</h2>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="expected-users">
-                        <span data-i18n="expected-users">Utenti Previsti</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="expected-users-help">Stima del numero di utenti del software</span>
+                        <span data-i18n="expected-users">Expected Users</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="expected-users-help">Estimated number of software users</span>
                     </label>
-                    <input type="number" name="expectedUsers" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Es: 100">
+                    <input type="number" name="expectedUsers" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Ex: 100">
 
                     <label class="block text-sm font-medium text-gray-700" for="optimistic-multiplier">
-                        <span data-i18n="optimistic-multiplier">Moltiplicatore Ottimistico</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="optimistic-multiplier-help">Scenario positivo per il numero di utenti</span>
+                        <span data-i18n="optimistic-multiplier">Optimistic Multiplier</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="optimistic-multiplier-help">Positive scenario for number of users</span>
                     </label>
-                    <input type="number" name="optimisticMultiplier" id="optimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-1.2" placeholder="Es: 1.2" value="1.2">
+                    <input type="number" name="optimisticMultiplier" id="optimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-1.2" placeholder="Ex: 1.2" value="1.2">
 
                     <label class="block text-sm font-medium text-gray-700" for="pessimistic-multiplier">
-                        <span data-i18n="pessimistic-multiplier">Moltiplicatore Pessimistico</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="pessimistic-multiplier-help">Scenario negativo per il numero di utenti</span>
+                        <span data-i18n="pessimistic-multiplier">Pessimistic Multiplier</span><br>
+                        <span class="text-xs text-gray-500" data-i18n="pessimistic-multiplier-help">Negative scenario for number of users</span>
                     </label>
-                    <input type="number" name="pessimisticMultiplier" id="pessimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-0.8" placeholder="Es: 0.8" value="0.8">
+                    <input type="number" name="pessimisticMultiplier" id="pessimistic-multiplier" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-0.8" placeholder="Ex: 0.8" value="0.8">
                 </div>
             </div>
         </div>
 
-        <!-- Sezione dei risultati -->
+        <!-- Results Section -->
         <div class="mt-6">
-            <h2 class="text-xl font-bold mb-3 text-indigo-700 text-center" data-i18n="analysis-results">Risultati dell'Analisi</h2>
+            <h2 class="text-xl font-bold mb-3 text-indigo-700 text-center" data-i18n="analysis-results">Analysis Results</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-100">
-                    <h3 class="text-lg font-bold text-green-700 mb-2" data-i18n="roi-12-months">ROI su 12 mesi</h3>
+                    <h3 class="text-lg font-bold text-green-700 mb-2" data-i18n="roi-12-months">12-month ROI</h3>
                     <div id="roi" class="text-2xl font-bold text-green-600">€0.00</div>
                 </div>
 
                 <div class="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg shadow-sm border border-blue-100">
-                    <h3 class="text-lg font-bold text-blue-700 mb-2" data-i18n="breakeven-time">Tempo di Pareggio</h3>
-                    <p id="breakeven" class="text-2xl font-bold text-blue-600" data-i18n="zero-months">0 mesi</p>
+                    <h3 class="text-lg font-bold text-blue-700 mb-2" data-i18n="breakeven-time">Breakeven Time</h3>
+                    <p id="breakeven" class="text-2xl font-bold text-blue-600" data-i18n="zero-months">0 months</p>
                 </div>
 
                 <div class="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-amber-100">
-                    <h3 class="text-lg font-bold text-amber-700 mb-2" data-i18n="financial-details">Dettagli Finanziari</h3>
+                    <h3 class="text-lg font-bold text-amber-700 mb-2" data-i18n="financial-details">Financial Details</h3>
                     <div class="text-sm space-y-1">
-                        <p><span data-i18n="costs">Costi</span>: <span id="total-costs-detail" class="font-semibold">€0.00</span></p>
-                        <p><span data-i18n="direct-revenues">Ricavi diretti</span>: <span id="direct-revenue-detail" class="font-semibold">€0.00</span></p>
-                        <p><span data-i18n="recurring-annual-revenues">Ricavi annuali ricorrenti</span>: <span id="yearly-revenue-detail" class="font-semibold">€0.00</span></p>
+                        <p><span data-i18n="costs">Costs</span>: <span id="total-costs-detail" class="font-semibold">€0.00</span></p>
+                        <p><span data-i18n="direct-revenues">Direct revenues</span>: <span id="direct-revenue-detail" class="font-semibold">€0.00</span></p>
+                        <p><span data-i18n="recurring-annual-revenues">Annual recurring revenues</span>: <span id="yearly-revenue-detail" class="font-semibold">€0.00</span></p>
                     </div>
                 </div>
             </div>
 
-            <!-- Valutazione Complessiva -->
+            <!-- Overall Evaluation -->
             <div class="mt-4 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-100">
-                <h3 class="text-lg font-bold text-indigo-700 mb-3" data-i18n="overall-evaluation">Valutazione Complessiva</h3>
+                <h3 class="text-lg font-bold text-indigo-700 mb-3" data-i18n="overall-evaluation">Overall Evaluation</h3>
                 <div id="overall-evaluation" class="prose prose-indigo max-w-none"></div>
             </div>
         </div>
 
-        <!-- Configurazione AI -->
-        <div class="mt-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <h2 class="text-lg font-bold mb-3 text-indigo-600" data-i18n="ai-configuration">Configurazione AI</h2>
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700" for="ai-provider">
-                        <span data-i18n="ai-provider">Provider AI</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="select-provider">Seleziona il provider da utilizzare</span>
-                    </label>
-                    <select id="ai-provider"
-                            class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
-                        <option value="" data-i18n="select-provider">Seleziona un provider</option>
-                        <option value="perplexity" data-i18n="perplexity-ai">Perplexity AI</option>
-                        <option value="openai" data-i18n="openai">OpenAI</option>
-                    </select>
-                </div>
-
-                <!-- Configurazione Perplexity -->
-                <div id="perplexity-config" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="perplexity-key">
-                                <span data-i18n="perplexity-api-key">Chiave API Perplexity</span><br>
-                                <span class="text-xs text-gray-500" data-i18n="perplexity-api-key-help">La tua chiave API di Perplexity.ai</span>
-                            </label>
-                            <input type="password" id="perplexity-key"
-                                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
-                                   data-i18n-placeholder="enter-api-key" placeholder="Inserisci la tua chiave API">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="perplexity-model">
-                                <span data-i18n="perplexity-model">Modello Perplexity</span><br>
-                                <span class="text-xs text-gray-500" data-i18n="select-model">Seleziona il modello da utilizzare</span>
-                            </label>
-                            <select id="perplexity-model"
-                                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
-                                <option value="" disabled selected data-i18n="select-model">Seleziona un modello</option>
-                                <option value="llama-3.1-sonar-small-128k-online" data-i18n="llama-small">llama-3.1-sonar-small-128k-online (Veloce)</option>
-                                <option value="llama-3.1-sonar-large-128k-online" data-i18n="llama-large">llama-3.1-sonar-large-128k-online (Potente)</option>
-                                <option value="llama-3.1-sonar-huge-128k-online" data-i18n="llama-huge">llama-3.1-sonar-huge-128k-online (Molto potente)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Configurazione OpenAI -->
-                <div id="openai-config" class="hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="openai-key">
-                                <span data-i18n="openai-api-key">Chiave API OpenAI</span><br>
-                                <span class="text-xs text-gray-500" data-i18n="openai-api-key-help">La tua chiave API di OpenAI</span>
-                            </label>
-                            <input type="password" id="openai-key"
-                                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
-                                   data-i18n-placeholder="enter-api-key" placeholder="Inserisci la tua chiave API">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700" for="openai-model">
-                                <span data-i18n="openai-model">Modello OpenAI</span><br>
-                                <span class="text-xs text-gray-500" data-i18n="select-model">Seleziona il modello da utilizzare</span>
-                            </label>
-                            <select id="openai-model"
-                                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
-                                <option value="" disabled selected data-i18n="select-model">Seleziona un modello</option>
-                                <option value="gpt-4o-mini" data-i18n="gpt4-mini">gpt-4o-mini (Veloce)</option>
-                                <option value="chatgpt-4o-latest" data-i18n="gpt4">gpt-4o (Potente)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sezione Analisi AI -->
+        <!-- AI Analysis Section -->
         <div class="mt-6">
             <div class="flex justify-center mb-4">
                 <button id="ai-analysis-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                    <span data-i18n="request-ai-analysis">Richiedi analisi AI</span>
+                    <span data-i18n="request-ai-analysis">Request AI Analysis</span>
                     <div id="ai-spinner" class="hidden">
                         <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -234,16 +160,9 @@
                     </div>
                 </button>
             </div>
-
-            <div id="ai-analysis-section" class="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-100 hidden">
-                <h3 class="text-lg font-bold text-indigo-700 mb-2" data-i18n="ai-analysis">Analisi AI</h3>
-                <div id="ai-error" class="text-red-600 text-sm mb-2 hidden"></div>
-                <div id="ai-result" class="text-gray-700 prose prose-indigo max-w-none"></div>
-            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked@15/lib/marked.umd.min.js"></script>
     <script type="module" src="script.js"></script>
 </body>
 </html>

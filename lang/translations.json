@@ -602,5 +602,37 @@
     "translations-load-error": {
         "it": "Errore nel caricamento delle traduzioni",
         "en": "Error loading translations"
+    },
+    "analyze-software-project": {
+        "it": "Analizza questo progetto software dal punto di vista costi-benefici",
+        "en": "Analyze this software project from a cost-benefit perspective"
+    },
+    "development": {
+        "it": "Sviluppo",
+        "en": "Development"
+    },
+    "provide-detailed-analysis": {
+        "it": "Fornisci un'analisi dettagliata che includa",
+        "en": "Provide a detailed analysis including"
+    },
+    "economic-sustainability": {
+        "it": "Valutazione della sostenibilità economica",
+        "en": "Economic sustainability assessment"
+    },
+    "roi-analysis": {
+        "it": "Analisi del ROI previsto",
+        "en": "Expected ROI analysis"
+    },
+    "breakeven-estimate": {
+        "it": "Tempo stimato per il break-even",
+        "en": "Estimated break-even time"
+    },
+    "risks-and-mitigations": {
+        "it": "Rischi potenziali e suggerimenti per mitigarli",
+        "en": "Potential risks and mitigation suggestions"
+    },
+    "cost-benefit-recommendations": {
+        "it": "Raccomandazioni per ottimizzare il rapporto costi-benefici",
+        "en": "Recommendations to optimize the cost-benefit ratio"
     }
 }

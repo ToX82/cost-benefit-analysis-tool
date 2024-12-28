@@ -33,7 +33,7 @@ async function init() {
         const analyzer = new CostBenefitAnalyzer();
         new AIAnalyzer(analyzer);
     } catch (error) {
-        console.error('Errore durante l\'inizializzazione:', error);
+        console.error('Error during I18n initialization:', error);
     }
 }
 

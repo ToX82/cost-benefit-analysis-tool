@@ -1,5 +1,9 @@
 import { __ } from '../utils/I18n.js';
 
+/**
+ * Handles AI-based analysis of project data.
+ * Prepares and processes form data for AI analysis and manages UI state during analysis.
+ */
 export class AIAnalyzer {
     constructor(analyzer) {
         this.analyzer = analyzer;
@@ -74,11 +78,18 @@ export class AIAnalyzer {
         return query;
     }
 
+    /**
+     * Prepares form data for AI analysis by grouping fields by category.
+     * Processes input values and adds field descriptions for context.
+     * @returns {Object} Structured data object with categorized form fields:
+     *   - Each category contains field objects with:
+     *     - value: {number|string} The field value (parsed as number for numeric fields)
+     *     - description: {string} The field label or name
+     */
     prepareAnalysisData() {
         const form = document.getElementById('analysis-form');
         const data = {};
 
-        // Raggruppa i campi per categoria
         form.querySelectorAll('[data-category]').forEach(category => {
             const categoryName = category.dataset.category;
             data[categoryName] = {};
@@ -95,6 +106,11 @@ export class AIAnalyzer {
         return data;
     }
 
+    /**
+     * Updates UI elements to reflect the current analysis state.
+     * Toggles button state and loading spinner visibility.
+     * @param {boolean} isLoading - Whether the analysis is currently running
+     */
     updateUIState(isLoading) {
         this.button.disabled = isLoading;
         this.spinner.classList.toggle('hidden', !isLoading);

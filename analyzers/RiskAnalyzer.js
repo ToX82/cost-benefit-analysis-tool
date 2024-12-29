@@ -1,7 +1,17 @@
 import { CONFIG } from '../config.js';
 import { __ } from '../utils/I18n.js';
 
+/**
+ * Analyzes various risk factors associated with a project and provides risk assessment.
+ * Calculates risk scores based on multiple factors including occupation, duration, financial aspects,
+ * and provides mitigation strategies.
+ */
 export class RiskAnalyzer {
+    /**
+     * Creates a new RiskAnalyzer instance.
+     * @param {Object} inputs - The validated form inputs
+     * @param {Object} costs - The calculated project costs
+     */
     constructor(inputs, costs) {
         this.inputs = inputs;
         this.costs = costs;
@@ -10,6 +20,14 @@ export class RiskAnalyzer {
         this.mitigations = [];
     }
 
+    /**
+     * Performs a comprehensive risk analysis considering all risk factors.
+     * @returns {Object} The analysis results containing:
+     *   - score: {number} Overall risk score (0-100)
+     *   - level: {string} Risk level description
+     *   - details: {Array<string>} Detailed risk explanations
+     *   - mitigations: {Array<string>} Suggested risk mitigation strategies
+     */
     analyze() {
         this.calculateOccupationRisk();
         this.calculateDurationRisk();
@@ -26,6 +44,11 @@ export class RiskAnalyzer {
         };
     }
 
+    /**
+     * Calculates risk based on team occupation percentage.
+     * High occupation levels may indicate resource constraints and delivery risks.
+     * @private
+     */
     calculateOccupationRisk() {
         const OCCUPATION_THRESHOLD = 50;
         const MAX_RISK = 25;
@@ -41,6 +64,11 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates risk based on project duration.
+     * Longer projects have exponentially increasing risk due to complexity and market changes.
+     * @private
+     */
     calculateDurationRisk() {
         const WEEK_THRESHOLD = 4;
         const BASE_RISK_PER_THRESHOLD = 10;
@@ -67,6 +95,11 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates financial risk based on the selected business model.
+     * Delegates to specific risk calculation strategies based on the business model type.
+     * @private
+     */
     calculateFinancialRisk() {
         const strategies = {
             saas: () => this.calculateSaaSFinancialRisk(),
@@ -209,6 +242,11 @@ export class RiskAnalyzer {
         this.riskScore += risk;
     }
 
+    /**
+     * Determines the overall risk level based on the calculated risk score.
+     * @private
+     * @returns {string} Risk level description (very high, high, medium, or low)
+     */
     determineRiskLevel() {
         if (this.riskScore > CONFIG.RISK_THRESHOLDS.VERY_HIGH) return __('risk-level-very-high');
         if (this.riskScore > CONFIG.RISK_THRESHOLDS.HIGH) return __('risk-level-high');

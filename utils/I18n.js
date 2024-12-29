@@ -1,15 +1,23 @@
 /**
- * Handles internationalization and translations for the application
+ * Handles internationalization and translations for the application.
+ * Provides methods to load and manage translations from a JSON file.
+ * Supports fallback to English if a translation is not available in the current language.
  */
 class I18n {
+    /**
+     * Creates a new I18n instance.
+     * Initializes translations as an empty object and sets the current language
+     * based on the browser's language settings, defaulting to English.
+     */
     constructor() {
         this.translations = {};
         this.currentLang = navigator.language.split('-')[0] || 'en';
     }
 
     /**
-     * Loads translations from the JSON file
-     * @throws {Error} If translations cannot be loaded
+     * Loads translations from the JSON file at 'lang/translations.json'.
+     * @throws {Error} If translations cannot be loaded due to network issues or invalid JSON.
+     * @returns {Promise<void>}
      */
     async loadTranslations() {
         try {
@@ -25,10 +33,11 @@ class I18n {
     }
 
     /**
-     * Translates a key to the current language
-     * @param {string} key - The translation key
-     * @param {...any} args - Arguments to replace placeholders
-     * @returns {string} The translated string or the original key if not found
+     * Translates a key to the current language with optional placeholder replacements.
+     * Falls back to English if the translation is not available in the current language.
+     * @param {string} key - The translation key to look up
+     * @param {...any} args - Arguments to replace placeholders in the format {0}, {1}, etc.
+     * @returns {string} The translated string or the original key if no translation is found
      */
     translate(key, ...args) {
         const translation = this.translations[key];

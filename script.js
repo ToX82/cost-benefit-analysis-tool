@@ -1,41 +1,65 @@
 import { CostBenefitAnalyzer } from './analyzers/CostBenefitAnalyzer.js';
 import { AIAnalyzer } from './analyzers/AIAnalyzer.js';
 import { __, i18n } from './utils/I18n.js';
+import { BookmarkManager } from './managers/BookmarkManager.js';
+import { UIManager } from './managers/UIManager.js';
 
-// Funzione per tradurre l'interfaccia
+/**
+ * Translates all UI elements using data attributes
+ * - Elements with data-i18n: translates text content
+ * - Elements with data-i18n-placeholder: translates placeholder text
+ * - Elements with data-i18n-title: translates title attribute
+ * Also updates page title
+ */
 function translateUI() {
-    // Traduce tutti gli elementi con data-i18n
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         element.textContent = __(key);
     });
 
-    // Traduce i placeholder
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
         const key = element.getAttribute('data-i18n-placeholder');
         element.placeholder = __(key);
     });
 
-    // Aggiorna il titolo della pagina
+    document.querySelectorAll('[data-i18n-title]').forEach(element => {
+        const key = element.getAttribute('data-i18n-title');
+        element.title = __(key);
+    });
+
     document.title = __('tool-title');
 }
 
-// Inizializzazione asincrona
+/**
+ * Initializes the application:
+ * 1. Loads translations
+ * 2. Translates UI
+ * 3. Initializes analyzers
+ * 4. Restores state from URL parameters
+ * 5. Sets up share button functionality
+ */
 async function init() {
     try {
-        // Prima carica le traduzioni
         await i18n.loadTranslations();
-
-        // Poi traduci l'interfaccia
         translateUI();
 
-        // Infine inizializza gli analyzer
         const analyzer = new CostBenefitAnalyzer();
         new AIAnalyzer(analyzer);
+
+        BookmarkManager.restoreFromUrl();
+
+        document.getElementById('share-button').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const success = await BookmarkManager.copyBookmarkUrl();
+            UIManager.displayTemporaryMessage(
+                success ? __('bookmark-copied') : __('bookmark-copy-error'),
+                success ? 'success' : 'error'
+            );
+        });
     } catch (error) {
         console.error('Error during I18n initialization:', error);
     }
 }
 
-// Avvia l'inizializzazione quando il DOM è caricato
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', init);

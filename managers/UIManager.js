@@ -170,4 +170,30 @@ export class UIManager {
             'text-2xl font-bold text-green-500' :
             'text-2xl font-bold text-red-500';
     }
+
+    /**
+     * Shows a temporary message to the user
+     * @param {string} message - The message to display
+     * @param {string} type - The message type ('success' or 'error')
+     */
+    static displayTemporaryMessage(message, type = 'success') {
+        const container = document.createElement('div');
+        container.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+            type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        } text-white z-50 transition-opacity duration-300`;
+        container.textContent = message;
+
+        document.body.appendChild(container);
+
+        // Fade in
+        requestAnimationFrame(() => {
+            container.style.opacity = '1';
+        });
+
+        // Fade out and remove after 3 seconds
+        setTimeout(() => {
+            container.style.opacity = '0';
+            setTimeout(() => container.remove(), 300);
+        }, 3000);
+    }
 }

@@ -5,6 +5,10 @@ import { __ } from '../utils/I18n.js';
  * Prepares and processes form data for AI analysis and manages UI state during analysis.
  */
 export class AIAnalyzer {
+    /**
+     * Creates an instance of AIAnalyzer
+     * @param {Object} analyzer - The main analyzer instance
+     */
     constructor(analyzer) {
         this.analyzer = analyzer;
         this.button = document.getElementById('ai-analysis-btn');
@@ -14,10 +18,17 @@ export class AIAnalyzer {
         this.initializeEventListeners();
     }
 
+    /**
+     * Sets up event listeners for the AI analysis button
+     */
     initializeEventListeners() {
         this.button.addEventListener('click', () => this.requestAnalysis());
     }
 
+    /**
+     * Handles the AI analysis request
+     * Opens Perplexity AI in a new tab with the analysis query
+     */
     async requestAnalysis() {
         if (this.isAnalyzing) return;
 
@@ -28,46 +39,50 @@ export class AIAnalyzer {
             const data = this.prepareAnalysisData();
             const query = this.buildPerplexityQuery(data);
 
-            // Apri una nuova finestra con la richiesta GET a Perplexity
             window.open(`https://www.perplexity.ai/?q=${encodeURIComponent(query)}`, '_blank');
 
         } catch (error) {
-            console.error('Errore durante l\'analisi AI:', error);
+            console.error('Error during AI analysis:', error);
         } finally {
             this.isAnalyzing = false;
             this.updateUIState(false);
         }
     }
 
+    /**
+     * Builds a structured query for Perplexity AI analysis
+     * @param {Object} data - The prepared form data
+     * @returns {string} The formatted query string
+     */
     buildPerplexityQuery(data) {
-        // Costruisci una query strutturata per l'analisi
         let query = __('analyze-software-project') + '\n\n';
 
-        // Aggiungi informazioni sul modello di business
+        // Business model section
         query += `${__('business-model')}: ${data.costs.businessModel.value}\n\n`;
 
-        // Aggiungi informazioni sui costi
+        // Costs section
         query += __('costs').toUpperCase() + ':\n';
         query += `- ${__('direct-costs')}: €${data.costs.directCosts.value}\n`;
         query += `- ${__('indirect-costs')}: €${data.costs.indirectCosts.value}\n\n`;
 
-        // Aggiungi informazioni sui ricavi
+        // Revenue section
         query += __('revenues').toUpperCase() + ':\n';
         query += `- ${__('upfront-payment')}: €${data.revenues.upfrontPayment.value}\n`;
         query += `- ${__('final-payment')}: €${data.revenues.finalPayment.value}\n`;
         query += `- ${__('recurring-revenue')}: €${data.revenues.recurringRevenue.value}\n\n`;
 
-        // Aggiungi informazioni sullo sviluppo
+        // Development section
         query += __('development').toUpperCase() + ':\n';
         query += `- ${__('dev-weeks')}: ${data.resources.devWeeks.value}\n`;
         query += `- ${__('dev-occupation')}: ${data.resources.devOccupation.value}%\n\n`;
 
-        // Aggiungi informazioni sugli utenti
+        // Users section
         query += __('users').toUpperCase() + ':\n';
         query += `- ${__('expected-users')}: ${data.users.expectedUsers.value}\n`;
         query += `- ${__('optimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.optimisticMultiplier.value)} ${__('users').toLowerCase()}\n`;
         query += `- ${__('pessimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.pessimisticMultiplier.value)} ${__('users').toLowerCase()}\n\n`;
 
+        // Analysis requests
         query += __('provide-detailed-analysis') + ':\n';
         query += `1. ${__('economic-sustainability')}\n`;
         query += `2. ${__('roi-analysis')}\n`;
@@ -79,12 +94,8 @@ export class AIAnalyzer {
     }
 
     /**
-     * Prepares form data for AI analysis by grouping fields by category.
-     * Processes input values and adds field descriptions for context.
-     * @returns {Object} Structured data object with categorized form fields:
-     *   - Each category contains field objects with:
-     *     - value: {number|string} The field value (parsed as number for numeric fields)
-     *     - description: {string} The field label or name
+     * Prepares form data for AI analysis by grouping fields by category
+     * @returns {Object} Structured data object with categorized form fields
      */
     prepareAnalysisData() {
         const form = document.getElementById('analysis-form');
@@ -107,8 +118,7 @@ export class AIAnalyzer {
     }
 
     /**
-     * Updates UI elements to reflect the current analysis state.
-     * Toggles button state and loading spinner visibility.
+     * Updates UI elements to reflect the current analysis state
      * @param {boolean} isLoading - Whether the analysis is currently running
      */
     updateUIState(isLoading) {

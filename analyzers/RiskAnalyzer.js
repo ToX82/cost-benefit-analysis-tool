@@ -2,15 +2,12 @@ import { CONFIG } from '../config.js';
 import { __ } from '../utils/I18n.js';
 
 /**
- * Analyzes various risk factors associated with a project and provides risk assessment.
- * Calculates risk scores based on multiple factors including occupation, duration, financial aspects,
- * and provides mitigation strategies.
+ * Analyzes project risks and provides assessment with mitigation strategies
  */
 export class RiskAnalyzer {
     /**
-     * Creates a new RiskAnalyzer instance.
-     * @param {Object} inputs - The validated form inputs
-     * @param {Object} costs - The calculated project costs
+     * @param {Object} inputs - Validated form inputs
+     * @param {Object} costs - Calculated project costs
      */
     constructor(inputs, costs) {
         this.inputs = inputs;
@@ -21,12 +18,8 @@ export class RiskAnalyzer {
     }
 
     /**
-     * Performs a comprehensive risk analysis considering all risk factors.
-     * @returns {Object} The analysis results containing:
-     *   - score: {number} Overall risk score (0-100)
-     *   - level: {string} Risk level description
-     *   - details: {Array<string>} Detailed risk explanations
-     *   - mitigations: {Array<string>} Suggested risk mitigation strategies
+     * Performs complete risk analysis considering all factors
+     * @returns {Object} Analysis results with score, level, details and mitigations
      */
     analyze() {
         this.calculateOccupationRisk();
@@ -45,9 +38,7 @@ export class RiskAnalyzer {
     }
 
     /**
-     * Calculates risk based on team occupation percentage.
-     * High occupation levels may indicate resource constraints and delivery risks.
-     * @private
+     * Calculates risk based on team occupation percentage
      */
     calculateOccupationRisk() {
         const OCCUPATION_THRESHOLD = 50;
@@ -65,9 +56,7 @@ export class RiskAnalyzer {
     }
 
     /**
-     * Calculates risk based on project duration.
-     * Longer projects have exponentially increasing risk due to complexity and market changes.
-     * @private
+     * Calculates risk based on project duration with exponential increase
      */
     calculateDurationRisk() {
         const WEEK_THRESHOLD = 4;
@@ -96,9 +85,7 @@ export class RiskAnalyzer {
     }
 
     /**
-     * Calculates financial risk based on the selected business model.
-     * Delegates to specific risk calculation strategies based on the business model type.
-     * @private
+     * Delegates financial risk calculation based on business model
      */
     calculateFinancialRisk() {
         const strategies = {
@@ -113,6 +100,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates financial risk for SaaS model based on breakeven time
+     */
     calculateSaaSFinancialRisk() {
         const BREAKEVEN_MONTHS = 12;
         const MAX_RISK = 25;
@@ -131,6 +121,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates financial risk for commissioned model based on upfront payment ratio
+     */
     calculateCommissionedFinancialRisk() {
         const MIN_UPFRONT_RATIO = 0.3;
         const MAX_RISK = 25;
@@ -147,6 +140,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates financial risk for mixed model considering both upfront and recurring revenue
+     */
     calculateMixedFinancialRisk() {
         const BREAKEVEN_MONTHS = 12;
         const MAX_RISK = 25;
@@ -167,6 +163,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates risk based on user estimate variability
+     */
     calculateUserRisk() {
         const MAX_BASE_RISK = 20;
         const RISK_THRESHOLD = 10;
@@ -184,6 +183,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates risk based on expected user base size
+     */
     calculateUserBaseRisk() {
         const THRESHOLDS = { high: 50, low: 200 };
         const BASE_RISK_COMMISSIONED = 5;
@@ -214,6 +216,9 @@ export class RiskAnalyzer {
         }
     }
 
+    /**
+     * Calculates risk based on project margin
+     */
     calculateMarginRisk() {
         const totalCosts = this.costs.totalCosts;
         const revenue = this.inputs.upfrontPayment + this.inputs.finalPayment +
@@ -243,9 +248,8 @@ export class RiskAnalyzer {
     }
 
     /**
-     * Determines the overall risk level based on the calculated risk score.
-     * @private
-     * @returns {string} Risk level description (very high, high, medium, or low)
+     * Maps risk score to descriptive risk level
+     * @returns {string} Risk level description
      */
     determineRiskLevel() {
         if (this.riskScore > CONFIG.RISK_THRESHOLDS.VERY_HIGH) return __('risk-level-very-high');

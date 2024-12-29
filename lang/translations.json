@@ -654,5 +654,25 @@
     "risk-index": {
         "it": "Indice di rischio",
         "en": "Risk index"
+    },
+    "results": {
+        "it": "Risultati",
+        "en": "Results"
+    },
+    "bookmark-copy-error": {
+        "it": "Errore durante la copia del bookmark negli appunti",
+        "en": "Error copying bookmark to clipboard"
+    },
+    "bookmark-copied": {
+        "it": "Bookmark copiato negli appunti",
+        "en": "Bookmark copied to clipboard"
+    },
+    "share-analysis": {
+        "it": "Condividi analisi",
+        "en": "Share analysis"
+    },
+    "bookmark-tooltip": {
+        "it": "Trascina nei preferiti per salvare l'analisi, o clicca per copiare il link",
+        "en": "Drag to bookmarks to save analysis, or click to copy the link"
     }
 }

@@ -118,8 +118,19 @@
         </div>
 
         <!-- Results Section -->
-        <div class="mt-6">
-            <h2 class="text-xl font-bold mb-3 text-indigo-700 text-center" data-i18n="analysis-results">Analysis Results</h2>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mt-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-indigo-600" data-i18n="results">Results</h2>
+                <a href="#" id="share-button" class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors no-underline inline-flex items-center justify-center group relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                    </svg>
+                    <span class="sr-only" data-i18n="share-analysis">Share analysis</span>
+                    <span class="absolute -bottom-12 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bookmark-tooltip">
+                        Trascina nei preferiti
+                    </span>
+                </a>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-100">
                     <h3 class="text-lg font-bold text-green-700 mb-2" data-i18n="roi-12-months">12-month ROI</h3>

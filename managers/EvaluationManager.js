@@ -1,7 +1,15 @@
 import { CONFIG } from '../config.js';
 import { __ } from '../utils/I18n.js';
 
+/**
+ * Handles evaluation and assessment of project metrics and KPIs
+ */
 export class EvaluationManager {
+    /**
+     * Returns a qualitative assessment of ROI based on configured thresholds
+     * @param {number} roiPercentage - ROI percentage value
+     * @returns {string} Translated ROI evaluation message
+     */
     static getROIEvaluation(roiPercentage) {
         if (roiPercentage >= CONFIG.ROI_THRESHOLDS.EXCELLENT) {
             return __('roi-excellent');
@@ -15,6 +23,14 @@ export class EvaluationManager {
         return __('roi-loss');
     }
 
+    /**
+     * Combines all evaluation aspects into a complete project assessment
+     * @param {Object} evaluation - Base evaluation object
+     * @param {Object} roi - ROI calculation results
+     * @param {number} breakeven - Breakeven point in months
+     * @param {Object} inputs - User input values
+     * @returns {string} Combined HTML-formatted evaluation text
+     */
     static addOverallEvaluation(evaluation, roi, breakeven, inputs) {
         const evaluations = [];
 
@@ -26,6 +42,13 @@ export class EvaluationManager {
         return evaluations.filter(e => e).join('<br><br>');
     }
 
+    /**
+     * Evaluates financial health based on ROI and breakeven
+     * @param {Object} roi - ROI calculation results
+     * @param {number} breakeven - Breakeven point in months
+     * @param {Object} inputs - User input values
+     * @returns {string} HTML-formatted financial evaluation
+     */
     static evaluateFinancials(roi, breakeven, inputs) {
         const roiValue = roi.base.value;
         const roiPercentage = roi.base.percentage;
@@ -64,6 +87,11 @@ export class EvaluationManager {
                 ${__('critical-profitability-detail', roiPercentage.toFixed(1))}`;
     }
 
+    /**
+     * Evaluates project timeline and development duration
+     * @param {Object} inputs - User input values
+     * @returns {string} HTML-formatted timeline evaluation
+     */
     static evaluateTimeline(inputs) {
         const warnings = [];
 
@@ -80,6 +108,11 @@ export class EvaluationManager {
             warnings.join('<br>') : '';
     }
 
+    /**
+     * Evaluates resource allocation and team occupation
+     * @param {Object} inputs - User input values
+     * @returns {string} HTML-formatted resource evaluation
+     */
     static evaluateResources(inputs) {
         if (inputs.devOccupation > 80) {
             return `<span class="text-red-600 font-semibold">${__('resource-saturation-risk')}</span>.
@@ -94,6 +127,13 @@ export class EvaluationManager {
         return '';
     }
 
+    /**
+     * Evaluates business model and payment structure
+     * @param {Object} inputs - User input values
+     * @param {Object} roi - ROI calculation results
+     * @param {number} breakeven - Breakeven point in months
+     * @returns {string} HTML-formatted business model evaluation
+     */
     static evaluateBusinessModel(inputs, roi, breakeven) {
         if (inputs.businessModel === 'commissioned') {
             const upfrontRatio = inputs.upfrontPayment / (inputs.directCosts + inputs.indirectCosts);

@@ -171,7 +171,11 @@ export class RiskAnalyzer {
         const RISK_THRESHOLD = 10;
         const VARIABILITY_FACTOR = 20;
 
-        const userVariability = Math.abs(this.inputs.optimisticUsers - this.inputs.pessimisticUsers) / this.inputs.expectedUsers;
+        const maxVariation = Math.max(
+            Math.abs(this.inputs.optimisticUsers - this.inputs.expectedUsers),
+            Math.abs(this.inputs.expectedUsers - this.inputs.pessimisticUsers)
+        );
+        const userVariability = maxVariation / this.inputs.expectedUsers;
         const baseRisk = Math.min(MAX_BASE_RISK, userVariability * VARIABILITY_FACTOR);
         const risk = this.inputs.businessModel === 'saas' ? baseRisk * 1.2 : baseRisk;
 

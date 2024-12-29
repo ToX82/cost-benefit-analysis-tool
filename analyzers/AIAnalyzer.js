@@ -78,9 +78,9 @@ export class AIAnalyzer {
 
         // Users section
         query += __('users').toUpperCase() + ':\n';
-        query += `- ${__('expected-users')}: ${data.users.expectedUsers.value}\n`;
-        query += `- ${__('optimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.optimisticMultiplier.value)} ${__('users').toLowerCase()}\n`;
-        query += `- ${__('pessimistic-scenario')}: ${Math.round(data.users.expectedUsers.value * data.users.pessimisticMultiplier.value)} ${__('users').toLowerCase()}\n\n`;
+        query += `- ${__('expected-users')}: ${data.users.expectedUsers.value} ${__('users').toLowerCase()}\n`;
+        query += `- ${__('optimistic-scenario')}: ${data.users.optimisticUsers.value} ${__('users').toLowerCase()}\n`;
+        query += `- ${__('pessimistic-scenario')}: ${data.users.pessimisticUsers.value} ${__('users').toLowerCase()}\n\n`;
 
         // Analysis requests
         query += __('provide-detailed-analysis') + ':\n';

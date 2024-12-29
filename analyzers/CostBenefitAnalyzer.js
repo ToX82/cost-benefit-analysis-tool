@@ -305,8 +305,8 @@ export class CostBenefitAnalyzer {
     setCommissionedMode(usersCard) {
         usersCard.classList.add('hidden');
         this.setInputValue('expected-users', '1');
-        this.setInputValue('optimistic-multiplier', '1');
-        this.setInputValue('pessimistic-multiplier', '1');
+        this.setInputValue('optimistic-users', '1');
+        this.setInputValue('pessimistic-users', '1');
     }
 
     /**
@@ -316,8 +316,10 @@ export class CostBenefitAnalyzer {
     setSaaSMode(usersCard) {
         usersCard.classList.remove('hidden');
         if (this.getInputValue('expected-users') === '1') {
-            this.setInputValue('optimistic-multiplier', '1.2');
-            this.setInputValue('pessimistic-multiplier', '0.8');
+            const defaultExpected = 100;
+            this.setInputValue('expected-users', defaultExpected.toString());
+            this.setInputValue('optimistic-users', Math.round(defaultExpected * 1.2).toString());
+            this.setInputValue('pessimistic-users', Math.round(defaultExpected * 0.8).toString());
         }
     }
 

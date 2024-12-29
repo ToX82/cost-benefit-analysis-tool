@@ -131,30 +131,6 @@
         "it": "Stima del numero di utenti del software",
         "en": "Estimated number of software users"
     },
-    "optimistic-multiplier": {
-        "it": "Moltiplicatore Ottimistico",
-        "en": "Optimistic Multiplier"
-    },
-    "optimistic-multiplier-help": {
-        "it": "Scenario positivo per il numero di utenti",
-        "en": "Positive scenario for number of users"
-    },
-    "example-1.2": {
-        "it": "Es: 1.2",
-        "en": "Ex: 1.2"
-    },
-    "pessimistic-multiplier": {
-        "it": "Moltiplicatore Pessimistico",
-        "en": "Pessimistic Multiplier"
-    },
-    "pessimistic-multiplier-help": {
-        "it": "Scenario negativo per il numero di utenti",
-        "en": "Negative scenario for number of users"
-    },
-    "example-0.8": {
-        "it": "Es: 0.8",
-        "en": "Ex: 0.8"
-    },
     "analysis-results": {
         "it": "Risultati dell'Analisi",
         "en": "Analysis Results"
@@ -674,5 +650,21 @@
     "bookmark-tooltip": {
         "it": "Trascina nei preferiti per salvare l'analisi, o clicca per copiare il link",
         "en": "Drag to bookmarks to save analysis, or click to copy the link"
+    },
+    "optimistic-users": {
+        "it": "Utenti (Scenario Ottimistico)",
+        "en": "Users (Optimistic Scenario)"
+    },
+    "optimistic-users-help": {
+        "it": "Stima ottimistica del numero di utenti",
+        "en": "Optimistic estimate of user count"
+    },
+    "pessimistic-users": {
+        "it": "Utenti (Scenario Pessimistico)",
+        "en": "Users (Pessimistic Scenario)"
+    },
+    "pessimistic-users-help": {
+        "it": "Stima pessimistica del numero di utenti",
+        "en": "Pessimistic estimate of user count"
     }
 }

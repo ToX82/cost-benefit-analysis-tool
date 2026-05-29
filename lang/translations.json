@@ -3,6 +3,94 @@
         "it": "Strumento di Analisi Costi-Benefici",
         "en": "Cost Benefit Analysis Tool"
     },
+    "flow-step-1-title": {
+        "it": "Progetto",
+        "en": "Project"
+    },
+    "flow-step-1-desc": {
+        "it": "Dai un nome al progetto e scegli come guadagni: abbonamento, lavoro su commissione, o entrambi.",
+        "en": "Name your project and choose how you earn: subscription, commissioned work, or both."
+    },
+    "flow-step-2-title": {
+        "it": "Costi",
+        "en": "Costs"
+    },
+    "flow-step-2-desc": {
+        "it": "Elenca ogni spesa: stipendi, server, licenze… Indica se è mensile, una tantum o legata al numero di utenti.",
+        "en": "List every expense: salaries, servers, licenses… Mark whether it's monthly, one-time, or tied to user count."
+    },
+    "flow-step-3-title": {
+        "it": "Ricavi",
+        "en": "Revenues"
+    },
+    "flow-step-3-desc": {
+        "it": "Quanto incassi e quanti clienti nuovi ti aspetti ogni mese? Compila tre scenari: pessimistico, base e ottimistico.",
+        "en": "How much do you charge and how many new customers per month? Fill in three scenarios: pessimistic, base, and optimistic."
+    },
+    "flow-step-4-title": {
+        "it": "Risultati",
+        "en": "Results"
+    },
+    "flow-step-4-desc": {
+        "it": "Qui vedi se il progetto è sostenibile. I numeri si aggiornano automaticamente quando modifichi costi o ricavi.",
+        "en": "See whether the project is viable. Numbers update automatically when you change costs or revenues."
+    },
+    "results-kpi-desc": {
+        "it": "Stima del primo anno di attività — non è un bilancio contabile, ma una proiezione per orientare le decisioni.",
+        "en": "First-year estimate — not a formal accounting statement, but a projection to guide decisions."
+    },
+    "results-kpi-label": {
+        "it": "Numeri chiave — primo anno",
+        "en": "Key numbers — first year"
+    },
+    "scenario-legend-intro": {
+        "it": "Per ogni piano tariffario indica quanti nuovi clienti acquisisci ogni mese in ciascuno scenario.",
+        "en": "For each pricing plan, enter how many new customers you acquire each month in each scenario."
+    },
+    "scenario-abbr-base": {
+        "it": "Base",
+        "en": "Base"
+    },
+    "scenario-abbr-opt": {
+        "it": "Ottim.",
+        "en": "Optim."
+    },
+    "scenario-abbr-pess": {
+        "it": "Pess.",
+        "en": "Pess."
+    },
+    "scenario-cost-preview-hint": {
+        "it": "Costo annuo stimato per scenario",
+        "en": "Estimated annual cost per scenario"
+    },
+    "tier-zone-pricing": {
+        "it": "Tariffa",
+        "en": "Pricing"
+    },
+    "tier-zone-details": {
+        "it": "Parametri del piano",
+        "en": "Plan parameters"
+    },
+    "tier-zone-acquisition": {
+        "it": "Acquisizione clienti",
+        "en": "Customer acquisition"
+    },
+    "tier-computed-label": {
+        "it": "auto",
+        "en": "auto"
+    },
+    "clients-per-month-short": {
+        "it": "/mese",
+        "en": "/mo"
+    },
+    "tier-revenue-y1": {
+        "it": "Incasso stimato — anno 1",
+        "en": "Estimated revenue — year 1"
+    },
+    "tier-breakeven-hint": {
+        "it": "Clienti servirebbero solo con questo piano per coprire i costi operativi (stima indicativa)",
+        "en": "Customers needed with this plan alone to cover operating costs (indicative estimate)"
+    },
     "page-subtitle-default": {
         "it": "Valutazione finanziaria del progetto",
         "en": "Project financial assessment"
@@ -12,8 +100,12 @@
         "en": "Analysis for"
     },
     "projection-scenarios-label": {
-        "it": "Proiezioni cumulative (P / B / O)",
-        "en": "Cumulative projections (P / B / O)"
+        "it": "Andamento nel tempo (3 scenari)",
+        "en": "Trend over time (3 scenarios)"
+    },
+    "projection-order-hint": {
+        "it": "Ordine: Pessimistico → Base → Ottimistico. Ogni riga mostra utile cumulato e ROI %.",
+        "en": "Order: Pessimistic → Base → Optimistic. Each row shows cumulative profit and ROI %."
     },
     "projection-year-1": {
         "it": "Anno 1",
@@ -52,20 +144,24 @@
         "en": "Business Model"
     },
     "select-project-type": {
-        "it": "Seleziona il tipo di progetto",
-        "en": "Select project type"
+        "it": "Come guadagni con questo progetto?",
+        "en": "How does this project make money?"
+    },
+    "business-model-help": {
+        "it": "SaaS = abbonamenti ricorrenti · Commissionato = pagamenti una tantum · Misto = entrambi",
+        "en": "SaaS = recurring subscriptions · Commissioned = one-time payments · Mixed = both"
     },
     "saas": {
-        "it": "SaaS",
-        "en": "SaaS"
+        "it": "SaaS — abbonamenti mensili",
+        "en": "SaaS — monthly subscriptions"
     },
     "commissioned": {
-        "it": "Commissionato",
-        "en": "Commissioned"
+        "it": "Commissionato — pagamento a progetto",
+        "en": "Commissioned — project-based payment"
     },
     "mixed": {
-        "it": "Misto (SaaS + Commissionato)",
-        "en": "Mixed (SaaS + Commissioned)"
+        "it": "Misto — commissione + abbonamento",
+        "en": "Mixed — project fee + subscription"
     },
     "direct-costs": {
         "it": "Costi Diretti (€)",
@@ -176,48 +272,116 @@
         "en": "Analysis Results"
     },
     "roi-12-months": {
-        "it": "ROI su 12 mesi",
-        "en": "12-month ROI"
+        "it": "Guadagni vs costi — anno 1",
+        "en": "Profit vs costs — year 1"
+    },
+    "roi-12-months-hint": {
+        "it": "Quanto ti resta dopo 12 mesi: incassi totali meno costi (operativi, acquisizione clienti e spese una tantum). La % indica il ritorno sui costi.",
+        "en": "What you keep after 12 months: total revenue minus costs (operating, customer acquisition, and one-time expenses). The % is return on costs."
+    },
+    "roi-scenario-opt-hint": {
+        "it": "Se acquisisci più clienti del previsto",
+        "en": "If you acquire more customers than expected"
+    },
+    "roi-scenario-pess-hint": {
+        "it": "Se acquisisci meno clienti del previsto",
+        "en": "If you acquire fewer customers than expected"
     },
     "breakeven-time": {
-        "it": "Tempo di Pareggio",
-        "en": "Break-even Time"
+        "it": "Quando inizi a guadagnare",
+        "en": "When you start making money"
+    },
+    "breakeven-time-hint": {
+        "it": "Mese in cui entrate e uscite cumulate si pareggiano (include costi mensili e spesa per acquisire clienti).",
+        "en": "Month when cumulative income and expenses break even (includes monthly costs and customer acquisition spend)."
     },
     "zero-months": {
         "it": "0 mesi",
         "en": "0 months"
     },
     "financial-details": {
-        "it": "Dettagli Finanziari",
-        "en": "Financial Details"
+        "it": "Conto economico semplificato",
+        "en": "Simplified P&L"
+    },
+    "financial-details-intro": {
+        "it": "Entrate e uscite del primo anno nello scenario base.",
+        "en": "Income and expenses for the first year in the base scenario."
+    },
+    "costs": {
+        "it": "Costi totali anno 1",
+        "en": "Total year-1 costs"
+    },
+    "costs-row-hint": {
+        "it": "Operativi + acquisizione clienti + una tantum",
+        "en": "Operating + acquisition + one-time"
     },
     "direct-revenues": {
-        "it": "Ricavi diretti",
-        "en": "Direct Revenues"
+        "it": "Incassi una tantum",
+        "en": "One-time payments"
+    },
+    "direct-revenues-hint": {
+        "it": "Anticipi, saldi, vendite singole",
+        "en": "Deposits, final payments, single sales"
     },
     "recurring-annual-revenues": {
-        "it": "Ricavi annuali ricorrenti",
-        "en": "Recurring Annual Revenues"
+        "it": "Incassi da abbonamenti — anno 1",
+        "en": "Subscription revenue — year 1"
+    },
+    "recurring-annual-hint": {
+        "it": "Somma dei canoni nel primo anno, con crescita clienti",
+        "en": "Sum of fees in year 1, accounting for customer growth"
     },
     "total-commissions": {
-        "it": "Totale provvigioni",
-        "en": "Total Commissions"
+        "it": "Provvigioni e fee passate",
+        "en": "Commissions and pass-through fees"
     },
-    "annual-gross-margin": {
-        "it": "Margine annuale lordo",
-        "en": "Annual Gross Margin"
+    "commissions-hint": {
+        "it": "Parte dei ricavi trattenuta da partner o piattaforme",
+        "en": "Share of revenue retained by partners or platforms"
+    },
+    "annual-net-profit-y1": {
+        "it": "= Quanto ti resta (anno 1)",
+        "en": "= What you keep (year 1)"
     },
     "market-inputs-title": {
         "it": "Mercato e Acquisizione",
         "en": "Market & Acquisition"
     },
     "cac-label": {
-        "it": "CAC — Costo acquisizione cliente (€)",
-        "en": "CAC — Customer Acquisition Cost (€)"
+        "it": "Quanto spendi per acquisire un cliente? (€)",
+        "en": "How much do you spend to acquire one customer? (€)"
     },
     "cac-help": {
-        "it": "Marketing + vendite / clienti acquisiti",
-        "en": "Marketing + sales / customers acquired"
+        "it": "Es. marketing + vendite ÷ clienti conquistati. Viene moltiplicato per i nuovi clienti/mese e scalato da ROI, cash flow e break-even.",
+        "en": "E.g. marketing + sales ÷ customers won. Multiplied by new customers/month and included in ROI, cash flow, and break-even."
+    },
+    "acquisition-costs-y1": {
+        "it": "Spesa acquisizione clienti",
+        "en": "Customer acquisition spend"
+    },
+    "acquisition-costs-hint": {
+        "it": "CAC × nuovi clienti/mese × 12 mesi",
+        "en": "CAC × new customers/month × 12 months"
+    },
+    "low-ltvcac-critical": {
+        "it": "LTV:CAC critico ({0}x) — ogni cliente acquisito genera una perdita netta",
+        "en": "Critical LTV:CAC ({0}x) — each acquired customer generates a net loss"
+    },
+    "low-ltvcac-warning": {
+        "it": "LTV:CAC sotto target ({0}x, obiettivo ≥ 3x)",
+        "en": "LTV:CAC below target ({0}x, goal ≥ 3x)"
+    },
+    "reduce-cac-mitigation": {
+        "it": "Ridurre il CAC ottimizzando i canali di acquisizione",
+        "en": "Reduce CAC by optimizing acquisition channels"
+    },
+    "increase-ltv-mitigation": {
+        "it": "Aumentare LTV con upselling, retention o pricing",
+        "en": "Increase LTV through upselling, retention, or pricing"
+    },
+    "optimize-acquisition-mitigation": {
+        "it": "Ottimizzare il mix acquisizione/retention per raggiungere LTV:CAC ≥ 3x",
+        "en": "Optimize acquisition/retention mix to reach LTV:CAC ≥ 3x"
     },
     "tam-label": {
         "it": "TAM — Mercato potenziale (utenti)",
@@ -228,68 +392,76 @@
         "en": "Total number of potential customers in the market"
     },
     "unit-economics-title": {
-        "it": "Unit Economics",
-        "en": "Unit Economics"
+        "it": "Economics per singolo cliente",
+        "en": "Per-customer economics"
+    },
+    "unit-economics-desc": {
+        "it": "Quanto vale un cliente nel tempo e quanto costa acquisirlo. Utile per capire se il modello scala.",
+        "en": "How much a customer is worth over time and what it costs to acquire them. Helps assess whether the model scales."
     },
     "ue-ltv": {
-        "it": "LTV",
-        "en": "LTV"
+        "it": "Valore cliente (LTV)",
+        "en": "Customer value (LTV)"
     },
     "ue-ltv-hint": {
-        "it": "Valore vita cliente",
-        "en": "Customer Lifetime Value"
+        "it": "Quanto incassi in media da un cliente per tutta la sua permanenza",
+        "en": "Average total revenue from one customer over their lifetime"
     },
     "ue-cac": {
-        "it": "CAC",
-        "en": "CAC"
+        "it": "Costo acquisizione (CAC)",
+        "en": "Acquisition cost (CAC)"
     },
     "ue-cac-hint": {
-        "it": "Costo acquisizione",
-        "en": "Acquisition cost"
+        "it": "Quanto spendi per conquistare un nuovo cliente",
+        "en": "What you spend to win a new customer"
     },
     "ue-ltvcac": {
-        "it": "LTV:CAC",
-        "en": "LTV:CAC"
+        "it": "Rapporto LTV : CAC",
+        "en": "LTV : CAC ratio"
     },
     "ue-ltvcac-hint": {
-        "it": "Target ≥ 3x",
-        "en": "Target ≥ 3x"
+        "it": "Quante volte il valore cliente copre il costo di acquisizione — obiettivo ≥ 3×",
+        "en": "How many times customer value covers acquisition cost — target ≥ 3×"
     },
     "ue-payback": {
-        "it": "Payback CAC",
-        "en": "CAC Payback"
-    },
-    "ue-payback-hint": {
-        "it": "Mesi per recuperare CAC",
+        "it": "Mesi per recuperare il CAC",
         "en": "Months to recover CAC"
     },
+    "ue-payback-hint": {
+        "it": "Tempo per ripagare l'acquisizione con il margine mensile del cliente",
+        "en": "Time to pay back acquisition from the customer's monthly margin"
+    },
     "ue-gmargin": {
-        "it": "Gross Margin %",
-        "en": "Gross Margin %"
+        "it": "Margine lordo %",
+        "en": "Gross margin %"
     },
     "ue-gmargin-hint": {
-        "it": "Ricavi ricorrenti netti / ricavi lordi",
-        "en": "Net recurring revenues / gross revenues"
+        "it": "Quanto resta dopo costi variabili (es. infrastruttura che scala) e provvigioni",
+        "en": "What remains after variable costs (e.g. scaling infra) and commissions"
     },
     "ue-nmargin": {
-        "it": "Net Margin %",
-        "en": "Net Margin %"
+        "it": "Margine netto %",
+        "en": "Net margin %"
     },
     "ue-nmargin-hint": {
-        "it": "Utile netto / ricavi totali",
-        "en": "Net profit / total revenues"
+        "it": "Utile anno 1 diviso incassi totali — include tutti i costi",
+        "en": "Year-1 profit divided by total revenue — all costs included"
     },
     "ue-commrate": {
-        "it": "Commission Rate %",
-        "en": "Commission Rate %"
+        "it": "Incidenza provvigioni %",
+        "en": "Commission share %"
     },
     "ue-commrate-hint": {
-        "it": "Provvigioni / ricavi lordi",
-        "en": "Commissions / gross revenues"
+        "it": "Quota dei ricavi lordi trattenuta da terzi",
+        "en": "Share of gross revenue retained by third parties"
     },
     "cashflow-title": {
-        "it": "Cash Flow Cumulativo (36 mesi)",
-        "en": "Cumulative Cash Flow (36 months)"
+        "it": "Andamento cassa — 36 mesi",
+        "en": "Cash position — 36 months"
+    },
+    "cashflow-desc": {
+        "it": "Saldo cumulativo mese per mese: sopra lo zero stai guadagnando, sotto stai bruciando cassa.",
+        "en": "Running balance month by month: above zero you're profitable, below you're burning cash."
     },
     "monthly-acquisition-rate": {
         "it": "Nuovi utenti/mese",
@@ -299,9 +471,17 @@
         "it": "Churn mensile",
         "en": "Monthly churn"
     },
+    "churn-rate-hint": {
+        "it": "% di clienti che abbandonano ogni mese",
+        "en": "% of customers who cancel each month"
+    },
     "tier-breakeven-label": {
-        "it": "Break-even",
-        "en": "Break-even"
+        "it": "Clienti per pareggiare i costi",
+        "en": "Customers to break even"
+    },
+    "tier-net-label": {
+        "it": "Tu incassi (netto)",
+        "en": "You earn (net)"
     },
     "tier-breakeven-unit": {
         "it": "utenti (steady state) per coprire i costi",
@@ -320,8 +500,8 @@
         "en": "Diversify pricing plans or customer segments"
     },
     "overall-evaluation": {
-        "it": "Valutazione Complessiva",
-        "en": "Overall Evaluation"
+        "it": "Verdetto del progetto",
+        "en": "Project verdict"
     },
     "ai-configuration": {
         "it": "Configurazione AI",
@@ -396,8 +576,8 @@
         "en": "gpt-4o (Powerful)"
     },
     "request-ai-analysis": {
-        "it": "Richiedi analisi AI",
-        "en": "Request AI Analysis"
+        "it": "Chiedi un parere all'AI",
+        "en": "Get AI feedback"
     },
     "ai-analysis": {
         "it": "Analisi AI",
@@ -566,6 +746,10 @@
     "ai-analysis-error": {
         "it": "Si è verificato un errore durante l'analisi. Riprova più tardi.",
         "en": "An error occurred during analysis. Please try again later."
+    },
+    "ai-active-users-label": {
+        "it": "Utenti attivi (mese 12)",
+        "en": "Active users (month 12)"
     },
     "roi-excellent": {
         "it": "Eccellente ritorno sull'investimento",
@@ -796,8 +980,8 @@
         "en": "Not reachable"
     },
     "risk-index": {
-        "it": "Indice di rischio",
-        "en": "Risk index"
+        "it": "Livello di rischio",
+        "en": "Risk level"
     },
     "results": {
         "it": "Risultati",
@@ -812,8 +996,8 @@
         "en": "Bookmark copied to clipboard"
     },
     "share-analysis": {
-        "it": "Analisi costi-benefici",
-        "en": "Cost-Benefit Analysis"
+        "it": "Condividi link",
+        "en": "Share link"
     },
     "bookmark-tooltip": {
         "it": "Trascina nei preferiti per salvare l'analisi, o clicca per copiare il link",
@@ -896,8 +1080,24 @@
         "en": "Amount"
     },
     "total-annualized": {
-        "it": "Totale Annualizzato",
-        "en": "Annualized Total"
+        "it": "Totale costi — stima anno 1",
+        "en": "Total costs — year 1 estimate"
+    },
+    "cost-total-hint": {
+        "it": "Somma di tutte le voci, annualizzate. I costi a scalini si adattano al numero di utenti nello scenario base.",
+        "en": "Sum of all items, annualized. Step-scaled costs adjust to user count in the base scenario."
+    },
+    "freq-monthly": {
+        "it": "Ogni mese",
+        "en": "Every month"
+    },
+    "freq-onetime": {
+        "it": "Una sola volta",
+        "en": "One-time only"
+    },
+    "freq-scaling": {
+        "it": "Cresce con gli utenti",
+        "en": "Grows with users"
     },
     "category-personnel": {
         "it": "Personale",
@@ -923,18 +1123,6 @@
         "it": "Altro",
         "en": "Other"
     },
-    "freq-monthly": {
-        "it": "Mensile (×12)",
-        "en": "Monthly (×12)"
-    },
-    "freq-onetime": {
-        "it": "Una Tantum",
-        "en": "One-time"
-    },
-    "freq-scaling": {
-        "it": "A scalini (utenti)",
-        "en": "Step-scaled (users)"
-    },
     "scaling-per-unit-label": {
         "it": "€ / unità",
         "en": "€ / unit"
@@ -952,8 +1140,8 @@
         "en": "min."
     },
     "freq-per-elab": {
-        "it": "Per elaborazione",
-        "en": "Per processing"
+        "it": "Per ogni elaborazione",
+        "en": "Per processing job"
     },
     "per-elab-cost-label": {
         "it": "€ / elaborazione",
@@ -980,12 +1168,12 @@
         "en": "Ex: Junior developers"
     },
     "onetime-revenues": {
-        "it": "Ricavi Una Tantum",
-        "en": "One-time Revenues"
+        "it": "Pagamenti una tantum",
+        "en": "One-time payments"
     },
     "recurring-revenues": {
-        "it": "Abbonamenti / Licenze",
-        "en": "Subscriptions / Licenses"
+        "it": "Piani a abbonamento o licenza",
+        "en": "Subscription or license plans"
     },
     "add-onetime-revenue": {
         "it": "Aggiungi",
@@ -1036,16 +1224,48 @@
         "en": "Ex: Basic License"
     },
     "revenue-scenario-base": {
-        "it": "Scenario Base",
-        "en": "Base Scenario"
+        "it": "Scenario base — previsione realistica",
+        "en": "Base scenario — realistic forecast"
     },
     "revenue-scenario-optimistic": {
-        "it": "Ottimistico",
-        "en": "Optimistic"
+        "it": "Ottimistico — crescita sopra le attese",
+        "en": "Optimistic — growth above expectations"
     },
     "revenue-scenario-pessimistic": {
-        "it": "Pessimistico",
-        "en": "Pessimistic"
+        "it": "Pessimistico — crescita sotto le attese",
+        "en": "Pessimistic — growth below expectations"
+    },
+    "recurring-summary-title": {
+        "it": "Totale incassi da abbonamenti",
+        "en": "Total subscription revenue"
+    },
+    "recurring-summary-hint": {
+        "it": "Primo numero = anno 1 cumulato · secondo (sotto) = anno 2",
+        "en": "First number = cumulative year 1 · second (below) = year 2"
+    },
+    "scenario-strip-y2": {
+        "it": "anno 2",
+        "en": "year 2"
+    },
+    "onetime-section-desc": {
+        "it": "Incassi che ricevi una sola volta: anticipo, saldo a consegna, vendita licenza perpetua.",
+        "en": "Revenue received once: deposit, delivery payment, perpetual license sale."
+    },
+    "recurring-section-desc": {
+        "it": "Ogni piano ha prezzo, eventuali provvigioni e quanti clienti nuovi arrivano ogni mese.",
+        "en": "Each plan has a price, optional commissions, and how many new customers arrive each month."
+    },
+    "eval-card-desc": {
+        "it": "Giudizio automatico su redditività e rischi principali.",
+        "en": "Automatic assessment of profitability and main risks."
+    },
+    "cost-empty-desc": {
+        "it": "Aggiungi almeno una voce per sbloccare i calcoli.",
+        "en": "Add at least one item to unlock calculations."
+    },
+    "recurring-empty-desc": {
+        "it": "Crea un piano (es. Starter, Pro) con prezzo e clienti attesi al mese.",
+        "en": "Create a plan (e.g. Starter, Pro) with price and expected customers per month."
     },
     "cost-items-required": {
         "it": "Inserire almeno una voce di costo per procedere con l'analisi",
@@ -1060,12 +1280,8 @@
         "en": "Price"
     },
     "tier-commission-label": {
-        "it": "Provvigioni",
-        "en": "Commissions"
-    },
-    "tier-net-label": {
-        "it": "Netto Annuo",
-        "en": "Annual Net"
+        "it": "Trattenuto da terzi",
+        "en": "Retained by third parties"
     },
     "per-user-month": {
         "it": "/ utente / mese",

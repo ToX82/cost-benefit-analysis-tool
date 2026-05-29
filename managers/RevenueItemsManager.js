@@ -123,81 +123,94 @@ export class RevenueItemsManager {
                 <button type="button" class="btn-icon" data-tier-delete style="flex-shrink:0;">×</button>
             </div>
 
-            <!-- Pricing block -->
-            <div class="tier-pricing">
-                <div class="tier-pricing-col">
-                    <div class="tier-pricing-label" style="color:#94a3b8;">${__('tier-price-label')}</div>
-                    <div style="position:relative;">
-                        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:#94a3b8;pointer-events:none;">€</span>
-                        <input type="number" data-tier-price min="0" step="any"
-                            class="inp" style="font-size:14px;font-weight:700;padding:7px 8px 7px 20px;text-align:center;"
-                            placeholder="0" value="${price}">
+            <div class="tier-body">
+                <div class="tier-body-left">
+                    <div class="tier-zone-title">${__('tier-zone-pricing')}</div>
+                    <div class="tier-pricing">
+                        <div class="tier-pricing-col">
+                            <div class="tier-pricing-label" style="color:#94a3b8;">${__('tier-price-label')}</div>
+                            <div style="position:relative;">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:#94a3b8;pointer-events:none;">€</span>
+                                <input type="number" data-tier-price min="0" step="any"
+                                    class="inp tier-price-inp" placeholder="0" value="${price}">
+                            </div>
+                            <div class="tier-pricing-unit" data-tier-price-unit>${priceUnit}</div>
+                        </div>
+                        <div class="tier-pricing-col">
+                            <div class="tier-pricing-label" style="color:#fca5a5;">${__('tier-commission-label')}</div>
+                            <div style="position:relative;">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:#fca5a5;pointer-events:none;">€</span>
+                                <input type="number" data-tier-commission min="0" step="any"
+                                    class="inp inp-danger tier-price-inp" style="color:#ef4444;"
+                                    placeholder="0" value="${commission}">
+                            </div>
+                            <div class="tier-pricing-unit" data-tier-commission-unit>${isOnetime ? __('per-license') : __('per-license-year')}</div>
+                        </div>
+                        <div class="tier-pricing-col is-computed">
+                            <div class="tier-pricing-label" style="color:#34d399;">${__('tier-net-label')}<span class="tier-computed-badge">${__('tier-computed-label')}</span></div>
+                            <div data-tier-net>—</div>
+                            <div class="tier-pricing-unit" data-tier-net-unit>${priceUnit}</div>
+                        </div>
                     </div>
-                    <div class="tier-pricing-unit" data-tier-price-unit>${priceUnit}</div>
+
+                    <div class="tier-zone-title">${__('tier-zone-details')}</div>
+                    <div class="tier-meta">
+                        <div class="tier-elab">
+                            <span class="tier-elab-label">${__('elab-per-license-label')}</span>
+                            <input type="number" data-tier-elaborations min="0" step="1"
+                                class="inp-bare tier-elab-inp" placeholder="0" value="${elaborationsPerLicense}">
+                            <span class="tier-elab-hint">${__('elab-per-license-unit')}</span>
+                        </div>
+
+                        <div class="tier-elab" data-churn-row style="${isOnetime ? 'display:none;' : ''}">
+                            <span class="tier-elab-label" style="color:#b91c1c;">${__('churn-rate-label')}</span>
+                            <input type="number" data-tier-churn min="0" max="100" step="0.1"
+                                class="inp-bare tier-elab-inp" style="color:#ef4444;"
+                                placeholder="0" value="${churnRate}">
+                            <span class="tier-elab-hint">${__('churn-rate-hint')}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="tier-pricing-col">
-                    <div class="tier-pricing-label" style="color:#fca5a5;">${__('tier-commission-label')}</div>
-                    <div style="position:relative;">
-                        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:#fca5a5;pointer-events:none;">€</span>
-                        <input type="number" data-tier-commission min="0" step="any"
-                            class="inp inp-danger" style="font-size:14px;font-weight:700;padding:7px 8px 7px 20px;text-align:center;color:#ef4444;"
-                            placeholder="0" value="${commission}">
-                    </div>
-                    <div class="tier-pricing-unit" data-tier-commission-unit>${isOnetime ? __('per-license') : __('per-license-year')}</div>
-                </div>
-                <div class="tier-pricing-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                    <div class="tier-pricing-label" style="color:#34d399;">${__('tier-net-label')}</div>
-                    <div data-tier-net style="font-size:18px;font-weight:800;color:#059669;letter-spacing:-0.4px;margin:6px 0;">—</div>
-                    <div class="tier-pricing-unit" data-tier-net-unit>${priceUnit}</div>
-                </div>
-            </div>
 
-            <!-- Elaborations per license -->
-            <div class="tier-elab">
-                <span class="tier-elab-label">${__('elab-per-license-label')}</span>
-                <input type="number" data-tier-elaborations min="0" step="1"
-                    class="inp-bare" style="width:64px;font-weight:700;font-size:14px;"
-                    placeholder="0" value="${elaborationsPerLicense}">
-                <span style="font-size:10px;color:#94a3b8;">${__('elab-per-license-unit')}</span>
-            </div>
+                <div class="tier-scenarios">
+                    <div class="tier-zone-title tier-zone-title-scenarios">${__('tier-zone-acquisition')}</div>
+                    <div class="tier-scenarios-grid">
 
-            <!-- Churn rate (monthly tiers only) -->
-            <div class="tier-elab" data-churn-row style="${isOnetime ? 'display:none;' : ''}">
-                <span class="tier-elab-label" style="color:#fca5a5;">${__('churn-rate-label')}</span>
-                <input type="number" data-tier-churn min="0" max="100" step="0.1"
-                    class="inp-bare" style="width:64px;font-weight:700;font-size:14px;color:#ef4444;"
-                    placeholder="0" value="${churnRate}">
-                <span style="font-size:10px;color:#94a3b8;">%/mese · LTV: <span data-tier-ltv style="font-weight:700;color:#6366f1;">—</span></span>
-            </div>
+                        <div class="scenario-box s-pess">
+                            <div class="scenario-label">${__('revenue-scenario-pessimistic')}</div>
+                            <div class="scenario-input-wrap">
+                                ${fmtInp('data-tier-pessimistic', pessimisticAcq, 's-pess')}
+                                <span class="scenario-input-unit">${__('clients-per-month-short')}</span>
+                            </div>
+                            <div class="scenario-rev" data-revenue-pessimistic>
+                                <span class="scenario-rev-label">${__('tier-revenue-y1')}</span>
+                                <span class="scenario-rev-value">—</span>
+                            </div>
+                        </div>
 
-            <!-- Break-even -->
-            <div class="tier-elab" data-breakeven-row>
-                <span class="tier-elab-label" style="color:#6366f1;" data-i18n="tier-breakeven-label">Break-even</span>
-                <span data-tier-breakeven style="font-size:13px;font-weight:800;color:#4f46e5;">—</span>
-                <span style="font-size:10px;color:#94a3b8;" data-i18n="tier-breakeven-unit">utenti (steady state) per coprire i costi</span>
-            </div>
+                        <div class="scenario-box s-base">
+                            <div class="scenario-label">${__('revenue-scenario-base')}</div>
+                            <div class="scenario-input-wrap">
+                                ${fmtInp('data-tier-base', baseAcq, 's-base')}
+                                <span class="scenario-input-unit">${__('clients-per-month-short')}</span>
+                            </div>
+                            <div class="scenario-rev" data-revenue-base>
+                                <span class="scenario-rev-label">${__('tier-revenue-y1')}</span>
+                                <span class="scenario-rev-value">—</span>
+                            </div>
+                        </div>
 
-            <!-- Scenario acquisition rates -->
-            <div class="tier-scenarios">
-                <div class="tier-scenarios-label" data-i18n="monthly-acquisition-rate">${__('monthly-acquisition-rate')}</div>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-
-                    <div class="scenario-box s-pess">
-                        <div class="scenario-label">${__('pessimistic')}</div>
-                        ${fmtInp('data-tier-pessimistic', pessimisticAcq, 's-pess')}
-                        <div class="scenario-rev" data-revenue-pessimistic>—</div>
-                    </div>
-
-                    <div class="scenario-box s-base">
-                        <div class="scenario-label">${__('tier-units-base')}</div>
-                        ${fmtInp('data-tier-base', baseAcq, 's-base')}
-                        <div class="scenario-rev" data-revenue-base>—</div>
-                    </div>
-
-                    <div class="scenario-box s-opt">
-                        <div class="scenario-label">${__('optimistic')}</div>
-                        ${fmtInp('data-tier-optimistic', optimisticAcq, 's-opt')}
-                        <div class="scenario-rev" data-revenue-optimistic>—</div>
+                        <div class="scenario-box s-opt">
+                            <div class="scenario-label">${__('revenue-scenario-optimistic')}</div>
+                            <div class="scenario-input-wrap">
+                                ${fmtInp('data-tier-optimistic', optimisticAcq, 's-opt')}
+                                <span class="scenario-input-unit">${__('clients-per-month-short')}</span>
+                            </div>
+                            <div class="scenario-rev" data-revenue-optimistic>
+                                <span class="scenario-rev-label">${__('tier-revenue-y1')}</span>
+                                <span class="scenario-rev-value">—</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -274,26 +287,16 @@ export class RevenueItemsManager {
             const users = this.#activeUsers(tier, 12, field);
             return Math.max(0, this.#netMonthly(tier)) * users;
         };
-        const suffix = isOnetime ? ' (12m)' : ' (a.1)';
         const setRev = (attr, field) => {
             const el = card.querySelector(`[${attr}]`);
-            if (!el) return;
+            const valEl = el?.querySelector('.scenario-rev-value');
+            if (!valEl) return;
             const acq = tier[field] || 0;
-            el.textContent = acq > 0 ? `${fmt(rev12(field))}${suffix}` : '—';
+            valEl.textContent = acq > 0 ? fmt(rev12(field)) : '—';
         };
         setRev('data-revenue-base', 'baseAcqPerMonth');
         setRev('data-revenue-optimistic', 'optimisticAcqPerMonth');
         setRev('data-revenue-pessimistic', 'pessimisticAcqPerMonth');
-
-        // LTV
-        const ltvEl = card.querySelector('[data-tier-ltv]');
-        if (ltvEl && !isOnetime) {
-            const netMonthly = Math.max(0, this.#netMonthly(tier));
-            const churn = tier.churnRate || 0;
-            ltvEl.textContent = (churn > 0 && netMonthly > 0)
-                ? fmt(netMonthly / (churn / 100))
-                : '—';
-        }
     }
 
     static addRecurringTier(label = '', price = '', commission = '', baseAcq = '',
@@ -372,7 +375,7 @@ export class RevenueItemsManager {
     }
 
     /**
-     * Active subscription users at month 12 (reference snapshot).
+     * Active subscription users at a given month.
      */
     static getActiveUsers(month, scenario = 'base') {
         const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
@@ -381,6 +384,30 @@ export class RevenueItemsManager {
         return this.#recurringTiers
             .filter(t => t.licenseType !== 'onetime')
             .reduce((sum, t) => sum + this.#activeUsers(t, month, field), 0);
+    }
+
+    /**
+     * Total users/licenses at a given month (subscriptions + cumulative one-time sales).
+     * Used for scaling cost calculations.
+     */
+    static getTotalUsersAtMonth(month, scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => sum + this.#activeUsers(t, month, field), 0);
+    }
+
+    /**
+     * Total elaborations per month at a given month and scenario.
+     */
+    static getElaborationsAtMonth(month, scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => {
+            const users = this.#activeUsers(t, month, field);
+            return sum + users * (t.elaborationsPerLicense || 0);
+        }, 0);
     }
 
     /**
@@ -402,7 +429,7 @@ export class RevenueItemsManager {
      * Active subscription users at month 12 (used as user-count reference).
      */
     static getTotalUnits(scenario = 'base') {
-        return this.getActiveUsers(12, scenario);
+        return this.getTotalUsersAtMonth(12, scenario);
     }
 
     /**
@@ -463,6 +490,30 @@ export class RevenueItemsManager {
     }
 
     /**
+     * New customers acquired per month (sum across all tiers).
+     */
+    static getMonthlyNewAcquisitions(scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => sum + (t[field] || 0), 0);
+    }
+
+    /**
+     * Monthly spend on customer acquisition (CAC × new customers/month).
+     */
+    static getMonthlyAcquisitionCost(cac, scenario = 'base') {
+        return (cac || 0) * this.getMonthlyNewAcquisitions(scenario);
+    }
+
+    /**
+     * Cumulative acquisition spend over a number of months.
+     */
+    static getAcquisitionCostForMonths(cac, months, scenario = 'base') {
+        return this.getMonthlyAcquisitionCost(cac, scenario) * months;
+    }
+
+    /**
      * Weighted average LTV (weighted by acquisition rate).
      */
     static getWeightedLTV() {
@@ -501,17 +552,19 @@ export class RevenueItemsManager {
             const y1 = cumRev(scen, 12);
             const y2 = cumRev(scen, 24);
             set(`recurring-${prefix}-total`,
-                `${fmt(y1)}<span class="scenario-strip-y2">${fmt(y2)} anno 2</span>`);
+                `${fmt(y1)}<span class="scenario-strip-y2">${fmt(y2)} ${__('scenario-strip-y2')}</span>`);
         }
 
         const count = this.#recurringTiers.length;
         const emptyEl   = document.getElementById('recurring-empty-state');
         const container = document.getElementById('recurring-tiers-container');
         const summary   = document.getElementById('recurring-summary');
+        const legend    = document.getElementById('scenario-legend');
 
         if (emptyEl)   emptyEl.classList.toggle('hidden', count > 0);
         if (container) container.classList.toggle('show', count > 0);
         if (summary)   summary.classList.toggle('hidden', count === 0);
+        if (legend)    legend.classList.toggle('hidden', count === 0);
     }
 
     static getOnetimeItems()   { return [...this.#onetimeItems]; }

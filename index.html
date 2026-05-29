@@ -11,23 +11,35 @@
     <style>
     /* ── Reset & Base ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+        --page-max: 1280px;
+        --page-gutter: clamp(16px, 4vw, 32px);
+        --section-gap: 20px;
+        --tier-surface: #f1f5f9;
+        --tier-scenarios-surface: #f8fafc;
+    }
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         background: #f1f5f9;
         color: #1e293b;
         min-height: 100vh;
-        padding: 24px 16px 48px;
+        padding: 28px 0 56px;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
     }
 
     /* ── Layout ────────────────────────────────────────────── */
-    .page { max-width: 1200px; margin: 0 auto; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    @media (max-width: 768px) {
-        .grid-2 { grid-template-columns: 1fr; }
+    .page {
+        width: min(calc(100% - 2 * var(--page-gutter)), var(--page-max));
+        margin-inline: auto;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--section-gap); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--section-gap); }
+    @media (max-width: 1024px) {
         .grid-3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .grid-2 { grid-template-columns: 1fr; }
     }
 
     /* ── Cards ─────────────────────────────────────────────── */
@@ -63,7 +75,14 @@
         font-size: 13px; font-weight: 500; color: #475569;
         display: block; margin-bottom: 6px;
     }
-    .hint-text { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .hint-text { font-size: 11px; color: #94a3b8; margin-top: 4px; line-height: 1.45; }
+    .section-hint {
+        font-size: 12px; color: #64748b; line-height: 1.5;
+        margin: 0 0 14px; padding: 0 24px 0;
+    }
+    .card-header + .section-hint { margin-top: -6px; padding-top: 0; }
+    .card-body > .section-hint:first-child { padding: 0; margin-top: 0; }
+    .fin-row-label-sub { display: block; font-size: 10px; font-weight: 400; color: #94a3b8; margin-top: 2px; }
     .stat-value {
         font-size: 26px; font-weight: 800;
         letter-spacing: -0.8px; line-height: 1;
@@ -168,50 +187,101 @@
     }
     .tier-card:hover {
         border-color: #a5b4fc;
-        box-shadow: 0 4px 12px rgba(79,70,229,.1);
+        box-shadow: 0 4px 16px rgba(79,70,229,.1);
     }
     .tier-head {
-        display: flex; align-items: center; gap: 10px;
-        padding: 14px 16px;
-        border-bottom: 1px solid #f1f5f9;
+        display: flex; align-items: center; gap: 12px;
+        padding: 16px 20px;
+        background: #fff;
+        border-bottom: 1px solid #e2e8f0;
     }
     .tier-head input[type=text] {
-        flex: 1; font-size: 14px; font-weight: 700;
+        flex: 1; font-size: 15px; font-weight: 700;
         color: #1e293b; background: transparent;
         border: none; border-bottom: 1.5px solid transparent;
         padding: 2px 0; outline: none;
         font-family: inherit; transition: border-color .15s;
+        min-width: 0;
     }
     .tier-head input[type=text]:hover  { border-bottom-color: #e2e8f0; }
     .tier-head input[type=text]:focus  { border-bottom-color: #4f46e5; }
 
+    .tier-body {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    .tier-body-left { background: var(--tier-surface); }
+    @media (min-width: 720px) {
+        .tier-body {
+            grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        }
+        .tier-scenarios {
+            border-left: 1px solid #e2e8f0;
+        }
+    }
+
     .tier-pricing {
-        display: grid; grid-template-columns: repeat(3,1fr);
-        background: #f8fafc;
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        background: var(--tier-surface);
         border-bottom: 1px solid #f1f5f9;
     }
-    .tier-pricing-col { padding: 12px 10px; text-align: center; }
+    @media (min-width: 720px) {
+        .tier-pricing { border-bottom: none; }
+    }
+    .tier-pricing-col { padding: 14px 12px; text-align: center; }
     .tier-pricing-col + .tier-pricing-col { border-left: 1px solid #e2e8f0; }
-    .tier-pricing-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-    .tier-pricing-unit { font-size: 10px; color: #94a3b8; margin-top: 6px; }
+    .tier-pricing-label {
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 10px; line-height: 1.3;
+    }
+    .tier-pricing-unit { font-size: 11px; color: #94a3b8; margin-top: 8px; line-height: 1.35; }
+    .tier-price-inp {
+        font-size: 15px !important; font-weight: 700 !important;
+        padding: 8px 10px 8px 22px !important; text-align: center;
+    }
+    [data-tier-net] {
+        font-size: 18px; font-weight: 800; color: #059669;
+        letter-spacing: -0.4px; margin: 6px 0;
+    }
 
-    .tier-scenarios { padding: 12px; flex: 1; }
-    .tier-scenarios-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; margin-bottom: 10px; }
+    .tier-meta { background: var(--tier-surface); }
+    .tier-scenarios {
+        padding: 14px 16px; flex: 1;
+        background: var(--tier-scenarios-surface);
+        display: flex; flex-direction: column; justify-content: center;
+    }
+    @media (max-width: 719px) {
+        .tier-scenarios { border-top: 1px solid #e2e8f0; }
+    }
+    .tier-scenarios-label {
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #94a3b8; margin-bottom: 12px;
+    }
+    .tier-scenarios-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    }
 
-    .scenario-box { padding: 10px 8px; border-radius: 10px; text-align: center; }
+    .scenario-box { padding: 12px 10px; border-radius: 12px; text-align: center; min-width: 0; }
     .s-pess { background: #fff7ed; border: 1.5px solid #fed7aa; }
     .s-base { background: #eef2ff; border: 1.5px solid #c7d2fe; }
     .s-opt  { background: #ecfdf5; border: 1.5px solid #a7f3d0; }
-    .scenario-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+    .scenario-label {
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .8px;
+        margin-bottom: 10px; line-height: 1.3;
+    }
     .s-pess .scenario-label { color: #f97316; }
     .s-base .scenario-label { color: #4f46e5; }
     .s-opt  .scenario-label { color: #10b981; }
-    .scenario-rev { font-size: 11px; font-weight: 600; margin-top: 8px; }
+    .scenario-rev { font-size: 12px; font-weight: 600; margin-top: 10px; line-height: 1.35; }
     .s-pess .scenario-rev { color: #ea580c; }
     .s-base .scenario-rev { color: #4338ca; }
     .s-opt  .scenario-rev { color: #059669; }
     .scenario-units-inp {
-        font-size: 18px; font-weight: 800; font-family: inherit;
+        font-size: 20px; font-weight: 800; font-family: inherit;
+        font-variant-numeric: tabular-nums;
         background: transparent; border: none;
         border-bottom: 1.5px solid transparent;
         width: 100%; text-align: center; outline: none;
@@ -239,21 +309,25 @@
 
     /* ── Tier elaborations row ──────────────────────────────── */
     .tier-elab {
-        display: flex; align-items: center; gap: 8px;
-        padding: 8px 14px;
+        display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px;
+        padding: 11px 20px;
         border-top: 1px solid #f1f5f9;
-        background: #f8faff;
+        background: var(--tier-surface);
     }
-    .tier-elab-label { font-size: 11px; font-weight: 600; color: #94a3b8; flex: 1; }
+    .tier-elab-label { font-size: 12px; font-weight: 600; color: #64748b; flex: 1; min-width: 140px; }
+    .tier-elab-value { font-size: 14px; font-weight: 800; color: #4f46e5; }
+    .tier-elab-hint { font-size: 11px; color: #94a3b8; }
+    .tier-elab-inp {
+        width: 80px; font-weight: 700; font-size: 15px;
+        font-variant-numeric: tabular-nums;
+    }
 
-    /* ── Tier grid ──────────────────────────────────────────── */
+    /* ── Tier grid — full-width list, no cramped columns ──── */
     #recurring-tiers-container { display: none; }
     #recurring-tiers-container.show {
-        display: grid; grid-template-columns: 1fr; gap: 16px;
+        display: flex; flex-direction: column; gap: 16px;
         margin-bottom: 16px;
     }
-    @media (min-width: 768px)  { #recurring-tiers-container.show { grid-template-columns: repeat(2,1fr); } }
-    @media (min-width: 1100px) { #recurring-tiers-container.show { grid-template-columns: repeat(3,1fr); } }
 
     /* ── Category badges ────────────────────────────────────── */
     .cat-badge {
@@ -429,7 +503,8 @@
 
     /* ── Unit economics responsive + states ───────────────── */
     #ue-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    @media (max-width: 900px) { #ue-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 1024px) { #ue-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 640px) { #ue-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { #ue-grid { grid-template-columns: 1fr; } }
     .ue-tile { border-radius: 12px; padding: 12px 14px; transition: box-shadow .15s; }
     .ue-tile.is-good    { box-shadow: 0 0 0 1px #a7f3d0; }
@@ -443,6 +518,89 @@
     }
     .scenario-strip-y2 {
         font-size: 11px; font-weight: 600; opacity: .75; margin-top: 4px;
+    }
+
+    /* ── Guided flow (1 → 4) ────────────────────────────────── */
+    .flow-section { margin-bottom: 28px; scroll-margin-top: 24px; }
+    .flow-header {
+        display: flex; align-items: flex-start; gap: 14px;
+        margin-bottom: 14px;
+    }
+    .flow-step {
+        flex-shrink: 0; width: 28px; height: 28px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 999px; background: #4f46e5; color: #fff;
+        font-size: 13px; font-weight: 800;
+    }
+    .flow-step-results { background: #059669; }
+    .flow-title {
+        font-size: 16px; font-weight: 700; color: #0f172a;
+        letter-spacing: -0.2px; line-height: 1.3;
+    }
+    .flow-desc {
+        font-size: 13px; color: #64748b; margin-top: 3px; line-height: 1.45;
+    }
+
+    /* ── Tier zones & clarity ───────────────────────────────── */
+    .tier-zone-title {
+        font-size: 10px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1.1px; color: #94a3b8;
+        padding: 10px 20px 0;
+        background: var(--tier-surface);
+    }
+    .tier-zone-title-scenarios {
+        background: transparent; padding: 0 0 10px;
+    }
+    .tier-computed-badge {
+        display: inline-block; font-size: 9px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .6px;
+        color: #64748b; background: #e2e8f0;
+        padding: 2px 6px; border-radius: 4px; margin-left: 6px;
+        vertical-align: middle;
+    }
+    .tier-computed-value {
+        font-size: 15px; font-weight: 800; color: #4f46e5;
+        font-variant-numeric: tabular-nums;
+    }
+    .tier-pricing-col.is-computed { background: rgba(255, 255, 255, 0.55); }
+
+    .scenario-legend {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+        padding: 10px 14px; margin-bottom: 14px;
+        background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+        font-size: 12px; color: #64748b; line-height: 1.45;
+    }
+    .scenario-legend strong { color: #475569; font-weight: 600; }
+    .scenario-legend-dot {
+        width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+        margin-right: 4px; vertical-align: middle;
+    }
+    .scenario-input-wrap {
+        display: flex; align-items: baseline; justify-content: center;
+        gap: 4px; margin: 4px 0;
+    }
+    .scenario-input-unit {
+        font-size: 11px; font-weight: 600; color: #94a3b8;
+        white-space: nowrap;
+    }
+    .scenario-rev-label {
+        display: block; font-size: 10px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: .5px;
+        opacity: .85; margin-bottom: 3px;
+    }
+    .scenario-rev-value {
+        font-size: 13px; font-weight: 800;
+        font-variant-numeric: tabular-nums;
+    }
+    .s-pess .scenario-rev-value { color: #ea580c; }
+    .s-base .scenario-rev-value { color: #4338ca; }
+    .s-opt  .scenario-rev-value { color: #059669; }
+
+    /* ── Results block ──────────────────────────────────────── */
+    .results-verdict { margin-bottom: 20px; }
+    .results-kpi-label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1px; color: #64748b; margin-bottom: 12px;
     }
     </style>
 </head>
@@ -478,7 +636,15 @@
     </div>
 
     <!-- ── Config ────────────────────────────────────────────── -->
-    <div class="card" id="analysis-form" style="margin-bottom:16px;">
+    <section class="flow-section" id="step-config">
+        <div class="flow-header">
+            <span class="flow-step">1</span>
+            <div>
+                <div class="flow-title" data-i18n="flow-step-1-title">Progetto</div>
+                <p class="flow-desc" data-i18n="flow-step-1-desc">Nome e modello di business — determina quali voci di ricavo mostrare.</p>
+            </div>
+        </div>
+    <div class="card" id="analysis-form">
         <div class="card-header" style="padding-bottom:16px;">
             <span class="section-title" data-i18n="business-model">Business Model</span>
         </div>
@@ -496,13 +662,23 @@
                         <option value="commissioned" data-i18n="commissioned">Commissionato</option>
                         <option value="mixed" data-i18n="mixed">Misto (SaaS + Commissionato)</option>
                     </select>
+                    <p class="hint-text" data-i18n="business-model-help">SaaS = abbonamenti ricorrenti · Commissionato = pagamenti una tantum · Misto = entrambi</p>
                 </div>
             </div>
         </div>
     </div>
+    </section>
 
     <!-- ── Costs Section ─────────────────────────────────────── -->
-    <div class="card" style="margin-bottom:16px;">
+    <section class="flow-section" id="step-costs">
+        <div class="flow-header">
+            <span class="flow-step">2</span>
+            <div>
+                <div class="flow-title" data-i18n="flow-step-2-title">Costi</div>
+                <p class="flow-desc" data-i18n="flow-step-2-desc">Inserisci tutte le spese del progetto. Servono almeno una voce per calcolare ROI e break-even.</p>
+            </div>
+        </div>
+    <div class="card">
         <div class="card-header">
             <span class="section-title" data-i18n="project-costs-title">Costi del Progetto</span>
             <button type="button" id="add-cost-btn" class="btn btn-ghost">
@@ -520,7 +696,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
                 </svg>
                 <span class="empty-title" data-i18n="no-costs-message">Nessuna voce di costo</span>
-                <span class="empty-desc">Aggiungi le voci per avviare l'analisi</span>
+                <span class="empty-desc" data-i18n="cost-empty-desc">Aggiungi almeno una voce per sbloccare i calcoli.</span>
             </div>
 
             <!-- Table -->
@@ -543,15 +719,27 @@
             <div id="cost-footer" style="margin-top:16px; padding-top:14px; border-top:1px solid #f1f5f9;">
                 <div id="cost-category-totals" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; min-height:22px;"></div>
                 <div style="display:flex; align-items:center; justify-content:space-between;">
-                    <span class="overline" data-i18n="total-annualized">Totale Annualizzato</span>
+                    <div>
+                        <span class="overline" data-i18n="total-annualized">Totale costi — stima anno 1</span>
+                        <p class="hint-text" style="margin-top:4px;max-width:420px;" data-i18n="cost-total-hint">Somma di tutte le voci, annualizzate.</p>
+                    </div>
                     <span id="cost-grand-total" style="font-size:20px; font-weight:800; color:#4f46e5; letter-spacing:-0.5px;">€ 0,00</span>
                 </div>
             </div>
         </div>
     </div>
+    </section>
 
     <!-- ── Revenues Section ──────────────────────────────────── -->
-    <div class="card" style="margin-bottom:16px;">
+    <section class="flow-section" id="step-revenues">
+        <div class="flow-header">
+            <span class="flow-step">3</span>
+            <div>
+                <div class="flow-title" data-i18n="flow-step-3-title">Ricavi</div>
+                <p class="flow-desc" data-i18n="flow-step-3-desc">Definisci i piani e quanti clienti prevedi di acquisire ogni mese in ciascuno scenario.</p>
+            </div>
+        </div>
+    <div class="card">
         <div class="card-header">
             <span class="section-title" data-i18n="revenues">Ricavi</span>
         </div>
@@ -559,6 +747,7 @@
 
             <!-- One-time revenues (commissioned / mixed) -->
             <div id="onetime-revenues-section" class="hidden">
+                <p class="section-hint" style="padding:0;margin-bottom:12px;" data-i18n="onetime-section-desc">Incassi che ricevi una sola volta.</p>
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
                     <span class="overline" data-i18n="onetime-revenues">Ricavi Una Tantum</span>
                     <button type="button" id="add-onetime-btn" class="btn btn-ghost-green" style="padding:6px 10px; font-size:12px;">
@@ -593,8 +782,23 @@
             <!-- Divider for mixed -->
             <hr id="revenue-divider" class="divider hidden">
 
+            <!-- CAC (SaaS / mixed) -->
+            <div id="market-cac-section" class="hidden" style="margin-bottom:20px;">
+                <div class="overline" style="margin-bottom:12px;" data-i18n="market-inputs-title">Mercato e Acquisizione</div>
+                <div style="max-width:320px;">
+                    <label class="label-text" for="cac" data-i18n="cac-label">CAC — Costo acquisizione cliente (€)</label>
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:13px;pointer-events:none;">€</span>
+                        <input type="number" id="cac" class="inp" min="0" step="any"
+                            style="padding-left:28px;" placeholder="0">
+                    </div>
+                    <p class="hint-text" data-i18n="cac-help">Marketing + vendite / clienti acquisiti</p>
+                </div>
+            </div>
+
             <!-- Recurring tiers -->
             <div id="recurring-revenues-section">
+                <p class="section-hint" style="padding:0;margin-bottom:12px;" data-i18n="recurring-section-desc">Ogni piano ha prezzo, provvigioni e clienti nuovi al mese.</p>
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                     <span class="overline" data-i18n="recurring-revenues">Abbonamenti / Licenze</span>
                     <button type="button" id="add-tier-btn" class="btn btn-ghost-blue" style="padding:6px 10px; font-size:12px;">
@@ -611,7 +815,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span class="empty-title" data-i18n="no-recurring-message">Nessun piano ricorrente</span>
-                    <span class="empty-desc">Aggiungi i tuoi piani SaaS con prezzo e utenti previsti</span>
+                    <span class="empty-desc" data-i18n="recurring-empty-desc">Crea un piano con prezzo e clienti attesi al mese.</span>
+                </div>
+
+                <div id="scenario-legend" class="scenario-legend hidden">
+                    <span data-i18n="scenario-legend-intro">Scenari: per ogni piano indica i nuovi clienti al mese.</span>
+                    <span><span class="scenario-legend-dot" style="background:#f97316;"></span><span data-i18n="revenue-scenario-pessimistic">Pessimistico — crescita sotto le attese</span></span>
+                    <span><span class="scenario-legend-dot" style="background:#4f46e5;"></span><span data-i18n="revenue-scenario-base">Base — previsione realistica</span></span>
+                    <span><span class="scenario-legend-dot" style="background:#10b981;"></span><span data-i18n="revenue-scenario-optimistic">Ottimistico — crescita sopra le attese</span></span>
                 </div>
 
                 <!-- Card grid -->
@@ -619,17 +830,18 @@
 
                 <!-- Scenario summary -->
                 <div id="recurring-summary" class="hidden">
+                    <p class="hint-text" style="margin-bottom:10px;" data-i18n="recurring-summary-hint">Primo numero = anno 1 · sotto = anno 2</p>
                     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
                         <div class="scenario-strip scenario-strip-pess">
-                            <div class="overline" style="color:#f97316; margin-bottom:6px;" data-i18n="revenue-scenario-pessimistic">Pessimistico</div>
+                            <div class="overline" style="color:#f97316; margin-bottom:6px;" data-i18n="scenario-abbr-pess">Pess.</div>
                             <div id="recurring-pes-total" class="scenario-strip-value tabular" style="color:#c2410c;">—</div>
                         </div>
                         <div class="scenario-strip scenario-strip-base">
-                            <div class="overline" style="color:#4f46e5; margin-bottom:6px;" data-i18n="revenue-scenario-base">Base</div>
+                            <div class="overline" style="color:#4f46e5; margin-bottom:6px;" data-i18n="scenario-abbr-base">Base</div>
                             <div id="recurring-base-total" class="scenario-strip-value tabular" style="color:#3730a3;">—</div>
                         </div>
                         <div class="scenario-strip scenario-strip-opt">
-                            <div class="overline" style="color:#10b981; margin-bottom:6px;" data-i18n="revenue-scenario-optimistic">Ottimistico</div>
+                            <div class="overline" style="color:#10b981; margin-bottom:6px;" data-i18n="scenario-abbr-opt">Ottim.</div>
                             <div id="recurring-opt-total" class="scenario-strip-value tabular" style="color:#065f46;">—</div>
                         </div>
                     </div>
@@ -637,9 +849,27 @@
             </div>
         </div>
     </div>
+    </section>
 
     <!-- ── Results ───────────────────────────────────────────── -->
-    <div class="grid-3" style="margin-bottom:16px;">
+    <section class="flow-section" id="step-results">
+        <div class="flow-header">
+            <span class="flow-step flow-step-results">4</span>
+            <div>
+                <div class="flow-title" data-i18n="flow-step-4-title">Risultati</div>
+                <p class="flow-desc" data-i18n="flow-step-4-desc">Sintesi automatica — si aggiorna mentre modifichi costi e ricavi.</p>
+            </div>
+        </div>
+
+    <div id="eval-card" class="eval-card results-verdict">
+        <div class="overline" style="color:#6366f1; margin-bottom:6px;" data-i18n="overall-evaluation">Verdetto del progetto</div>
+        <p class="hint-text" style="margin-bottom:12px;" data-i18n="eval-card-desc">Giudizio automatico su redditività e rischi.</p>
+        <div id="overall-evaluation" class="eval-body"></div>
+    </div>
+
+    <p class="results-kpi-label" data-i18n="results-kpi-label">Indicatori chiave (12 mesi)</p>
+    <p class="hint-text" style="margin:-8px 0 16px;" data-i18n="results-kpi-desc">Stima del primo anno — proiezione, non bilancio contabile.</p>
+    <div class="grid-3" style="margin-bottom:20px;">
 
         <div id="roi-card" class="result-card result-card-green">
             <div class="overline" style="color:#10b981; margin-bottom:10px;" data-i18n="roi-12-months">ROI 12 mesi</div>
@@ -652,38 +882,59 @@
         </div>
 
         <div id="financial-card" class="result-card result-card-amber">
-            <div class="overline" style="color:#f59e0b; margin-bottom:10px;" data-i18n="financial-details">Dettagli finanziari</div>
+            <div class="overline" style="color:#f59e0b; margin-bottom:6px;" data-i18n="financial-details">Conto economico semplificato</div>
+            <p class="hint-text" style="margin-bottom:10px;" data-i18n="financial-details-intro">Entrate e uscite del primo anno — scenario base.</p>
             <div class="fin-stack">
                 <div class="fin-row">
-                    <span class="fin-row-label" data-i18n="costs">Costi</span>
+                    <span class="fin-row-label">
+                        <span data-i18n="costs">Costi totali anno 1</span>
+                        <span class="fin-row-label-sub" data-i18n="costs-row-hint">Operativi + acquisizione + una tantum</span>
+                    </span>
                     <span id="total-costs-detail" class="fin-value tabular is-cost">€ 0,00</span>
                 </div>
                 <div class="fin-row">
-                    <span class="fin-row-label" data-i18n="direct-revenues">Ricavi diretti</span>
+                    <span class="fin-row-label">
+                        <span data-i18n="direct-revenues">Incassi una tantum</span>
+                        <span class="fin-row-label-sub" data-i18n="direct-revenues-hint">Anticipi, saldi, vendite singole</span>
+                    </span>
                     <span id="direct-revenue-detail" class="fin-value tabular">€ 0,00</span>
                 </div>
                 <div class="fin-row">
-                    <span class="fin-row-label" data-i18n="recurring-annual-revenues">Ricorrenti/anno</span>
+                    <span class="fin-row-label">
+                        <span data-i18n="recurring-annual-revenues">Incassi abbonamenti — anno 1</span>
+                        <span class="fin-row-label-sub" data-i18n="recurring-annual-hint">Canoni cumulati con crescita clienti</span>
+                    </span>
                     <span id="yearly-revenue-detail" class="fin-value tabular">€ 0,00</span>
                 </div>
                 <div class="fin-row">
-                    <span class="fin-row-label" data-i18n="total-commissions">Totale provvigioni</span>
+                    <span class="fin-row-label">
+                        <span data-i18n="total-commissions">Provvigioni e fee</span>
+                        <span class="fin-row-label-sub" data-i18n="commissions-hint">Trattenute da partner o piattaforme</span>
+                    </span>
                     <span id="total-commissions-detail" class="fin-value tabular is-commission">€ 0,00</span>
                 </div>
+                <div id="acquisition-cost-row" class="fin-row hidden">
+                    <span class="fin-row-label">
+                        <span data-i18n="acquisition-costs-y1">Spesa acquisizione clienti</span>
+                        <span class="fin-row-label-sub" data-i18n="acquisition-costs-hint">CAC × nuovi clienti/mese × 12</span>
+                    </span>
+                    <span id="acquisition-cost-detail" class="fin-value tabular is-cost">€ 0,00</span>
+                </div>
                 <div class="fin-row fin-row-total">
-                    <span class="fin-row-label" data-i18n="annual-gross-margin">Margine annuale lordo</span>
-                    <span id="annual-gross-margin-detail" class="fin-value tabular">€ 0,00</span>
+                    <span class="fin-row-label" data-i18n="annual-net-profit-y1">Utile netto anno 1</span>
+                    <span id="annual-net-profit-detail" class="fin-value tabular">€ 0,00</span>
                 </div>
                 <div id="users-scenarios" class="projection-block hidden"></div>
             </div>
         </div>
     </div>
 
-    <!-- ── Unit Economics ──────────────────────────────────── -->
+    <!-- Unit Economics + chart below KPIs -->
     <div class="card" style="margin-bottom:16px;">
-        <div class="card-header" style="padding-bottom:14px;">
-            <span class="section-title" data-i18n="unit-economics-title">Unit Economics</span>
+        <div class="card-header" style="padding-bottom:8px;">
+            <span class="section-title" data-i18n="unit-economics-title">Economics per singolo cliente</span>
         </div>
+        <p class="section-hint" data-i18n="unit-economics-desc">Quanto vale un cliente e quanto costa acquisirlo.</p>
         <div class="card-body" style="padding-top:0;">
             <div id="ue-grid">
                 <div class="ue-tile" style="background:#f5f3ff;border:1px solid #ddd6fe;">
@@ -691,10 +942,25 @@
                     <div id="ue-ltv" class="ue-value tabular" style="color:#4f46e5;">—</div>
                     <div class="hint-text" data-i18n="ue-ltv-hint">Valore vita cliente</div>
                 </div>
+                <div class="ue-tile" style="background:#eff6ff;border:1px solid #bfdbfe;">
+                    <div class="overline" style="color:#1d4ed8;margin-bottom:6px;" data-i18n="ue-cac">CAC</div>
+                    <div id="ue-cac" class="ue-value tabular" style="font-size:16px;color:#2563eb;">—</div>
+                    <div class="hint-text" data-i18n="ue-cac-hint">Costo acquisizione</div>
+                </div>
+                <div id="ue-ltvcac-tile" class="ue-tile" style="background:#ecfdf5;border:1px solid #a7f3d0;">
+                    <div class="overline" style="color:#047857;margin-bottom:6px;" data-i18n="ue-ltvcac">LTV:CAC</div>
+                    <div id="ue-ltvcac" class="ue-value tabular" style="font-size:16px;color:#059669;">—</div>
+                    <div class="hint-text" data-i18n="ue-ltvcac-hint">Target ≥ 3x</div>
+                </div>
+                <div class="ue-tile" style="background:#fffbeb;border:1px solid #fde68a;">
+                    <div class="overline" style="color:#b45309;margin-bottom:6px;" data-i18n="ue-payback">Payback CAC</div>
+                    <div id="ue-payback" class="ue-value tabular" style="font-size:16px;color:#d97706;">—</div>
+                    <div class="hint-text" data-i18n="ue-payback-hint">Mesi per recuperare CAC</div>
+                </div>
                 <div class="ue-tile" style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;">
                     <div class="overline" style="color:#475569;margin-bottom:4px;" data-i18n="ue-gmargin">Gross Margin %</div>
                     <div id="ue-gmargin" class="ue-value tabular" style="font-size:16px;color:#1e293b;">—</div>
-                    <div class="hint-text" data-i18n="ue-gmargin-hint">Ricavi ricorrenti netti / ricavi lordi</div>
+                    <div class="hint-text" data-i18n="ue-gmargin-hint">(Ricavi netti − COGS variabili) / ricavi lordi</div>
                 </div>
                 <div id="ue-nmargin-tile" class="ue-tile" style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;">
                     <div class="overline" style="color:#475569;margin-bottom:4px;" data-i18n="ue-nmargin">Net Margin %</div>
@@ -712,21 +978,16 @@
 
     <!-- ── Cash Flow Chart ──────────────────────────────────── -->
     <div class="card" style="margin-bottom:16px;">
-        <div class="card-header" style="padding-bottom:14px;">
-            <span class="section-title" data-i18n="cashflow-title">Cash Flow Cumulativo (36 mesi)</span>
+        <div class="card-header" style="padding-bottom:8px;">
+            <span class="section-title" data-i18n="cashflow-title">Andamento cassa — 36 mesi</span>
         </div>
+        <p class="section-hint" data-i18n="cashflow-desc">Sopra zero stai guadagnando, sotto zero stai bruciando cassa.</p>
         <div class="card-body" style="padding-top:4px;">
             <div id="cashflow-chart" style="width:100%;"></div>
         </div>
     </div>
 
-    <!-- Evaluation -->
-    <div id="eval-card" class="eval-card" style="margin-bottom:16px;">
-        <div class="overline" style="color:#6366f1; margin-bottom:12px;" data-i18n="overall-evaluation">Valutazione complessiva</div>
-        <div id="overall-evaluation" class="eval-body"></div>
-    </div>
-
-    <!-- ── AI Analysis ───────────────────────────────────────── -->
+    <!-- Evaluation moved to top of results -->
     <div style="display:flex; justify-content:center; padding-top:8px;">
         <button id="ai-analysis-btn" class="btn btn-primary btn-primary-lg" disabled>
             <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -741,6 +1002,7 @@
             </div>
         </button>
     </div>
+    </section>
 
 </div>
 

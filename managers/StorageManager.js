@@ -16,7 +16,7 @@ export class StorageManager {
      */
     static saveToStorage() {
         try {
-            // Save static inputs (business-model, dev-weeks, dev-occupation)
+            // Save static inputs (project name, business model, CAC, …)
             document.querySelectorAll('input[id], select[id]').forEach(input => {
                 const value = input.value.trim();
                 if (value) {

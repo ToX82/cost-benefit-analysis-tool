@@ -7,9 +7,13 @@ export class InputManager {
      * @returns {Object}
      */
     static collectInputs() {
+        const cacRaw = document.getElementById('cac')?.value;
+        const cac = cacRaw !== undefined && cacRaw !== '' ? parseFloat(cacRaw) : 0;
+
         return {
             projectName: document.getElementById('project-name')?.value.trim() || '',
-            businessModel: document.getElementById('business-model')?.value || 'saas'
+            businessModel: document.getElementById('business-model')?.value || 'saas',
+            cac: Number.isFinite(cac) && cac >= 0 ? cac : 0
         };
     }
 }

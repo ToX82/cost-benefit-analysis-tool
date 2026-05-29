@@ -8,11 +8,12 @@ import { __ } from '../utils/I18n.js';
  * Optional roi: { base: { value, percentage } } — aligns viability floor with ROI evaluation.
  */
 export class RiskAnalyzer {
-    constructor(inputs, costs, revenues = null, roi = null) {
+    constructor(inputs, costs, revenues = null, roi = null, breakeven = null) {
         this.inputs = inputs;
         this.costs = costs;
         this.revenues = revenues;
         this.roi = roi;
+        this.breakeven = breakeven;
         this.riskScore = 0;
         this.details = [];
         this.mitigations = [];
@@ -24,6 +25,7 @@ export class RiskAnalyzer {
         this.calculateUserRisk();
         this.calculateUserBaseRisk();
         this.calculateConcentrationRisk();
+        this.calculateCACRisk();
         this.applyViabilityFloor();
 
         return {
@@ -56,8 +58,10 @@ export class RiskAnalyzer {
             return;
         }
 
-        const monthsToBreakeven = this.costs.totalCosts / this.inputs.monthlyRecurring;
-        const risk = Math.min(MAX_RISK, Math.max(0, (monthsToBreakeven - BREAKEVEN_MONTHS) * 2));
+        const monthsToBreakeven = this.#resolvedBreakevenMonths();
+        const risk = Number.isFinite(monthsToBreakeven)
+            ? Math.min(MAX_RISK, Math.max(0, (monthsToBreakeven - BREAKEVEN_MONTHS) * 2))
+            : MAX_RISK;
 
         this.riskScore += risk;
 
@@ -96,7 +100,7 @@ export class RiskAnalyzer {
 
         const upfrontRisk = Math.max(0, (1 - upfrontRatio) * MAX_RISK);
         const recurringRisk = this.inputs.monthlyRecurring > 0
-            ? Math.min(MAX_RISK, Math.max(0, (this.costs.totalCosts / this.inputs.monthlyRecurring - BREAKEVEN_MONTHS) * 2))
+            ? Math.min(MAX_RISK, Math.max(0, (this.#resolvedBreakevenMonths() - BREAKEVEN_MONTHS) * 2))
             : MAX_RISK;
 
         const totalRisk = (upfrontRisk * 0.4) + (recurringRisk * 0.6);
@@ -204,6 +208,25 @@ export class RiskAnalyzer {
         }
     }
 
+    calculateCACRisk() {
+        const cac = this.inputs.cac || 0;
+        const ltv = this.inputs.ltv || 0;
+        if (cac <= 0 || ltv <= 0) return;
+
+        const ratio = ltv / cac;
+
+        if (ratio < 1) {
+            this.riskScore += 20;
+            this.details.push(__('low-ltvcac-critical', ratio.toFixed(1)));
+            this.mitigations.push(__('reduce-cac-mitigation'));
+            this.mitigations.push(__('increase-ltv-mitigation'));
+        } else if (ratio < 3) {
+            this.riskScore += 10;
+            this.details.push(__('low-ltvcac-warning', ratio.toFixed(1)));
+            this.mitigations.push(__('optimize-acquisition-mitigation'));
+        }
+    }
+
     /**
      * Economic non-viability dominates operational factors: a structurally
      * unprofitable project cannot be downgraded by low team load or short duration.
@@ -236,6 +259,20 @@ export class RiskAnalyzer {
         const revenue = this.inputs.onetimeRevenue + (this.inputs.monthlyRecurring * 12);
         const margin = revenue - totalCosts;
         return totalCosts > 0 ? (margin / totalCosts) * 100 : 0;
+    }
+
+    /**
+     * Uses cash-flow breakeven when available; falls back to costs/MRR approximation.
+     * @returns {number}
+     */
+    #resolvedBreakevenMonths() {
+        if (typeof this.breakeven === 'number' && Number.isFinite(this.breakeven)) {
+            return this.breakeven;
+        }
+        if (this.inputs.monthlyRecurring > 0) {
+            return this.costs.totalCosts / this.inputs.monthlyRecurring;
+        }
+        return Infinity;
     }
 
     determineRiskLevel() {

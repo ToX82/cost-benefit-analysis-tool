@@ -112,9 +112,9 @@ export class CostItemsManager {
                             placeholder="1" value="${minUnits}">
                     </div>
                     <div style="display:flex;gap:8px;justify-content:flex-end;font-size:10.5px;font-weight:700;padding-top:5px;border-top:1px dashed #f1f5f9;">
-                        <span style="color:#4f46e5;">B: <span data-scaling-base>—</span></span>
-                        <span style="color:#10b981;">O: <span data-scaling-opt>—</span></span>
-                        <span style="color:#f97316;">P: <span data-scaling-pes>—</span></span>
+                        <span style="color:#4f46e5;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-base')}: <span data-scaling-base>—</span></span>
+                        <span style="color:#10b981;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-opt')}: <span data-scaling-opt>—</span></span>
+                        <span style="color:#f97316;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-pess')}: <span data-scaling-pes>—</span></span>
                     </div>
                 </div>
 
@@ -130,9 +130,9 @@ export class CostItemsManager {
                         </div>
                     </div>
                     <div style="display:flex;gap:8px;justify-content:flex-end;font-size:10.5px;font-weight:700;padding-top:5px;border-top:1px dashed #f1f5f9;">
-                        <span style="color:#4f46e5;">B: <span data-per-elab-base>—</span></span>
-                        <span style="color:#10b981;">O: <span data-per-elab-opt>—</span></span>
-                        <span style="color:#f97316;">P: <span data-per-elab-pes>—</span></span>
+                        <span style="color:#4f46e5;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-base')}: <span data-per-elab-base>—</span></span>
+                        <span style="color:#10b981;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-opt')}: <span data-per-elab-opt>—</span></span>
+                        <span style="color:#f97316;" title="${__('scenario-cost-preview-hint')}">${__('scenario-abbr-pess')}: <span data-per-elab-pes>—</span></span>
                     </div>
                 </div>
 
@@ -292,6 +292,12 @@ export class CostItemsManager {
     static hasScalingCosts()  { return this.#items.some(i => i.frequency === 'scaling'); }
     static hasPerElabCosts()  { return this.#items.some(i => i.frequency === 'per-elab'); }
 
+    static getItemScenarioCost(item, userCount = 0, elaborationCount = 0) {
+        if (item.frequency === 'scaling') return this.#getScalingCost(item, userCount);
+        if (item.frequency === 'per-elab') return this.#getPerElabCost(item, elaborationCount);
+        return this.annualizedAmount(item);
+    }
+
     static getOnetimeCosts() {
         return this.#items
             .filter(i => i.frequency === 'onetime')
@@ -302,6 +308,60 @@ export class CostItemsManager {
         return this.#items
             .filter(i => i.frequency !== 'onetime')
             .reduce((sum, i) => sum + this.annualizedAmount(i), 0);
+    }
+
+    /**
+     * Recurring annual costs at a given scale (fixed monthly/onetime excluded from onetime;
+     * scaling and per-elab use actual user/elaboration counts).
+     */
+    static getRecurringAnnualCostsAtScale(userCount = 0, elaborationCount = 0) {
+        let total = 0;
+        this.#items.forEach(item => {
+            if (item.frequency === 'onetime') return;
+            if (item.frequency === 'scaling') {
+                total += this.#getScalingCost(item, userCount);
+            } else if (item.frequency === 'per-elab') {
+                total += this.#getPerElabCost(item, elaborationCount);
+            } else {
+                total += this.annualizedAmount(item);
+            }
+        });
+        return total;
+    }
+
+    /**
+     * Variable COGS only (scaling + per-elab) at a given scale — excludes fixed recurring costs.
+     */
+    static getVariableAnnualCosts(userCount = 0, elaborationCount = 0) {
+        let total = 0;
+        this.#items.forEach(item => {
+            if (item.frequency === 'scaling') {
+                total += this.#getScalingCost(item, userCount);
+            } else if (item.frequency === 'per-elab') {
+                total += this.#getPerElabCost(item, elaborationCount);
+            }
+        });
+        return total;
+    }
+
+    /**
+     * Total operating cost for a single month at a given scale (excludes one-time costs).
+     */
+    static getMonthlyOperatingCost(userCount = 0, elaborationCount = 0) {
+        let total = 0;
+        this.#items.forEach(item => {
+            if (item.frequency === 'onetime') return;
+            if (item.frequency === 'monthly') {
+                total += item.amount || 0;
+            } else if (item.frequency === 'scaling') {
+                if (!item.usersPerUnit || item.usersPerUnit <= 0) return;
+                const units = Math.max(item.minUnits || 0, Math.ceil(userCount / item.usersPerUnit));
+                total += units * (item.costPerUnit || 0);
+            } else if (item.frequency === 'per-elab') {
+                total += (elaborationCount || 0) * (item.costPerElab || 0);
+            }
+        });
+        return total;
     }
 
     // ── Display updates ───────────────────────────────────────────────────────

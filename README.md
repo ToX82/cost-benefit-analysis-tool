@@ -10,10 +10,12 @@ A simple web-based tool for conducting cost-benefit analyses of software project
   - Mixed model (SaaS + Commissioned)
 
 - **Advanced Financial Analysis**
-  - Direct and indirect cost calculation
-  - Revenue projection (upfront, final, and recurring)
-  - ROI calculation with multiple scenarios
-  - Breakeven point analysis
+  - Categorized costs (fixed, one-time, scaling, per-elaboration)
+  - Revenue projection with monthly acquisition and churn
+  - ROI calculation with optimistic / base / pessimistic scenarios
+  - Cash-flow break-even with costs that scale with users and usage
+  - Cumulative cash flow chart (36 months)
+  - CAC input with LTV:CAC and CAC payback metrics
 
 - **Risk Assessment**
   - Automated risk scoring
@@ -21,16 +23,12 @@ A simple web-based tool for conducting cost-benefit analyses of software project
   - Mitigation suggestions
   - User base variability analysis
 
-- **Resource Management**
-  - Development timeline estimation
-  - Team occupation tracking
-  - Resource allocation optimization
-
 - **Smart Features**
-  - AI-powered project analysis
+  - AI-powered project analysis (via Perplexity export)
   - Multi-scenario modeling (optimistic/pessimistic)
-  - Internationalization support (currently English and Italian)
+  - Internationalization support (English and Italian)
   - Modern, responsive UI with real-time updates
+  - Shareable URLs and local storage persistence
 
 - **Multi-language support**
   - English and Italian are supported. Feel free to make a pull request to add your language.
@@ -38,7 +36,6 @@ A simple web-based tool for conducting cost-benefit analyses of software project
 ## Technology Stack
 
 - Pure JavaScript (ES6+)
-- TailwindCSS for styling
 - Modular architecture with separate managers and analyzers
 - No backend required - runs entirely in the browser
 - Uses local storage for data persistence
@@ -47,13 +44,16 @@ A simple web-based tool for conducting cost-benefit analyses of software project
 
 ```
 ├── analyzers/
-│   ├── AIAnalyzer.js         # AI-powered analysis
+│   ├── AIAnalyzer.js         # AI export to Perplexity
 │   ├── CostBenefitAnalyzer.js # Core analysis logic
 │   └── RiskAnalyzer.js       # Risk assessment
 ├── managers/
+│   ├── CostItemsManager.js   # Cost line items
+│   ├── RevenueItemsManager.js # Revenue tiers and one-time revenues
 │   ├── EvaluationManager.js  # Results evaluation
 │   ├── InputManager.js       # Input handling
 │   ├── StorageManager.js     # Data persistence
+│   ├── BookmarkManager.js    # URL sharing
 │   └── UIManager.js          # UI updates
 ├── utils/
 │   ├── CurrencyFormatter.js  # Currency formatting
@@ -70,7 +70,7 @@ A simple web-based tool for conducting cost-benefit analyses of software project
 1. Clone the repository
 2. Open `index.html` in a modern web browser
 3. Select your business model
-4. Input your project parameters
+4. Input your project parameters (costs, revenues, CAC for SaaS)
 5. Review the analysis results and recommendations
 
 ## Contributing

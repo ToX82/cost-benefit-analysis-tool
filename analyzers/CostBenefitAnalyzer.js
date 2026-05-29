@@ -64,6 +64,52 @@ export class CostBenefitAnalyzer {
         }
     }
 
+    /**
+     * Full analysis payload for AI export — all numbers finite, all strings non-empty.
+     * @returns {object|null}
+     */
+    getAnalysisSnapshot() {
+        const inputs = this.getValidatedInputs();
+        if (!inputs) return null;
+
+        const userCounts = {
+            base:        inputs.expectedUsers,
+            optimistic:  inputs.optimisticUsers,
+            pessimistic: inputs.pessimisticUsers
+        };
+
+        const elaborationCounts = {
+            base:        RevenueItemsManager.getTotalElaborations('base'),
+            optimistic:  RevenueItemsManager.getTotalElaborations('optimistic'),
+            pessimistic: RevenueItemsManager.getTotalElaborations('pessimistic')
+        };
+
+        const costs = this.#withAcquisitionCosts(
+            this.calculateCosts(userCounts, elaborationCounts),
+            inputs.cac
+        );
+        const revenues = this.calculateRevenues();
+        const roi = this.calculateROI(costs, revenues);
+
+        const breakeven = this.calculateBreakeven(costs, revenues, inputs);
+
+        return {
+            inputs,
+            userCounts,
+            elaborationCounts,
+            costs,
+            revenues,
+            roi,
+            breakeven,
+            riskIndex: new RiskAnalyzer(inputs, { totalCosts: costs.base }, revenues, roi, breakeven).analyze(),
+            unitEcon: this.calculateUnitEconomics(revenues, costs, inputs),
+            projections: this.calculateProjectionROI(costs, revenues, inputs),
+            costItems: CostItemsManager.getCostItems(),
+            onetimeItems: RevenueItemsManager.getOnetimeItems(),
+            recurringTiers: RevenueItemsManager.getRecurringTiers()
+        };
+    }
+
     calculateResults() {
         const inputs = this.getValidatedInputs();
         if (!inputs) return;
@@ -84,24 +130,24 @@ export class CostBenefitAnalyzer {
             // Update scaling and per-elab cost previews (B/O/P labels in table rows)
             CostItemsManager.updateScenarioDisplays(userCounts, elaborationCounts);
 
-            const costs    = this.calculateCosts(userCounts, elaborationCounts);
+            const operatingCosts = this.calculateCosts(userCounts, elaborationCounts);
+            const costs    = this.#withAcquisitionCosts(operatingCosts, inputs.cac);
             const revenues = this.calculateRevenues();
             const roi      = this.calculateROI(costs, revenues);
             const breakeven = this.calculateBreakeven(costs, revenues, inputs);
             const evaluation = EvaluationManager.getROIEvaluation(roi.base.percentage);
             const fullEval   = EvaluationManager.addOverallEvaluation(evaluation, roi, breakeven, inputs);
-            const riskIndex  = new RiskAnalyzer(inputs, { totalCosts: costs.base }, revenues, roi).analyze();
+            const riskIndex  = new RiskAnalyzer(inputs, { totalCosts: costs.base }, revenues, roi, breakeven).analyze();
 
-            const unitEcon   = this.calculateUnitEconomics(revenues, costs);
-            const cashFlow   = this.calculateCashFlow(costs, revenues);
+            const unitEcon   = this.calculateUnitEconomics(revenues, costs, inputs);
+            const cashFlow   = this.calculateCashFlow(costs, revenues, inputs);
 
             UIManager.updatePageHeader(inputs.projectName);
-            UIManager.updateFinancialDetails(costs, revenues);
+            UIManager.updateFinancialDetails(costs, revenues, roi);
             UIManager.updateROI(roi, inputs.businessModel);
             UIManager.updateBreakeven(breakeven);
             UIManager.updateEvaluation(fullEval, riskIndex, roi);
-            UIManager.updateRevenueSummary(revenues);
-            UIManager.updateTierBreakevens(costs.base);
+            UIManager.updateRevenueSummary(this.calculateProjectionROI(costs, revenues, inputs));
             UIManager.updateUnitEconomics(unitEcon);
             UIManager.updateCashFlowChart(cashFlow);
 
@@ -129,7 +175,34 @@ export class CostBenefitAnalyzer {
             expectedUsers:    RevenueItemsManager.getTotalUnits('base'),
             optimisticUsers:  RevenueItemsManager.getTotalUnits('optimistic'),
             pessimisticUsers: RevenueItemsManager.getTotalUnits('pessimistic'),
-            annualizedCosts:  CostItemsManager.getTotalCosts()
+            annualizedCosts:  CostItemsManager.getTotalCosts(),
+            ltv:              RevenueItemsManager.getWeightedLTV()
+        };
+    }
+
+    /**
+     * Adds year-1 acquisition spend (CAC × new customers/month × 12) per scenario.
+     * @param {{ base, optimistic, pessimistic }} operatingCosts
+     * @param {number} cac
+     */
+    #withAcquisitionCosts(operatingCosts, cac) {
+        const zeroAcq = { base: 0, optimistic: 0, pessimistic: 0 };
+        if (!cac || cac <= 0) {
+            return { ...operatingCosts, operating: { ...operatingCosts }, acquisition: zeroAcq };
+        }
+
+        const acquisition = {
+            base:        RevenueItemsManager.getAcquisitionCostForMonths(cac, 12, 'base'),
+            optimistic:  RevenueItemsManager.getAcquisitionCostForMonths(cac, 12, 'optimistic'),
+            pessimistic: RevenueItemsManager.getAcquisitionCostForMonths(cac, 12, 'pessimistic')
+        };
+
+        return {
+            base:        operatingCosts.base + acquisition.base,
+            optimistic:  operatingCosts.optimistic + acquisition.optimistic,
+            pessimistic: operatingCosts.pessimistic + acquisition.pessimistic,
+            operating:   operatingCosts,
+            acquisition
         };
     }
 
@@ -192,6 +265,44 @@ export class CostBenefitAnalyzer {
     }
 
     /**
+     * Cumulative ROI at 12 / 24 / 36 months per scenario (P / B / O).
+     * One-time costs count once; recurring and scaling costs scale with horizon years.
+     * Acquisition spend scales linearly with months (CAC × new customers/month).
+     */
+    calculateProjectionROI(costs, revenues, inputs = {}) {
+        const cac         = inputs.cac || 0;
+        const onetimeRev  = revenues.onetime;
+        const onetimeCost = CostItemsManager.getOnetimeCosts();
+        const opCosts     = costs.operating || costs;
+        const p           = revenues.projections;
+
+        const calcAt = (cumRecurring, scenarioOpCost, scenario, months) => {
+            const totalRev  = onetimeRev + cumRecurring;
+            const years     = months / 12;
+            const acqSpend  = RevenueItemsManager.getAcquisitionCostForMonths(cac, months, scenario);
+            const totalCost = onetimeCost + (scenarioOpCost - onetimeCost) * years + acqSpend;
+            return {
+                value: totalRev - totalCost,
+                percentage: totalCost > 0
+                    ? Math.round(((totalRev / totalCost) - 1) * 1000) / 10
+                    : 0
+            };
+        };
+
+        const forHorizon = (key, months) => ({
+            base:        calcAt(p[key].base,        opCosts.base,        'base',        months),
+            optimistic:  calcAt(p[key].optimistic,  opCosts.optimistic,  'optimistic',  months),
+            pessimistic: calcAt(p[key].pessimistic, opCosts.pessimistic, 'pessimistic', months)
+        });
+
+        return {
+            m12: forHorizon('m12', 12),
+            m24: forHorizon('m24', 24),
+            m36: forHorizon('m36', 36)
+        };
+    }
+
+    /**
      * ROI uses scenario-specific costs so optimistic revenue is weighed against
      * the (potentially higher) optimistic personnel costs.
      */
@@ -209,50 +320,68 @@ export class CostBenefitAnalyzer {
 
     /**
      * Finds the month at which cumulative cash flow turns positive.
-     * Iterates month by month using the growth model (up to 120 months = 10 years).
+     * Uses month-by-month revenue growth and operating costs that scale with users/elaborations.
      */
     calculateBreakeven(costs, revenues, inputs) {
+        const cac         = inputs?.cac || 0;
         const onetimeCost = CostItemsManager.getOnetimeCosts();
-        const monthlyCost = CostItemsManager.getRecurringAnnualCosts() / 12;
-
-        let cumulative = revenues.onetime - onetimeCost;
+        let cumulative    = revenues.onetime - onetimeCost;
         if (cumulative >= 0) return 0;
 
         for (let m = 1; m <= 120; m++) {
-            const monthRev = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
-            cumulative += monthRev - monthlyCost;
+            const users     = RevenueItemsManager.getTotalUsersAtMonth(m, 'base');
+            const elabs     = RevenueItemsManager.getElaborationsAtMonth(m, 'base');
+            const monthRev  = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
+            const monthCost = CostItemsManager.getMonthlyOperatingCost(users, elabs)
+                + RevenueItemsManager.getMonthlyAcquisitionCost(cac, 'base');
+            cumulative += monthRev - monthCost;
             if (cumulative >= 0) return m;
         }
         return Infinity;
     }
 
-    calculateUnitEconomics(revenues, costs) {
+    calculateUnitEconomics(revenues, costs, inputs = {}) {
         const ltv        = RevenueItemsManager.getWeightedLTV();
+        const cac        = inputs.cac || 0;
         const grossRev   = RevenueItemsManager.getTotalGrossRevenues('base') + revenues.onetime;
-        const commRate   = grossRev > 0 ? (revenues.totalCommissions / grossRev) * 100 : 0;
+        const netRev     = grossRev - (revenues.totalCommissions || 0);
+        const commRate   = grossRev > 0 ? ((revenues.totalCommissions || 0) / grossRev) * 100 : 0;
+
+        const users12       = RevenueItemsManager.getTotalUsersAtMonth(12, 'base');
+        const elabs12       = RevenueItemsManager.getElaborationsAtMonth(12, 'base');
+        const variableCosts = CostItemsManager.getVariableAnnualCosts(users12, elabs12);
+
         const totalRev   = revenues.yearly + revenues.onetime;
-        const recurCosts = CostItemsManager.getRecurringAnnualCosts();
-        const grossMarginPct = revenues.yearly > 0
-            ? ((revenues.yearly - recurCosts) / revenues.yearly) * 100
+        const grossMarginPct = grossRev > 0
+            ? ((netRev - variableCosts) / grossRev) * 100
             : null;
         const netMarginPct = totalRev > 0
             ? ((totalRev - costs.base) / totalRev) * 100
             : null;
-        return { ltv, commRate, grossMarginPct, netMarginPct };
+
+        const netMonthlyPerUser = RevenueItemsManager.getWeightedMonthlyNetPerUnit();
+        const ltvCac = cac > 0 && ltv > 0 ? ltv / cac : null;
+        const cacPayback = cac > 0 && netMonthlyPerUser > 0 ? cac / netMonthlyPerUser : null;
+
+        return { ltv, cac, ltvCac, cacPayback, commRate, grossMarginPct, netMarginPct };
     }
 
-    calculateCashFlow(costs, revenues) {
-        const onetimeCost   = CostItemsManager.getOnetimeCosts();
-        const monthlyCost   = CostItemsManager.getRecurringAnnualCosts() / 12;
-        const onetimeRev    = revenues.onetime;
-        const months        = [];
+    calculateCashFlow(costs, revenues, inputs = {}) {
+        const cac         = inputs.cac || 0;
+        const onetimeCost = CostItemsManager.getOnetimeCosts();
+        const onetimeRev  = revenues.onetime;
+        const months      = [];
 
         let cumulative = onetimeRev - onetimeCost;
         months.push(cumulative);
 
         for (let m = 1; m <= CASH_FLOW_MONTHS; m++) {
-            const monthRev = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
-            cumulative += monthRev - monthlyCost;
+            const users     = RevenueItemsManager.getTotalUsersAtMonth(m, 'base');
+            const elabs     = RevenueItemsManager.getElaborationsAtMonth(m, 'base');
+            const monthRev  = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
+            const monthCost = CostItemsManager.getMonthlyOperatingCost(users, elabs)
+                + RevenueItemsManager.getMonthlyAcquisitionCost(cac, 'base');
+            cumulative += monthRev - monthCost;
             months.push(cumulative);
         }
 
@@ -266,10 +395,12 @@ export class CostBenefitAnalyzer {
 
             const showOnetime   = bm === 'commissioned' || bm === 'mixed';
             const showRecurring = bm === 'saas'         || bm === 'mixed';
+            const showCac       = bm === 'saas'         || bm === 'mixed';
 
             document.getElementById('onetime-revenues-section')?.classList.toggle('hidden', !showOnetime);
             document.getElementById('recurring-revenues-section')?.classList.toggle('hidden', !showRecurring);
             document.getElementById('revenue-divider')?.classList.toggle('hidden', bm !== 'mixed');
+            document.getElementById('market-cac-section')?.classList.toggle('hidden', !showCac);
 
             this.calculateResults();
         } catch (e) {

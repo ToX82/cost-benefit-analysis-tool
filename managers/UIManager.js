@@ -33,55 +33,67 @@ export class UIManager {
         if (state) card.classList.add(state);
     }
 
-    static updateFinancialDetails(costs, revenues) {
+    static updateFinancialDetails(costs, revenues, roi) {
         if (!costs || !revenues) return;
         this.updateElement('total-costs-detail', CurrencyFormatter.format(costs.base));
         this.updateElement('direct-revenue-detail', CurrencyFormatter.format(revenues.onetime));
         this.updateElement('yearly-revenue-detail', CurrencyFormatter.format(revenues.yearly));
         this.updateElement('total-commissions-detail', CurrencyFormatter.format(revenues.totalCommissions ?? 0));
 
-        const grossMargin = revenues.yearly - costs.base;
-        const el = document.getElementById('annual-gross-margin-detail');
+        const acqRow = document.getElementById('acquisition-cost-row');
+        const acqEl  = document.getElementById('acquisition-cost-detail');
+        const acqSpend = costs.acquisition?.base ?? 0;
+        if (acqRow) acqRow.classList.toggle('hidden', acqSpend <= 0);
+        if (acqEl && acqSpend > 0) {
+            acqEl.textContent = CurrencyFormatter.format(acqSpend);
+        }
+
+        const netProfit = roi?.base?.value ?? (revenues.onetime + revenues.yearly - costs.base);
+        const el = document.getElementById('annual-net-profit-detail');
         const totalRow = document.querySelector('.fin-row-total');
         if (el) {
-            el.textContent = CurrencyFormatter.format(grossMargin);
-            el.style.color = grossMargin >= 0 ? '#059669' : '#ef4444';
+            el.textContent = CurrencyFormatter.format(netProfit);
+            el.style.color = netProfit >= 0 ? '#059669' : '#ef4444';
         }
         if (totalRow) {
-            totalRow.style.borderTopColor = grossMargin >= 0 ? '#fde68a' : '#fecaca';
+            totalRow.style.borderTopColor = netProfit >= 0 ? '#fde68a' : '#fecaca';
         }
 
-        this.setResultCardState('financial-card', grossMargin >= 0 ? 'is-positive' : 'is-negative');
+        this.setResultCardState('financial-card', netProfit >= 0 ? 'is-positive' : 'is-negative');
 
         const overline = document.querySelector('#financial-card .overline');
-        if (overline) overline.style.color = grossMargin >= 0 ? '#f59e0b' : '#ef4444';
+        if (overline) overline.style.color = netProfit >= 0 ? '#f59e0b' : '#ef4444';
     }
 
-    static updateRevenueSummary(revenues) {
+    static updateRevenueSummary(roiProjections) {
         const element = document.getElementById('users-scenarios');
         const businessModel = document.getElementById('business-model')?.value;
 
         if (!element) return;
 
-        if (businessModel === 'commissioned' || !revenues.projections) {
+        if (businessModel === 'commissioned' || !roiProjections) {
             element.classList.add('hidden');
             return;
         }
 
         element.classList.remove('hidden');
-        const fmt = v => CurrencyFormatter.format(v);
-        const p = revenues.projections;
+        const fmt = ({ value, percentage }) =>
+            `${CurrencyFormatter.format(value)} (${percentage.toFixed(1)}%)`;
+        const p = roiProjections;
 
         const row = (year, data) => `
-            <span class="projection-year"><strong>${year}</strong></span>
-            <span class="projection-values">
-                <span class="v-pess">${fmt(data.pessimistic)}</span> /
-                <span class="v-base">${fmt(data.base)}</span> /
-                <span class="v-opt">${fmt(data.optimistic)}</span>
-            </span>`;
+            <div style="margin-bottom:8px;">
+                <span class="projection-year"><strong>${year}</strong></span>
+                <div class="projection-values" style="display:flex;flex-direction:column;gap:3px;margin-top:4px;">
+                    <span class="v-pess"><span style="font-size:10px;font-weight:700;color:#ea580c;text-transform:uppercase;">${__('scenario-abbr-pess')}:</span> ${fmt(data.pessimistic)}</span>
+                    <span class="v-base"><span style="font-size:10px;font-weight:700;color:#4338ca;text-transform:uppercase;">${__('scenario-abbr-base')}:</span> ${fmt(data.base)}</span>
+                    <span class="v-opt"><span style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;">${__('scenario-abbr-opt')}:</span> ${fmt(data.optimistic)}</span>
+                </div>
+            </div>`;
 
         element.innerHTML = `
-            <div style="margin-bottom:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;">${__('projection-scenarios-label')}</div>
+            <div style="margin-bottom:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;">${__('projection-scenarios-label')}</div>
+            <p class="hint-text" style="margin-bottom:8px;">${__('projection-order-hint')}</p>
             ${row(__('projection-year-1'), p.m12)}
             ${row(__('projection-year-2'), p.m24)}
             ${row(__('projection-year-3'), p.m36)}
@@ -101,17 +113,20 @@ export class UIManager {
         element.className = `roi-hero tabular${isPositive ? '' : ' is-negative'}`;
 
         if (businessModel === 'commissioned') {
-            element.textContent = fmt(roi.base.value, roi.base.percentage);
+            element.innerHTML = `
+                ${fmt(roi.base.value, roi.base.percentage)}
+                <p class="hint-text" style="margin-top:8px;font-weight:500;line-height:1.45;">${__('roi-12-months-hint')}</p>`;
         } else {
             element.innerHTML = `
                 ${fmt(roi.base.value, roi.base.percentage)}
+                <p class="hint-text" style="margin-top:8px;font-weight:500;line-height:1.45;">${__('roi-12-months-hint')}</p>
                 <div class="roi-scenarios">
                     <div class="roi-scenario-row">
-                        <span class="roi-scenario-label opt">${__('optimistic')}</span>
+                        <span class="roi-scenario-label opt">${__('optimistic')}<span style="display:block;font-weight:400;font-size:10px;color:#94a3b8;">${__('roi-scenario-opt-hint')}</span></span>
                         <span class="roi-scenario-value tabular">${fmt(roi.optimistic.value, roi.optimistic.percentage)}</span>
                     </div>
                     <div class="roi-scenario-row">
-                        <span class="roi-scenario-label pess">${__('pessimistic')}</span>
+                        <span class="roi-scenario-label pess">${__('pessimistic')}<span style="display:block;font-weight:400;font-size:10px;color:#94a3b8;">${__('roi-scenario-pess-hint')}</span></span>
                         <span class="roi-scenario-value tabular">${fmt(roi.pessimistic.value, roi.pessimistic.percentage)}</span>
                     </div>
                 </div>`;
@@ -132,7 +147,7 @@ export class UIManager {
         const text = breakeven !== Infinity
             ? `${Math.ceil(breakeven)} ${__('months')}`
             : __('not-reachable');
-        el.textContent = text;
+        el.innerHTML = `${text}<p class="hint-text" style="margin-top:8px;font-weight:500;line-height:1.45;">${__('breakeven-time-hint')}</p>`;
 
         el.className = 'stat-hero tabular';
         if (breakeven === Infinity) {
@@ -189,28 +204,26 @@ export class UIManager {
         }
     }
 
-    static updateTierBreakevens(annualCostBase) {
-        document.querySelectorAll('[data-tier-id]').forEach(card => {
-            const el = card.querySelector('[data-tier-breakeven]');
-            if (!el) return;
-            const netAnnual = parseFloat(card.querySelector('[data-tier-net]')?.textContent?.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0;
-            if (netAnnual > 0 && annualCostBase > 0) {
-                el.textContent = Math.ceil(annualCostBase / netAnnual).toLocaleString('it-IT');
-            } else {
-                el.textContent = '—';
-            }
-        });
-    }
-
     static updateUnitEconomics(data) {
         if (!data) return;
         const fmt    = v => CurrencyFormatter.format(v);
         const fmtPct = v => v !== null ? `${v.toFixed(1)}%` : '—';
+        const fmtRatio = v => v !== null ? `${v.toFixed(1)}x` : '—';
+        const fmtMonths = v => v !== null ? `${Math.ceil(v)} ${__('months')}` : '—';
 
         this.updateElement('ue-ltv',      data.ltv > 0 ? fmt(data.ltv) : '—');
+        this.updateElement('ue-cac',      data.cac > 0 ? fmt(data.cac) : '—');
+        this.updateElement('ue-ltvcac',   fmtRatio(data.ltvCac));
+        this.updateElement('ue-payback',  fmtMonths(data.cacPayback));
         this.updateElement('ue-commrate', data.commRate > 0 ? fmtPct(data.commRate) : '—');
         this.updateElement('ue-gmargin',  data.grossMarginPct !== null ? fmtPct(data.grossMarginPct) : '—');
         this.updateElement('ue-nmargin',  data.netMarginPct  !== null ? fmtPct(data.netMarginPct)  : '—');
+
+        const ltvcacTile = document.getElementById('ue-ltvcac-tile');
+        if (ltvcacTile && data.ltvCac !== null) {
+            ltvcacTile.classList.remove('is-good', 'is-warning', 'is-bad');
+            ltvcacTile.classList.add(data.ltvCac >= 3 ? 'is-good' : data.ltvCac >= 1 ? 'is-warning' : 'is-bad');
+        }
 
         const nmarginEl = document.getElementById('ue-nmargin');
         const nmarginTile = document.getElementById('ue-nmargin-tile');

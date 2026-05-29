@@ -763,6 +763,50 @@
         "it": "Una Tantum",
         "en": "One-time"
     },
+    "freq-scaling": {
+        "it": "A scalini (utenti)",
+        "en": "Step-scaled (users)"
+    },
+    "scaling-per-unit-label": {
+        "it": "€ / unità",
+        "en": "€ / unit"
+    },
+    "scaling-every-label": {
+        "it": "ogni",
+        "en": "every"
+    },
+    "scaling-users-label": {
+        "it": "utenti",
+        "en": "users"
+    },
+    "scaling-min-label": {
+        "it": "min.",
+        "en": "min."
+    },
+    "freq-per-elab": {
+        "it": "Per elaborazione",
+        "en": "Per processing"
+    },
+    "per-elab-cost-label": {
+        "it": "€ / elaborazione",
+        "en": "€ / processing"
+    },
+    "elab-per-license-label": {
+        "it": "Elaborazioni / licenza / mese",
+        "en": "Processings / license / month"
+    },
+    "elab-per-license-unit": {
+        "it": "elab / lic / mese",
+        "en": "proc / lic / month"
+    },
+    "license-type-monthly": {
+        "it": "Mensile",
+        "en": "Monthly"
+    },
+    "license-type-onetime": {
+        "it": "Una Tantum",
+        "en": "One-time"
+    },
     "cost-description-placeholder": {
         "it": "Es: Sviluppatori junior",
         "en": "Ex: Junior developers"
@@ -848,19 +892,27 @@
         "en": "Price"
     },
     "tier-commission-label": {
-        "it": "Commissione",
-        "en": "Commission"
+        "it": "Provvigioni",
+        "en": "Commissions"
     },
     "tier-net-label": {
-        "it": "Netto",
-        "en": "Net"
+        "it": "Netto Annuo",
+        "en": "Annual Net"
     },
     "per-user-month": {
         "it": "/ utente / mese",
         "en": "/ user / month"
     },
+    "per-user-year": {
+        "it": "/ utente / anno",
+        "en": "/ user / year"
+    },
     "per-license": {
         "it": "/ licenza",
         "en": "/ license"
+    },
+    "per-license-year": {
+        "it": "/ licenza / anno",
+        "en": "/ license / year"
     }
 }

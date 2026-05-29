@@ -50,10 +50,17 @@ export class AIAnalyzer {
         // Costs
         q += __('costs').toUpperCase() + ':\n';
         if (costItems.length > 0) {
+            const elabBase = RevenueItemsManager.getTotalElaborations('base');
             costItems.forEach(item => {
-                const ann = CostItemsManager.annualizedAmount(item);
-                q += `- [${__(`category-${item.category}`)}] ${item.label || '-'}: ${fmt(ann)} `;
-                q += `(${__(`freq-${item.frequency}`)})\n`;
+                if (item.frequency === 'per-elab') {
+                    q += `- [${__(`category-${item.category}`)}] ${item.label || '-'}: ${fmt(item.costPerElab)}/elab`;
+                    if (elabBase > 0) q += ` × ${elabBase} elab/mese = ${fmt(item.costPerElab * elabBase * 12)}/anno`;
+                    q += ` (${__('freq-per-elab')})\n`;
+                } else {
+                    const ann = CostItemsManager.annualizedAmount(item);
+                    q += `- [${__(`category-${item.category}`)}] ${item.label || '-'}: ${fmt(ann)} `;
+                    q += `(${__(`freq-${item.frequency}`)})\n`;
+                }
             });
         }
         q += `${__('total-annualized')}: ${fmt(CostItemsManager.getTotalCosts())}\n\n`;
@@ -69,7 +76,9 @@ export class AIAnalyzer {
         if (recurringTiers.length > 0) {
             q += __('recurring-revenues').toUpperCase() + ':\n';
             recurringTiers.forEach(t => {
-                q += `- ${t.label || '-'}: ${fmt(t.price)}/utente/mese`;
+                const typeLabel = t.licenseType === 'onetime' ? __('license-type-onetime') : __('license-type-monthly');
+                const unitSuffix = t.licenseType === 'onetime' ? '/licenza' : '/utente/mese';
+                q += `- ${t.label || '-'} [${typeLabel}]: ${fmt(t.price)}${unitSuffix}`;
                 q += ` × ${t.baseUnits} base (ottimistico: ${t.optimisticUnits}, pessimistico: ${t.pessimisticUnits})\n`;
             });
             q += `${__('revenue-scenario-base')}: ${fmt(RevenueItemsManager.getMonthlyRecurring('base'))}/mese`;

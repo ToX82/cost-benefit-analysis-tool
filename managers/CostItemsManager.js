@@ -3,14 +3,15 @@ import { CurrencyFormatter } from '../utils/CurrencyFormatter.js';
 
 /**
  * Manages categorized cost items.
- * Supports three frequency types:
- *   'monthly'  – recurring monthly cost, annualized ×12
- *   'onetime'  – one-time cost
- *   'scaling'  – cost that grows step-wise with total users
- *                (costPerUnit, usersPerUnit, minUnits)
+ * Supports four frequency types:
+ *   'monthly'   – recurring monthly cost, annualized ×12
+ *   'onetime'   – one-time cost
+ *   'scaling'   – cost that grows step-wise with total users
+ *                 (costPerUnit, usersPerUnit, minUnits)
+ *   'per-elab'  – cost per elaboration; total = costPerElab × Σ(tier_licenses × tier_elaborations) × 12
  *
- * Scaling items contribute different amounts per scenario.
- * Call updateScenarioDisplays(userCounts) after revenue tiers change.
+ * Scaling and per-elab items contribute different amounts per scenario.
+ * Call updateScenarioDisplays(userCounts, elaborationCounts) after revenue tiers change.
  */
 export class CostItemsManager {
     static #items = [];
@@ -40,7 +41,7 @@ export class CostItemsManager {
     }
 
     static #frequencyOptions(selected = 'monthly') {
-        return ['monthly', 'onetime', 'scaling']
+        return ['monthly', 'onetime', 'scaling', 'per-elab']
             .map(f => `<option value="${f}"${f === selected ? ' selected' : ''}>${__(`freq-${f}`)}</option>`)
             .join('');
     }
@@ -48,7 +49,7 @@ export class CostItemsManager {
     // ── Row creation ──────────────────────────────────────────────────────────
 
     static #createRow(id, category = 'personnel', label = '', amount = '', frequency = 'monthly',
-                      costPerUnit = '', usersPerUnit = '', minUnits = '1') {
+                      costPerUnit = '', usersPerUnit = '', minUnits = '1', costPerElab = '') {
         const tr = document.createElement('tr');
         tr.dataset.costId = id;
 
@@ -57,6 +58,7 @@ export class CostItemsManager {
 
         const inpClass = 'border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 bg-white font-medium outline-none';
         const isScaling = frequency === 'scaling';
+        const isPerElab = frequency === 'per-elab';
 
         tr.innerHTML = `
             <td style="padding:8px 8px 8px 16px; vertical-align:top; padding-top:10px; width:150px;">
@@ -76,7 +78,7 @@ export class CostItemsManager {
             <td style="padding:8px; vertical-align:top; padding-top:10px; text-align:right; width:240px;">
 
                 <!-- Regular amount (monthly / onetime) -->
-                <div data-amount-section style="${isScaling ? 'display:none;' : ''}">
+                <div data-amount-section style="${(isScaling || isPerElab) ? 'display:none;' : ''}">
                     <div style="position:relative; display:inline-block; width:130px;">
                         <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:13px;pointer-events:none;">€</span>
                         <input type="number" data-cost-amount min="0" step="any"
@@ -88,7 +90,6 @@ export class CostItemsManager {
 
                 <!-- Scaling fields -->
                 <div data-scaling-section style="${!isScaling ? 'display:none;' : ''}; text-align:right;">
-                    <!-- Unit cost -->
                     <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:5px;">
                         <span style="font-size:11px;color:#94a3b8;white-space:nowrap;">${__('scaling-per-unit-label')}</span>
                         <div style="position:relative;width:100px;">
@@ -98,7 +99,6 @@ export class CostItemsManager {
                                 placeholder="0" value="${costPerUnit}">
                         </div>
                     </div>
-                    <!-- Users per unit + min units -->
                     <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-bottom:7px;font-size:12px;">
                         <span style="color:#94a3b8;">${__('scaling-every-label')}</span>
                         <input type="number" data-scaling-users-per-unit min="1" step="1"
@@ -111,11 +111,28 @@ export class CostItemsManager {
                             class="${inpClass}" style="width:40px;text-align:center;font-size:13px;padding:6px 4px;font-weight:600;"
                             placeholder="1" value="${minUnits}">
                     </div>
-                    <!-- Scenario previews -->
                     <div style="display:flex;gap:8px;justify-content:flex-end;font-size:10.5px;font-weight:700;padding-top:5px;border-top:1px dashed #f1f5f9;">
                         <span style="color:#4f46e5;">B: <span data-scaling-base>—</span></span>
                         <span style="color:#10b981;">O: <span data-scaling-opt>—</span></span>
                         <span style="color:#f97316;">P: <span data-scaling-pes>—</span></span>
+                    </div>
+                </div>
+
+                <!-- Per-elaboration fields -->
+                <div data-per-elab-section style="${!isPerElab ? 'display:none;' : ''}; text-align:right;">
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:5px;">
+                        <span style="font-size:11px;color:#94a3b8;white-space:nowrap;">${__('per-elab-cost-label')}</span>
+                        <div style="position:relative;width:110px;">
+                            <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:12px;pointer-events:none;">€</span>
+                            <input type="number" data-per-elab-cost min="0" step="any"
+                                class="${inpClass}" style="width:110px;font-size:13px;padding:6px 8px 6px 20px;text-align:right;font-weight:600;"
+                                placeholder="0" value="${costPerElab}">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;font-size:10.5px;font-weight:700;padding-top:5px;border-top:1px dashed #f1f5f9;">
+                        <span style="color:#4f46e5;">B: <span data-per-elab-base>—</span></span>
+                        <span style="color:#10b981;">O: <span data-per-elab-opt>—</span></span>
+                        <span style="color:#f97316;">P: <span data-per-elab-pes>—</span></span>
                     </div>
                 </div>
 
@@ -130,7 +147,7 @@ export class CostItemsManager {
         );
 
         this.#applyRowVisuals(tr, { category, amount: parseFloat(amount) || 0, frequency,
-            costPerUnit: parseFloat(costPerUnit) || 0 });
+            costPerUnit: parseFloat(costPerUnit) || 0, costPerElab: parseFloat(costPerElab) || 0 });
         return tr;
     }
 
@@ -139,12 +156,16 @@ export class CostItemsManager {
         el.style.borderLeft = `3px solid ${c.badge}`;
 
         const isScaling = item.frequency === 'scaling';
+        const isPerElab = item.frequency === 'per-elab';
         const amountSection  = el.querySelector('[data-amount-section]');
         const scalingSection = el.querySelector('[data-scaling-section]');
-        if (amountSection)  amountSection.style.display  = isScaling ? 'none' : '';
-        if (scalingSection) scalingSection.style.display = isScaling ? '' : 'none';
+        const perElabSection = el.querySelector('[data-per-elab-section]');
 
-        if (!isScaling) {
+        if (amountSection)  amountSection.style.display  = (!isScaling && !isPerElab) ? '' : 'none';
+        if (scalingSection) scalingSection.style.display = isScaling  ? '' : 'none';
+        if (perElabSection) perElabSection.style.display = isPerElab  ? '' : 'none';
+
+        if (!isScaling && !isPerElab) {
             const hint = el.querySelector('[data-annualized-hint]');
             if (hint) {
                 hint.textContent = (item.frequency === 'monthly' && item.amount > 0)
@@ -157,12 +178,12 @@ export class CostItemsManager {
     // ── CRUD ──────────────────────────────────────────────────────────────────
 
     static addCostItem(category = 'personnel', label = '', amount = '', frequency = 'monthly',
-                       costPerUnit = '', usersPerUnit = '', minUnits = '1') {
+                       costPerUnit = '', usersPerUnit = '', minUnits = '1', costPerElab = '') {
         const id = `cost-${++this.#counter}`;
         document.getElementById('cost-items-body').appendChild(
-            this.#createRow(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits)
+            this.#createRow(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits, costPerElab)
         );
-        this.#items.push(this.#buildItem(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits));
+        this.#items.push(this.#buildItem(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits, costPerElab));
         this.#refresh();
         this.#dispatch();
     }
@@ -188,14 +209,14 @@ export class CostItemsManager {
         this.#dispatch();
     }
 
-    static #buildItem(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits) {
+    static #buildItem(id, category, label, amount, frequency, costPerUnit, usersPerUnit, minUnits, costPerElab) {
         return {
-            id, category, label,
-            frequency,
+            id, category, label, frequency,
             amount:       parseFloat(amount)      || 0,
             costPerUnit:  parseFloat(costPerUnit)  || 0,
             usersPerUnit: parseInt(usersPerUnit)   || 100,
-            minUnits:     parseInt(minUnits)       || 1
+            minUnits:     parseInt(minUnits)       || 1,
+            costPerElab:  parseFloat(costPerElab)  || 0
         };
     }
 
@@ -208,19 +229,20 @@ export class CostItemsManager {
             amount:       parseFloat(el.querySelector('[data-cost-amount]')?.value) || 0,
             costPerUnit:  parseFloat(el.querySelector('[data-scaling-unit-cost]')?.value) || 0,
             usersPerUnit: parseInt(el.querySelector('[data-scaling-users-per-unit]')?.value) || 100,
-            minUnits:     parseInt(el.querySelector('[data-scaling-min-units]')?.value) || 1
+            minUnits:     parseInt(el.querySelector('[data-scaling-min-units]')?.value) || 1,
+            costPerElab:  parseFloat(el.querySelector('[data-per-elab-cost]')?.value) || 0
         };
     }
 
     // ── Calculations ──────────────────────────────────────────────────────────
 
     /**
-     * Annualized cost for a single item at minimum scale (used for validation and AI query)
+     * Annualized cost for a single item at minimum scale.
+     * Per-elab items return 0 (their cost depends on elaboration counts).
      */
     static annualizedAmount(item) {
-        if (item.frequency === 'scaling') {
-            return (item.minUnits || 1) * (item.costPerUnit || 0) * 12;
-        }
+        if (item.frequency === 'scaling') return (item.minUnits || 1) * (item.costPerUnit || 0) * 12;
+        if (item.frequency === 'per-elab') return 0;
         return item.frequency === 'monthly' ? (item.amount || 0) * 12 : (item.amount || 0);
     }
 
@@ -230,17 +252,27 @@ export class CostItemsManager {
         return units * (item.costPerUnit || 0) * 12;
     }
 
+    static #getPerElabCost(item, totalElaborations) {
+        return (totalElaborations || 0) * (item.costPerElab || 0) * 12;
+    }
+
     /**
-     * Per-scenario totals. Pass userCounts = { base, optimistic, pessimistic }.
+     * Per-scenario totals.
+     * @param {{ base: number, optimistic: number, pessimistic: number }} userCounts
+     * @param {{ base: number, optimistic: number, pessimistic: number }} elaborationCounts
      * @returns {{ base: number, optimistic: number, pessimistic: number }}
      */
-    static getTotalCostsForScenario(userCounts = {}) {
+    static getTotalCostsForScenario(userCounts = {}, elaborationCounts = {}) {
         let base = 0, opt = 0, pes = 0;
         this.#items.forEach(item => {
             if (item.frequency === 'scaling') {
                 base += this.#getScalingCost(item, userCounts.base        || 0);
                 opt  += this.#getScalingCost(item, userCounts.optimistic  || 0);
                 pes  += this.#getScalingCost(item, userCounts.pessimistic || 0);
+            } else if (item.frequency === 'per-elab') {
+                base += this.#getPerElabCost(item, elaborationCounts.base        || 0);
+                opt  += this.#getPerElabCost(item, elaborationCounts.optimistic  || 0);
+                pes  += this.#getPerElabCost(item, elaborationCounts.pessimistic || 0);
             } else {
                 const ann = this.annualizedAmount(item);
                 base += ann; opt += ann; pes += ann;
@@ -250,29 +282,25 @@ export class CostItemsManager {
     }
 
     /**
-     * Simplified total using minimum units for scaling items.
-     * Used for validation (at least one cost item with some value).
+     * Simplified total using minimum units (scaling) and 0 for per-elab.
+     * Used for validation pre-check only.
      */
     static getTotalCosts() {
         return this.#items.reduce((sum, item) => sum + this.annualizedAmount(item), 0);
     }
 
-    /**
-     * Returns true if any items are of type 'scaling'
-     */
-    static hasScalingCosts() {
-        return this.#items.some(i => i.frequency === 'scaling');
-    }
+    static hasScalingCosts()  { return this.#items.some(i => i.frequency === 'scaling'); }
+    static hasPerElabCosts()  { return this.#items.some(i => i.frequency === 'per-elab'); }
 
     // ── Display updates ───────────────────────────────────────────────────────
 
     /**
-     * Updates B/O/P labels in scaling rows and the grand total.
-     * Called from the analyzer after computing user counts from revenue tiers.
-     * @param {{ base: number, optimistic: number, pessimistic: number }} userCounts
-     * @returns {{ base: number, optimistic: number, pessimistic: number }} total costs per scenario
+     * Updates B/O/P labels in scaling and per-elab rows and the grand total.
+     * @param {{ base, optimistic, pessimistic }} userCounts
+     * @param {{ base, optimistic, pessimistic }} elaborationCounts
+     * @returns {{ base, optimistic, pessimistic }} total costs per scenario
      */
-    static updateScenarioDisplays(userCounts) {
+    static updateScenarioDisplays(userCounts, elaborationCounts = {}) {
         const fmt = v => CurrencyFormatter.format(v);
 
         this.#items.filter(i => i.frequency === 'scaling').forEach(item => {
@@ -287,7 +315,19 @@ export class CostItemsManager {
             set('data-scaling-pes',  this.#getScalingCost(item, userCounts.pessimistic || 0));
         });
 
-        const totals = this.getTotalCostsForScenario(userCounts);
+        this.#items.filter(i => i.frequency === 'per-elab').forEach(item => {
+            const el = document.querySelector(`[data-cost-id="${item.id}"]`);
+            if (!el) return;
+            const set = (attr, val) => {
+                const span = el.querySelector(`[${attr}]`);
+                if (span) span.textContent = val > 0 ? fmt(val) : '—';
+            };
+            set('data-per-elab-base', this.#getPerElabCost(item, elaborationCounts.base        || 0));
+            set('data-per-elab-opt',  this.#getPerElabCost(item, elaborationCounts.optimistic  || 0));
+            set('data-per-elab-pes',  this.#getPerElabCost(item, elaborationCounts.pessimistic || 0));
+        });
+
+        const totals = this.getTotalCostsForScenario(userCounts, elaborationCounts);
         const grandEl = document.getElementById('cost-grand-total');
         if (grandEl) grandEl.textContent = CurrencyFormatter.format(totals.base);
         return totals;
@@ -297,7 +337,6 @@ export class CostItemsManager {
         const total = this.getTotalCosts();
         const count = this.#items.length;
 
-        // Category badges (using min-scale costs for consistent display)
         const byCat = Object.fromEntries(this.CATEGORIES.map(c => [c, 0]));
         this.#items.forEach(i => {
             byCat[i.category] = (byCat[i.category] || 0) + this.annualizedAmount(i);
@@ -339,12 +378,15 @@ export class CostItemsManager {
             document.getElementById('cost-items-body').appendChild(
                 this.#createRow(id, item.category || 'other', item.label || '',
                     item.amount || '', freq,
-                    item.costPerUnit || '', item.usersPerUnit || '', item.minUnits ?? '1')
+                    item.costPerUnit || '', item.usersPerUnit || '', item.minUnits ?? '1',
+                    item.costPerElab || '')
             );
             this.#items.push(this.#buildItem(id, item.category || 'other', item.label || '',
-                item.amount || '', freq, item.costPerUnit || '', item.usersPerUnit || '', item.minUnits ?? '1'));
+                item.amount || '', freq, item.costPerUnit || '', item.usersPerUnit || '',
+                item.minUnits ?? '1', item.costPerElab || ''));
         });
         this.#refresh();
+        this.#dispatch();
     }
 
     static #dispatch() {

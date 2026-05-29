@@ -73,10 +73,16 @@ export class CostBenefitAnalyzer {
                 pessimistic: inputs.pessimisticUsers
             };
 
-            // Update scaling cost previews (B/O/P labels in table rows)
-            CostItemsManager.updateScenarioDisplays(userCounts);
+            const elaborationCounts = {
+                base:        RevenueItemsManager.getTotalElaborations('base'),
+                optimistic:  RevenueItemsManager.getTotalElaborations('optimistic'),
+                pessimistic: RevenueItemsManager.getTotalElaborations('pessimistic')
+            };
 
-            const costs    = this.calculateCosts(userCounts);
+            // Update scaling and per-elab cost previews (B/O/P labels in table rows)
+            CostItemsManager.updateScenarioDisplays(userCounts, elaborationCounts);
+
+            const costs    = this.calculateCosts(userCounts, elaborationCounts);
             const revenues = this.calculateRevenues();
             const roi      = this.calculateROI(costs, revenues);
             const breakeven = this.calculateBreakeven(costs, revenues, inputs);
@@ -119,7 +125,7 @@ export class CostBenefitAnalyzer {
     }
 
     validateInputs() {
-        if (CostItemsManager.getTotalCosts() === 0) {
+        if (CostItemsManager.getCostItems().length === 0) {
             UIManager.displayError(__('cost-items-required'));
             return false;
         }
@@ -141,11 +147,10 @@ export class CostBenefitAnalyzer {
 
     /**
      * Returns per-scenario annualized costs.
-     * For projects with no scaling costs the three values are identical.
      * @returns {{ base: number, optimistic: number, pessimistic: number }}
      */
-    calculateCosts(userCounts) {
-        return CostItemsManager.getTotalCostsForScenario(userCounts);
+    calculateCosts(userCounts, elaborationCounts = {}) {
+        return CostItemsManager.getTotalCostsForScenario(userCounts, elaborationCounts);
     }
 
     calculateRevenues() {
@@ -154,14 +159,18 @@ export class CostBenefitAnalyzer {
         const monthOpt = RevenueItemsManager.getMonthlyRecurring('optimistic');
         const monthPes = RevenueItemsManager.getMonthlyRecurring('pessimistic');
 
+        const onetimeTierBase = RevenueItemsManager.getOnetimeTierRevenue('base');
+        const onetimeTierOpt  = RevenueItemsManager.getOnetimeTierRevenue('optimistic');
+        const onetimeTierPes  = RevenueItemsManager.getOnetimeTierRevenue('pessimistic');
+
         return {
-            onetime,
+            onetime: onetime + onetimeTierBase,
             monthly,
             yearly: monthly * CONFIG.MONTHS_PERIOD,
             scenarios: {
-                base:        onetime + monthly  * CONFIG.MONTHS_PERIOD,
-                optimistic:  onetime + monthOpt * CONFIG.MONTHS_PERIOD,
-                pessimistic: onetime + monthPes * CONFIG.MONTHS_PERIOD
+                base:        onetime + onetimeTierBase + monthly  * CONFIG.MONTHS_PERIOD,
+                optimistic:  onetime + onetimeTierOpt  + monthOpt * CONFIG.MONTHS_PERIOD,
+                pessimistic: onetime + onetimeTierPes  + monthPes * CONFIG.MONTHS_PERIOD
             }
         };
     }

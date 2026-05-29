@@ -26,7 +26,7 @@ export class UIManager {
      */
     static updateFinancialDetails(costs, revenues) {
         if (!costs || !revenues) return;
-        this.updateElement('total-costs-detail', CurrencyFormatter.format(costs.totalCosts));
+        this.updateElement('total-costs-detail', CurrencyFormatter.format(costs.base));
         this.updateElement('direct-revenue-detail', CurrencyFormatter.format(revenues.onetime));
         this.updateElement('yearly-revenue-detail', CurrencyFormatter.format(revenues.yearly));
     }

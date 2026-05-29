@@ -309,70 +309,193 @@
         margin: 20px 0 16px;
     }
     .section-divider-line { flex: 1; height: 1px; background: #f1f5f9; }
+
+    /* ── Tabular figures (financial data) ───────────────────── */
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    /* ── Page header with project context ───────────────────── */
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; gap:16px; }
+    .page-header-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+    .page-subtitle { margin-top:4px; font-size:13px; color:#64748b; font-weight:500; letter-spacing:0; text-transform:none; }
+    .page-subtitle strong { color:#4f46e5; font-weight:700; }
+
+    /* ── Result cards (semantic states) ─────────────────────── */
+    .result-card { transition: border-color .2s, box-shadow .2s; }
+    .result-card.is-positive { border-top-color: #10b981; }
+    .result-card.is-negative { border-top-color: #ef4444; background: linear-gradient(180deg, #fff 0%, #fffbfb 100%); }
+    .result-card.is-warning  { border-top-color: #f59e0b; }
+    .result-card.is-neutral  { border-top-color: #3b82f6; }
+
+    .roi-hero {
+        font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+        line-height: 1.25; color: #059669;
+    }
+    .roi-hero.is-negative { color: #dc2626; }
+    .roi-scenarios { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+    .roi-scenario-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 8px; font-size: 11px; line-height: 1.5; margin-bottom: 2px;
+    }
+    .roi-scenario-row:last-child { margin-bottom: 0; }
+    .roi-scenario-label { font-weight: 600; flex-shrink: 0; }
+    .roi-scenario-label.opt  { color: #059669; }
+    .roi-scenario-label.pess { color: #ea580c; }
+    .roi-scenario-value { font-weight: 700; color: #475569; text-align: right; }
+
+    .stat-hero {
+        font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+        line-height: 1.3; color: #2563eb;
+    }
+    .stat-hero.is-warning { color: #d97706; }
+    .stat-hero.is-danger  { color: #dc2626; }
+
+    /* ── Financial details rows ─────────────────────────────── */
+    .fin-stack { display: flex; flex-direction: column; gap: 0; }
+    .fin-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 12px; padding: 5px 0; font-size: 13px;
+    }
+    .fin-row + .fin-row { border-top: 1px solid #f8fafc; }
+    .fin-row-label { color: #64748b; flex-shrink: 0; }
+    .fin-value { font-weight: 700; color: #1e293b; text-align: right; word-break: break-word; }
+    .fin-value.is-cost { color: #475569; }
+    .fin-value.is-commission { color: #ef4444; }
+    .fin-row-total {
+        margin-top: 4px; padding-top: 8px !important;
+        border-top: 1.5px solid #fde68a !important;
+    }
+    .fin-row-total .fin-row-label { font-weight: 600; color: #475569; }
+    .fin-row-total .fin-value { font-size: 15px; font-weight: 800; }
+
+    .projection-block {
+        margin-top: 10px; padding-top: 10px;
+        border-top: 1px dashed #e2e8f0;
+        font-size: 11px; color: #64748b; line-height: 1.65;
+    }
+    .projection-block strong { color: #475569; font-weight: 700; }
+    .projection-year { display: block; margin-bottom: 4px; }
+    .projection-values { font-weight: 600; color: #334155; }
+    .projection-values .v-pess { color: #ea580c; }
+    .projection-values .v-base { color: #4338ca; font-weight: 700; }
+    .projection-values .v-opt  { color: #059669; }
+
+    /* ── Evaluation & risk ──────────────────────────────────── */
+    .eval-card { transition: background .2s, border-color .2s; }
+    .eval-card.is-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 100%);
+        border-color: #fecaca;
+    }
+    .eval-card.is-warning {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        border-color: #fde68a;
+    }
+    .eval-card.is-success {
+        background: linear-gradient(135deg, #ecfdf5 0%, #eef2ff 100%);
+        border-color: #a7f3d0;
+    }
+
+    .eval-body { font-size: 13px; line-height: 1.7; color: #374151; }
+    .eval-body p + p { margin-top: 10px; }
+    .eval-badge {
+        display: inline-block; font-size: 12px; font-weight: 700;
+        padding: 2px 8px; border-radius: 6px; margin-right: 4px;
+        vertical-align: baseline;
+    }
+    .eval-badge.danger  { background: #fee2e2; color: #b91c1c; }
+    .eval-badge.warning { background: #fef3c7; color: #b45309; }
+    .eval-badge.success { background: #d1fae5; color: #047857; }
+    .eval-badge.info    { background: #dbeafe; color: #1d4ed8; }
+    .eval-badge.neutral { background: #f1f5f9; color: #475569; }
+
+    .risk-panel {
+        margin-top: 16px; padding-top: 14px;
+        border-top: 1px solid rgba(99,102,241,.15);
+    }
+    .risk-panel-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 8px; gap: 12px;
+    }
+    .risk-panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6366f1; }
+    .risk-panel-score { font-size: 13px; font-weight: 800; color: #1e293b; }
+    .risk-meter { height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .risk-meter-fill {
+        height: 100%; border-radius: 999px;
+        transition: width .35s ease, background .2s;
+    }
+    .risk-meter-fill.low      { background: linear-gradient(90deg, #34d399, #10b981); }
+    .risk-meter-fill.medium   { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .risk-meter-fill.high     { background: linear-gradient(90deg, #fb923c, #ea580c); }
+    .risk-meter-fill.critical { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+    /* ── Unit economics responsive + states ───────────────── */
+    #ue-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 900px) { #ue-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { #ue-grid { grid-template-columns: 1fr; } }
+    .ue-tile { border-radius: 12px; padding: 12px 14px; transition: box-shadow .15s; }
+    .ue-tile.is-good    { box-shadow: 0 0 0 1px #a7f3d0; }
+    .ue-tile.is-warning { box-shadow: 0 0 0 1px #fde68a; }
+    .ue-tile.is-bad     { box-shadow: 0 0 0 1px #fecaca; }
+    .ue-value { font-size: 18px; font-weight: 800; letter-spacing: -0.4px; }
+
+    /* ── Scenario summary strips ────────────────────────────── */
+    .scenario-strip-value {
+        font-size: 14px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.35;
+    }
+    .scenario-strip-y2 {
+        font-size: 11px; font-weight: 600; opacity: .75; margin-top: 4px;
+    }
     </style>
 </head>
 <body>
 <div class="page">
 
     <!-- ── Page Header ──────────────────────────────────────── -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+    <div class="page-header">
         <div>
             <h1 class="page-title" data-i18n="tool-title">Cost-Benefit Analysis Tool</h1>
-            <p class="overline" style="margin-top:4px; color:#94a3b8;">Project Financial Assessment</p>
+            <p id="page-subtitle" class="page-subtitle overline" data-i18n="page-subtitle-default">Project Financial Assessment</p>
         </div>
-        <a href="#" id="share-button"
-            class="btn btn-ghost"
-            style="position:relative; border-radius:10px;"
-            title="">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-            </svg>
-            <span data-i18n="share-analysis">Condividi</span>
-            <span class="sr-only" data-i18n="bookmark-tooltip">Trascina nei preferiti o clicca per copiare</span>
-        </a>
+        <div class="page-header-actions">
+            <a href="#" id="bookmark-button"
+                class="btn btn-ghost"
+                style="border-radius:10px;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                </svg>
+                <span data-i18n="bookmark-save">Preferiti</span>
+            </a>
+            <a href="#" id="share-button"
+                class="btn btn-ghost"
+                style="position:relative; border-radius:10px;"
+                title="">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+                <span data-i18n="share-analysis">Condividi</span>
+                <span class="sr-only" data-i18n="bookmark-tooltip">Trascina nei preferiti o clicca per copiare</span>
+            </a>
+        </div>
     </div>
 
-    <!-- ── Config Row ────────────────────────────────────────── -->
-    <div class="grid-2" id="analysis-form" style="margin-bottom:16px;">
-
-        <!-- Business Model -->
-        <div class="card">
-            <div class="card-header" style="padding-bottom:16px;">
-                <span class="section-title" data-i18n="business-model">Business Model</span>
-            </div>
-            <div class="card-body" style="padding-top:0;" data-category="costs">
-                <label class="label-text" for="project-name" data-i18n="project-name">Nome Progetto</label>
-                <input type="text" id="project-name" class="inp" style="margin-bottom:14px;"
-                    data-i18n-placeholder="project-name-placeholder" placeholder="Es: App di gestione magazzino">
-                <label class="label-text" for="business-model" data-i18n="select-project-type">Seleziona il tipo di progetto</label>
-                <select name="businessModel" id="business-model" class="inp">
-                    <option value="saas" data-i18n="saas">SaaS</option>
-                    <option value="commissioned" data-i18n="commissioned">Commissionato</option>
-                    <option value="mixed" data-i18n="mixed">Misto (SaaS + Commissionato)</option>
-                </select>
-            </div>
+    <!-- ── Config ────────────────────────────────────────────── -->
+    <div class="card" id="analysis-form" style="margin-bottom:16px;">
+        <div class="card-header" style="padding-bottom:16px;">
+            <span class="section-title" data-i18n="business-model">Business Model</span>
         </div>
-
-        <!-- Time & Resources -->
-        <div class="card" data-category="resources">
-            <div class="card-header" style="padding-bottom:16px;">
-                <span class="section-title" data-i18n="time-resources">Tempo e Risorse</span>
-            </div>
-            <div class="card-body" style="padding-top:0;">
-                <div class="grid-2" style="gap:16px;">
-                    <div>
-                        <label class="label-text" for="dev-weeks" data-i18n="dev-weeks">Settimane di sviluppo</label>
-                        <input type="number" name="devWeeks" id="dev-weeks" class="inp"
-                            data-i18n-placeholder="example-8" placeholder="Es: 8">
-                        <p class="hint-text" data-i18n="dev-weeks-help">Durata in settimane</p>
-                    </div>
-                    <div>
-                        <label class="label-text" for="dev-occupation" data-i18n="dev-occupation">Occupazione (%)</label>
-                        <input type="number" name="devOccupation" id="dev-occupation" class="inp"
-                            min="0" max="100" value="80"
-                            data-i18n-placeholder="example-80" placeholder="Es: 80">
-                        <p class="hint-text" data-i18n="dev-occupation-help">Saturazione % del team</p>
-                    </div>
+        <div class="card-body" style="padding-top:0;" data-category="costs">
+            <div class="grid-2" style="gap:16px;">
+                <div>
+                    <label class="label-text" for="project-name" data-i18n="project-name">Nome Progetto</label>
+                    <input type="text" id="project-name" class="inp"
+                        data-i18n-placeholder="project-name-placeholder" placeholder="Es: App di gestione magazzino">
+                </div>
+                <div>
+                    <label class="label-text" for="business-model" data-i18n="select-project-type">Seleziona il tipo di progetto</label>
+                    <select name="businessModel" id="business-model" class="inp">
+                        <option value="saas" data-i18n="saas">SaaS</option>
+                        <option value="commissioned" data-i18n="commissioned">Commissionato</option>
+                        <option value="mixed" data-i18n="mixed">Misto (SaaS + Commissionato)</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -499,15 +622,15 @@
                     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
                         <div class="scenario-strip scenario-strip-pess">
                             <div class="overline" style="color:#f97316; margin-bottom:6px;" data-i18n="revenue-scenario-pessimistic">Pessimistico</div>
-                            <div id="recurring-pes-total" style="font-size:13px; color:#c2410c; font-weight:700; line-height:1.4;">—</div>
+                            <div id="recurring-pes-total" class="scenario-strip-value tabular" style="color:#c2410c;">—</div>
                         </div>
                         <div class="scenario-strip scenario-strip-base">
                             <div class="overline" style="color:#4f46e5; margin-bottom:6px;" data-i18n="revenue-scenario-base">Base</div>
-                            <div id="recurring-base-total" style="font-size:13px; color:#3730a3; font-weight:700; line-height:1.4;">—</div>
+                            <div id="recurring-base-total" class="scenario-strip-value tabular" style="color:#3730a3;">—</div>
                         </div>
                         <div class="scenario-strip scenario-strip-opt">
                             <div class="overline" style="color:#10b981; margin-bottom:6px;" data-i18n="revenue-scenario-optimistic">Ottimistico</div>
-                            <div id="recurring-opt-total" style="font-size:13px; color:#065f46; font-weight:700; line-height:1.4;">—</div>
+                            <div id="recurring-opt-total" class="scenario-strip-value tabular" style="color:#065f46;">—</div>
                         </div>
                     </div>
                 </div>
@@ -518,40 +641,89 @@
     <!-- ── Results ───────────────────────────────────────────── -->
     <div class="grid-3" style="margin-bottom:16px;">
 
-        <div class="result-card result-card-green">
+        <div id="roi-card" class="result-card result-card-green">
             <div class="overline" style="color:#10b981; margin-bottom:10px;" data-i18n="roi-12-months">ROI 12 mesi</div>
-            <div id="roi" style="font-size:22px; font-weight:800; color:#059669; letter-spacing:-0.5px; line-height:1.3;">€ 0,00</div>
+            <div id="roi" class="roi-hero tabular">€ 0,00</div>
         </div>
 
-        <div class="result-card result-card-blue">
+        <div id="breakeven-card" class="result-card result-card-blue">
             <div class="overline" style="color:#3b82f6; margin-bottom:10px;" data-i18n="breakeven-time">Tempo di pareggio</div>
-            <p id="breakeven" style="font-size:22px; font-weight:800; color:#2563eb; letter-spacing:-0.5px; line-height:1.3;" data-i18n="zero-months">0 mesi</p>
+            <p id="breakeven" class="stat-hero tabular" data-i18n="zero-months">0 mesi</p>
         </div>
 
-        <div class="result-card result-card-amber">
+        <div id="financial-card" class="result-card result-card-amber">
             <div class="overline" style="color:#f59e0b; margin-bottom:10px;" data-i18n="financial-details">Dettagli finanziari</div>
-            <div style="display:flex; flex-direction:column; gap:6px; font-size:13px;">
-                <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                    <span style="color:#64748b;" data-i18n="costs">Costi</span>
-                    <span id="total-costs-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+            <div class="fin-stack">
+                <div class="fin-row">
+                    <span class="fin-row-label" data-i18n="costs">Costi</span>
+                    <span id="total-costs-detail" class="fin-value tabular is-cost">€ 0,00</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                    <span style="color:#64748b;" data-i18n="direct-revenues">Ricavi diretti</span>
-                    <span id="direct-revenue-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+                <div class="fin-row">
+                    <span class="fin-row-label" data-i18n="direct-revenues">Ricavi diretti</span>
+                    <span id="direct-revenue-detail" class="fin-value tabular">€ 0,00</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                    <span style="color:#64748b;" data-i18n="recurring-annual-revenues">Ricorrenti/anno</span>
-                    <span id="yearly-revenue-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+                <div class="fin-row">
+                    <span class="fin-row-label" data-i18n="recurring-annual-revenues">Ricorrenti/anno</span>
+                    <span id="yearly-revenue-detail" class="fin-value tabular">€ 0,00</span>
                 </div>
-                <p id="users-scenarios" style="font-size:11px; color:#94a3b8; margin-top:4px; padding-top:6px; border-top:1px solid #fef3c7; line-height:1.6;"></p>
+                <div class="fin-row">
+                    <span class="fin-row-label" data-i18n="total-commissions">Totale provvigioni</span>
+                    <span id="total-commissions-detail" class="fin-value tabular is-commission">€ 0,00</span>
+                </div>
+                <div class="fin-row fin-row-total">
+                    <span class="fin-row-label" data-i18n="annual-gross-margin">Margine annuale lordo</span>
+                    <span id="annual-gross-margin-detail" class="fin-value tabular">€ 0,00</span>
+                </div>
+                <div id="users-scenarios" class="projection-block hidden"></div>
             </div>
         </div>
     </div>
 
+    <!-- ── Unit Economics ──────────────────────────────────── -->
+    <div class="card" style="margin-bottom:16px;">
+        <div class="card-header" style="padding-bottom:14px;">
+            <span class="section-title" data-i18n="unit-economics-title">Unit Economics</span>
+        </div>
+        <div class="card-body" style="padding-top:0;">
+            <div id="ue-grid">
+                <div class="ue-tile" style="background:#f5f3ff;border:1px solid #ddd6fe;">
+                    <div class="overline" style="color:#6d28d9;margin-bottom:6px;" data-i18n="ue-ltv">LTV</div>
+                    <div id="ue-ltv" class="ue-value tabular" style="color:#4f46e5;">—</div>
+                    <div class="hint-text" data-i18n="ue-ltv-hint">Valore vita cliente</div>
+                </div>
+                <div class="ue-tile" style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;">
+                    <div class="overline" style="color:#475569;margin-bottom:4px;" data-i18n="ue-gmargin">Gross Margin %</div>
+                    <div id="ue-gmargin" class="ue-value tabular" style="font-size:16px;color:#1e293b;">—</div>
+                    <div class="hint-text" data-i18n="ue-gmargin-hint">Ricavi ricorrenti netti / ricavi lordi</div>
+                </div>
+                <div id="ue-nmargin-tile" class="ue-tile" style="background:#f8fafc;border:1px solid #e2e8f0;padding:10px 14px;">
+                    <div class="overline" style="color:#475569;margin-bottom:4px;" data-i18n="ue-nmargin">Net Margin %</div>
+                    <div id="ue-nmargin" class="ue-value tabular" style="font-size:16px;color:#1e293b;">—</div>
+                    <div class="hint-text" data-i18n="ue-nmargin-hint">Utile netto / ricavi totali</div>
+                </div>
+                <div class="ue-tile" style="background:#fef2f2;border:1px solid #fecaca;padding:10px 14px;">
+                    <div class="overline" style="color:#b91c1c;margin-bottom:4px;" data-i18n="ue-commrate">Commission Rate %</div>
+                    <div id="ue-commrate" class="ue-value tabular" style="font-size:16px;color:#ef4444;">—</div>
+                    <div class="hint-text" data-i18n="ue-commrate-hint">Provvigioni / ricavi lordi</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Cash Flow Chart ──────────────────────────────────── -->
+    <div class="card" style="margin-bottom:16px;">
+        <div class="card-header" style="padding-bottom:14px;">
+            <span class="section-title" data-i18n="cashflow-title">Cash Flow Cumulativo (36 mesi)</span>
+        </div>
+        <div class="card-body" style="padding-top:4px;">
+            <div id="cashflow-chart" style="width:100%;"></div>
+        </div>
+    </div>
+
     <!-- Evaluation -->
-    <div class="eval-card" style="margin-bottom:16px;">
+    <div id="eval-card" class="eval-card" style="margin-bottom:16px;">
         <div class="overline" style="color:#6366f1; margin-bottom:12px;" data-i18n="overall-evaluation">Valutazione complessiva</div>
-        <div id="overall-evaluation" style="font-size:13px; line-height:1.7; color:#374151;"></div>
+        <div id="overall-evaluation" class="eval-body"></div>
     </div>
 
     <!-- ── AI Analysis ───────────────────────────────────────── -->

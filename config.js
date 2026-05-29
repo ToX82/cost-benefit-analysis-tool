@@ -7,12 +7,6 @@ export const CONFIG = {
     /** Number of months to consider for financial projections */
     MONTHS_PERIOD: 12,
 
-    /** Minimum number of development weeks allowed */
-    MIN_DEV_WEEKS: 1,
-
-    /** Default developer occupation percentage */
-    DEFAULT_OCCUPATION: 25,
-
     /**
      * Thresholds for Return on Investment (ROI) evaluation.
      * Values are percentages.
@@ -31,17 +25,17 @@ export const CONFIG = {
 
     /**
      * Thresholds for Risk Level evaluation.
-     * Values represent risk scores.
+     * Values represent risk scores (0–100).
      * @type {Object}
      */
     RISK_THRESHOLDS: {
-        /** Very high risk threshold (>=70) */
+        /** Very high risk threshold (>=70) — includes structurally unprofitable projects */
         VERY_HIGH: 70,
-        /** High risk threshold (>=48) */
-        HIGH: 48,
-        /** Medium risk threshold (>=25) */
-        MEDIUM: 25,
-        /** Low risk threshold (>=10) */
-        LOW: 10
+        /** High risk threshold (>=50) */
+        HIGH: 50,
+        /** Medium risk threshold (>=30) */
+        MEDIUM: 30,
+        /** Low risk threshold (>=15) */
+        LOW: 15
     }
 };

@@ -33,10 +33,17 @@ export class BookmarkManager {
         const url = new URL(window.location.href);
         url.search = params.toString();
 
+        const urlStr = url.toString();
         const shareButton = document.getElementById('share-button');
-        if (shareButton) shareButton.href = url.toString();
+        if (shareButton) shareButton.href = urlStr;
+        const bookmarkButton = document.getElementById('bookmark-button');
+        if (bookmarkButton) {
+            bookmarkButton.href = urlStr;
+            const label = bookmarkButton.querySelector('span[data-i18n]');
+            if (label && inputs.projectName) label.textContent = inputs.projectName;
+        }
 
-        return url.toString();
+        return urlStr;
     }
 
     /**
@@ -83,6 +90,17 @@ export class BookmarkManager {
                 console.error(__('bookmark-restore-error'), e);
             }
         }
+    }
+
+    /**
+     * Updates the browser address bar URL with current form state via history.pushState,
+     * so the user can bookmark it with Ctrl+D / Cmd+D.
+     * @returns {string} The generated URL
+     */
+    static updateBrowserUrl() {
+        const url = this.generateBookmarkUrl();
+        history.pushState(null, '', url);
+        return url;
     }
 
     /**

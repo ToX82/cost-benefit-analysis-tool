@@ -85,11 +85,6 @@ export class AIAnalyzer {
             q += ` (${fmt(RevenueItemsManager.getMonthlyRecurring('base') * 12)}/anno)\n\n`;
         }
 
-        // Development
-        q += __('development').toUpperCase() + ':\n';
-        q += `- ${__('dev-weeks')}: ${inputs.devWeeks}\n`;
-        q += `- ${__('dev-occupation')}: ${inputs.devOccupation}%\n\n`;
-
         // Analysis requests
         q += __('provide-detailed-analysis') + ':\n';
         q += `1. ${__('economic-sustainability')}\n`;

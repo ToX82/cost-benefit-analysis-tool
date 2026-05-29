@@ -56,6 +56,12 @@ async function init() {
                 success ? 'success' : 'error'
             );
         });
+
+        document.getElementById('bookmark-button').addEventListener('click', (e) => {
+            e.preventDefault();
+            BookmarkManager.updateBrowserUrl();
+            UIManager.displayTemporaryMessage(__('bookmark-url-updated'), 'info');
+        });
     } catch (error) {
         console.error('Error during I18n initialization:', error);
     }

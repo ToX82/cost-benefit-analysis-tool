@@ -292,6 +292,18 @@ export class CostItemsManager {
     static hasScalingCosts()  { return this.#items.some(i => i.frequency === 'scaling'); }
     static hasPerElabCosts()  { return this.#items.some(i => i.frequency === 'per-elab'); }
 
+    static getOnetimeCosts() {
+        return this.#items
+            .filter(i => i.frequency === 'onetime')
+            .reduce((sum, i) => sum + (i.amount || 0), 0);
+    }
+
+    static getRecurringAnnualCosts() {
+        return this.#items
+            .filter(i => i.frequency !== 'onetime')
+            .reduce((sum, i) => sum + this.annualizedAmount(i), 0);
+    }
+
     // ── Display updates ───────────────────────────────────────────────────────
 
     /**

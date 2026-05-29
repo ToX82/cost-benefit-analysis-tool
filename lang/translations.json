@@ -3,6 +3,38 @@
         "it": "Strumento di Analisi Costi-Benefici",
         "en": "Cost Benefit Analysis Tool"
     },
+    "page-subtitle-default": {
+        "it": "Valutazione finanziaria del progetto",
+        "en": "Project financial assessment"
+    },
+    "page-subtitle-project": {
+        "it": "Analisi di",
+        "en": "Analysis for"
+    },
+    "projection-scenarios-label": {
+        "it": "Proiezioni cumulative (P / B / O)",
+        "en": "Cumulative projections (P / B / O)"
+    },
+    "projection-year-1": {
+        "it": "Anno 1",
+        "en": "Year 1"
+    },
+    "projection-year-2": {
+        "it": "Anno 2",
+        "en": "Year 2"
+    },
+    "projection-year-3": {
+        "it": "Anno 3",
+        "en": "Year 3"
+    },
+    "cashflow-year-short": {
+        "it": "A",
+        "en": "Y"
+    },
+    "tam-penetration-suffix": {
+        "it": "su TAM {0}",
+        "en": "of TAM {0}"
+    },
     "project-name": {
         "it": "Nome Progetto",
         "en": "Project Name"
@@ -166,6 +198,126 @@
     "recurring-annual-revenues": {
         "it": "Ricavi annuali ricorrenti",
         "en": "Recurring Annual Revenues"
+    },
+    "total-commissions": {
+        "it": "Totale provvigioni",
+        "en": "Total Commissions"
+    },
+    "annual-gross-margin": {
+        "it": "Margine annuale lordo",
+        "en": "Annual Gross Margin"
+    },
+    "market-inputs-title": {
+        "it": "Mercato e Acquisizione",
+        "en": "Market & Acquisition"
+    },
+    "cac-label": {
+        "it": "CAC — Costo acquisizione cliente (€)",
+        "en": "CAC — Customer Acquisition Cost (€)"
+    },
+    "cac-help": {
+        "it": "Marketing + vendite / clienti acquisiti",
+        "en": "Marketing + sales / customers acquired"
+    },
+    "tam-label": {
+        "it": "TAM — Mercato potenziale (utenti)",
+        "en": "TAM — Total Addressable Market (users)"
+    },
+    "tam-help": {
+        "it": "Numero totale di potenziali clienti nel mercato",
+        "en": "Total number of potential customers in the market"
+    },
+    "unit-economics-title": {
+        "it": "Unit Economics",
+        "en": "Unit Economics"
+    },
+    "ue-ltv": {
+        "it": "LTV",
+        "en": "LTV"
+    },
+    "ue-ltv-hint": {
+        "it": "Valore vita cliente",
+        "en": "Customer Lifetime Value"
+    },
+    "ue-cac": {
+        "it": "CAC",
+        "en": "CAC"
+    },
+    "ue-cac-hint": {
+        "it": "Costo acquisizione",
+        "en": "Acquisition cost"
+    },
+    "ue-ltvcac": {
+        "it": "LTV:CAC",
+        "en": "LTV:CAC"
+    },
+    "ue-ltvcac-hint": {
+        "it": "Target ≥ 3x",
+        "en": "Target ≥ 3x"
+    },
+    "ue-payback": {
+        "it": "Payback CAC",
+        "en": "CAC Payback"
+    },
+    "ue-payback-hint": {
+        "it": "Mesi per recuperare CAC",
+        "en": "Months to recover CAC"
+    },
+    "ue-gmargin": {
+        "it": "Gross Margin %",
+        "en": "Gross Margin %"
+    },
+    "ue-gmargin-hint": {
+        "it": "Ricavi ricorrenti netti / ricavi lordi",
+        "en": "Net recurring revenues / gross revenues"
+    },
+    "ue-nmargin": {
+        "it": "Net Margin %",
+        "en": "Net Margin %"
+    },
+    "ue-nmargin-hint": {
+        "it": "Utile netto / ricavi totali",
+        "en": "Net profit / total revenues"
+    },
+    "ue-commrate": {
+        "it": "Commission Rate %",
+        "en": "Commission Rate %"
+    },
+    "ue-commrate-hint": {
+        "it": "Provvigioni / ricavi lordi",
+        "en": "Commissions / gross revenues"
+    },
+    "cashflow-title": {
+        "it": "Cash Flow Cumulativo (36 mesi)",
+        "en": "Cumulative Cash Flow (36 months)"
+    },
+    "monthly-acquisition-rate": {
+        "it": "Nuovi utenti/mese",
+        "en": "New users/month"
+    },
+    "churn-rate-label": {
+        "it": "Churn mensile",
+        "en": "Monthly churn"
+    },
+    "tier-breakeven-label": {
+        "it": "Break-even",
+        "en": "Break-even"
+    },
+    "tier-breakeven-unit": {
+        "it": "utenti (steady state) per coprire i costi",
+        "en": "users (steady state) to cover all costs"
+    },
+    "revenue-concentration-high": {
+        "it": "Concentrazione fatturato critica: \"{0}\" genera il {1}% dei ricavi",
+        "en": "Critical revenue concentration: \"{0}\" generates {1}% of revenues"
+    },
+    "revenue-concentration-medium": {
+        "it": "Fatturato concentrato: \"{0}\" genera il {1}% dei ricavi",
+        "en": "Revenue concentration: \"{0}\" generates {1}% of revenues"
+    },
+    "revenue-concentration-mitigation": {
+        "it": "Diversificare i piani tariffari o i segmenti di clientela",
+        "en": "Diversify pricing plans or customer segments"
     },
     "overall-evaluation": {
         "it": "Valutazione Complessiva",
@@ -366,6 +518,14 @@
     "project-loss": {
         "it": "Progetto in perdita ({0}% di margine negativo)",
         "en": "Project at a loss ({0}% negative margin)"
+    },
+    "structural-unviability-risk": {
+        "it": "Rischio strutturale: il progetto non è economicamente sostenibile nel caso base",
+        "en": "Structural risk: the project is not economically viable in the base case"
+    },
+    "no-recurring-revenue-risk": {
+        "it": "Assenza di ricavi ricorrenti in un modello SaaS",
+        "en": "No recurring revenue in a SaaS model"
     },
     "review-costs-revenues": {
         "it": "Rivedere urgentemente i costi e/o aumentare i ricavi",
@@ -658,6 +818,14 @@
     "bookmark-tooltip": {
         "it": "Trascina nei preferiti per salvare l'analisi, o clicca per copiare il link",
         "en": "Drag to bookmarks to save analysis, or click to copy the link"
+    },
+    "bookmark-save": {
+        "it": "Preferiti",
+        "en": "Bookmark"
+    },
+    "bookmark-url-updated": {
+        "it": "URL aggiornato — premi Ctrl+D (⌘+D su Mac) per salvare nei preferiti",
+        "en": "URL updated — press Ctrl+D (⌘+D on Mac) to save as bookmark"
     },
     "optimistic-users": {
         "it": "Utenti (Scenario Ottimistico)",

@@ -1,4 +1,3 @@
-import { CONFIG } from '../config.js';
 import { InputManager } from '../managers/InputManager.js';
 import { UIManager } from '../managers/UIManager.js';
 import { StorageManager } from '../managers/StorageManager.js';
@@ -7,6 +6,8 @@ import { RiskAnalyzer } from './RiskAnalyzer.js';
 import { CostItemsManager } from '../managers/CostItemsManager.js';
 import { RevenueItemsManager } from '../managers/RevenueItemsManager.js';
 import { __ } from '../utils/I18n.js';
+
+const CASH_FLOW_MONTHS = 36;
 
 /**
  * Main analyzer class that orchestrates cost-benefit calculations.
@@ -26,6 +27,7 @@ export class CostBenefitAnalyzer {
             document.querySelectorAll('input, select').forEach(el =>
                 el.addEventListener('change', () => this.handleInputChange())
             );
+            document.getElementById('project-name')?.addEventListener('input', () => this.handleInputChange());
 
             const bm = document.getElementById('business-model');
             if (!bm) throw new Error('Business model select not found');
@@ -88,13 +90,20 @@ export class CostBenefitAnalyzer {
             const breakeven = this.calculateBreakeven(costs, revenues, inputs);
             const evaluation = EvaluationManager.getROIEvaluation(roi.base.percentage);
             const fullEval   = EvaluationManager.addOverallEvaluation(evaluation, roi, breakeven, inputs);
-            const riskIndex  = new RiskAnalyzer(inputs, { totalCosts: costs.base }).analyze();
+            const riskIndex  = new RiskAnalyzer(inputs, { totalCosts: costs.base }, revenues, roi).analyze();
 
+            const unitEcon   = this.calculateUnitEconomics(revenues, costs);
+            const cashFlow   = this.calculateCashFlow(costs, revenues);
+
+            UIManager.updatePageHeader(inputs.projectName);
             UIManager.updateFinancialDetails(costs, revenues);
             UIManager.updateROI(roi, inputs.businessModel);
             UIManager.updateBreakeven(breakeven);
-            UIManager.updateEvaluation(fullEval, riskIndex);
+            UIManager.updateEvaluation(fullEval, riskIndex, roi);
             UIManager.updateRevenueSummary(revenues);
+            UIManager.updateTierBreakevens(costs.base);
+            UIManager.updateUnitEconomics(unitEcon);
+            UIManager.updateCashFlowChart(cashFlow);
 
             const aiBtn = document.getElementById('ai-analysis-btn');
             if (aiBtn) aiBtn.disabled = false;
@@ -129,19 +138,6 @@ export class CostBenefitAnalyzer {
             UIManager.displayError(__('cost-items-required'));
             return false;
         }
-
-        const devWeeks = parseFloat(document.getElementById('dev-weeks')?.value) || 0;
-        if (devWeeks < CONFIG.MIN_DEV_WEEKS) {
-            UIManager.displayError(__('invalid-dev-weeks'));
-            return false;
-        }
-
-        const devOccupation = parseFloat(document.getElementById('dev-occupation')?.value) || 0;
-        if (devOccupation < 0 || devOccupation > 100) {
-            UIManager.displayError(__('invalid-occupation'));
-            return false;
-        }
-
         return true;
     }
 
@@ -154,23 +150,43 @@ export class CostBenefitAnalyzer {
     }
 
     calculateRevenues() {
-        const onetime  = RevenueItemsManager.getTotalOnetimeRevenue();
-        const monthly  = RevenueItemsManager.getMonthlyRecurring('base');
-        const monthOpt = RevenueItemsManager.getMonthlyRecurring('optimistic');
-        const monthPes = RevenueItemsManager.getMonthlyRecurring('pessimistic');
+        const onetime = RevenueItemsManager.getTotalOnetimeRevenue();
 
-        const onetimeTierBase = RevenueItemsManager.getOnetimeTierRevenue('base');
-        const onetimeTierOpt  = RevenueItemsManager.getOnetimeTierRevenue('optimistic');
-        const onetimeTierPes  = RevenueItemsManager.getOnetimeTierRevenue('pessimistic');
+        const cumSum = (scenario, months) => {
+            let sum = 0;
+            for (let m = 1; m <= months; m++) {
+                sum += RevenueItemsManager.getMonthlyRevenueAtMonth(m, scenario);
+            }
+            return sum;
+        };
+
+        const m12b = cumSum('base', 12);
+        const m12o = cumSum('optimistic', 12);
+        const m12p = cumSum('pessimistic', 12);
 
         return {
-            onetime: onetime + onetimeTierBase,
-            monthly,
-            yearly: monthly * CONFIG.MONTHS_PERIOD,
+            onetime,
+            monthly: RevenueItemsManager.getMonthlyRevenueAtMonth(12, 'base'),
+            yearly: m12b,
+            totalCommissions: RevenueItemsManager.getTotalCommissions('base'),
+            concentration: RevenueItemsManager.getRevenueConcentration(),
+            projections: {
+                m12: { base: m12b, optimistic: m12o, pessimistic: m12p },
+                m24: {
+                    base:        cumSum('base', 24),
+                    optimistic:  cumSum('optimistic', 24),
+                    pessimistic: cumSum('pessimistic', 24)
+                },
+                m36: {
+                    base:        cumSum('base', 36),
+                    optimistic:  cumSum('optimistic', 36),
+                    pessimistic: cumSum('pessimistic', 36)
+                }
+            },
             scenarios: {
-                base:        onetime + onetimeTierBase + monthly  * CONFIG.MONTHS_PERIOD,
-                optimistic:  onetime + onetimeTierOpt  + monthOpt * CONFIG.MONTHS_PERIOD,
-                pessimistic: onetime + onetimeTierPes  + monthPes * CONFIG.MONTHS_PERIOD
+                base:        onetime + m12b,
+                optimistic:  onetime + m12o,
+                pessimistic: onetime + m12p
             }
         };
     }
@@ -191,13 +207,56 @@ export class CostBenefitAnalyzer {
         };
     }
 
-    /** Breakeven uses base scenario costs. */
+    /**
+     * Finds the month at which cumulative cash flow turns positive.
+     * Iterates month by month using the growth model (up to 120 months = 10 years).
+     */
     calculateBreakeven(costs, revenues, inputs) {
-        const devMonths = inputs.devWeeks / 4;
-        const remaining = costs.base - revenues.onetime;
-        if (remaining <= 0) return devMonths;
-        if (revenues.monthly <= 0) return Infinity;
-        return devMonths + (remaining / revenues.monthly);
+        const onetimeCost = CostItemsManager.getOnetimeCosts();
+        const monthlyCost = CostItemsManager.getRecurringAnnualCosts() / 12;
+
+        let cumulative = revenues.onetime - onetimeCost;
+        if (cumulative >= 0) return 0;
+
+        for (let m = 1; m <= 120; m++) {
+            const monthRev = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
+            cumulative += monthRev - monthlyCost;
+            if (cumulative >= 0) return m;
+        }
+        return Infinity;
+    }
+
+    calculateUnitEconomics(revenues, costs) {
+        const ltv        = RevenueItemsManager.getWeightedLTV();
+        const grossRev   = RevenueItemsManager.getTotalGrossRevenues('base') + revenues.onetime;
+        const commRate   = grossRev > 0 ? (revenues.totalCommissions / grossRev) * 100 : 0;
+        const totalRev   = revenues.yearly + revenues.onetime;
+        const recurCosts = CostItemsManager.getRecurringAnnualCosts();
+        const grossMarginPct = revenues.yearly > 0
+            ? ((revenues.yearly - recurCosts) / revenues.yearly) * 100
+            : null;
+        const netMarginPct = totalRev > 0
+            ? ((totalRev - costs.base) / totalRev) * 100
+            : null;
+        return { ltv, commRate, grossMarginPct, netMarginPct };
+    }
+
+    calculateCashFlow(costs, revenues) {
+        const onetimeCost   = CostItemsManager.getOnetimeCosts();
+        const monthlyCost   = CostItemsManager.getRecurringAnnualCosts() / 12;
+        const onetimeRev    = revenues.onetime;
+        const months        = [];
+
+        let cumulative = onetimeRev - onetimeCost;
+        months.push(cumulative);
+
+        for (let m = 1; m <= CASH_FLOW_MONTHS; m++) {
+            const monthRev = RevenueItemsManager.getMonthlyRevenueAtMonth(m, 'base');
+            cumulative += monthRev - monthlyCost;
+            months.push(cumulative);
+        }
+
+        return months;
     }
 
     handleBusinessModelChange() {

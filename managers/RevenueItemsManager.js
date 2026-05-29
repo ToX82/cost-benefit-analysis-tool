@@ -3,7 +3,14 @@ import { CurrencyFormatter } from '../utils/CurrencyFormatter.js';
 
 /**
  * Manages one-time revenues and recurring subscription tiers.
- * Net tier revenue = (price - commissionPerUnit) × units.
+ *
+ * Growth model: each tier stores a monthly acquisition rate (new users/month),
+ * not a static user count. Active users at month M:
+ *   - subscription: U(M) = (acq/churn) × (1 - (1-churn)^M)   if churn > 0
+ *                          acq × M                             if churn = 0
+ *   - one-time: cumulative sold = acq × M (revenue = acq × netPrice each month)
+ *
+ * Net tier revenue = (price - commissionPerUnit) × active users.
  */
 export class RevenueItemsManager {
     static #onetimeItems = [];
@@ -89,14 +96,15 @@ export class RevenueItemsManager {
 
     // ── Recurring tiers (card layout) ─────────────────────────────────────────
 
-    static #createTierCard(id, label, price, commission, baseUnits, optimisticUnits, pessimisticUnits, elaborationsPerLicense = '', licenseType = 'monthly') {
+    static #createTierCard(id, label, price, commission, baseAcq, optimisticAcq, pessimisticAcq,
+                           elaborationsPerLicense = '', licenseType = 'monthly', churnRate = '') {
         const card = document.createElement('div');
         card.dataset.tierId = id;
         card.className = 'tier-card';
 
         const isOnetime = licenseType === 'onetime';
         const fmtInp = (attr, val, colorCls = '') =>
-            `<input type="number" ${attr} min="0" step="any"
+            `<input type="number" ${attr} min="0" step="1"
                 class="scenario-units-inp ${colorCls}" placeholder="0" value="${val}">`;
         const priceUnit = isOnetime ? __('per-license') : __('per-user-month');
 
@@ -153,26 +161,42 @@ export class RevenueItemsManager {
                 <span style="font-size:10px;color:#94a3b8;">${__('elab-per-license-unit')}</span>
             </div>
 
-            <!-- Scenario quantities -->
+            <!-- Churn rate (monthly tiers only) -->
+            <div class="tier-elab" data-churn-row style="${isOnetime ? 'display:none;' : ''}">
+                <span class="tier-elab-label" style="color:#fca5a5;">${__('churn-rate-label')}</span>
+                <input type="number" data-tier-churn min="0" max="100" step="0.1"
+                    class="inp-bare" style="width:64px;font-weight:700;font-size:14px;color:#ef4444;"
+                    placeholder="0" value="${churnRate}">
+                <span style="font-size:10px;color:#94a3b8;">%/mese · LTV: <span data-tier-ltv style="font-weight:700;color:#6366f1;">—</span></span>
+            </div>
+
+            <!-- Break-even -->
+            <div class="tier-elab" data-breakeven-row>
+                <span class="tier-elab-label" style="color:#6366f1;" data-i18n="tier-breakeven-label">Break-even</span>
+                <span data-tier-breakeven style="font-size:13px;font-weight:800;color:#4f46e5;">—</span>
+                <span style="font-size:10px;color:#94a3b8;" data-i18n="tier-breakeven-unit">utenti (steady state) per coprire i costi</span>
+            </div>
+
+            <!-- Scenario acquisition rates -->
             <div class="tier-scenarios">
-                <div class="tier-scenarios-label" data-i18n="expected-users">${__('expected-users')}</div>
+                <div class="tier-scenarios-label" data-i18n="monthly-acquisition-rate">${__('monthly-acquisition-rate')}</div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
 
                     <div class="scenario-box s-pess">
                         <div class="scenario-label">${__('pessimistic')}</div>
-                        ${fmtInp('data-tier-pessimistic', pessimisticUnits, 's-pess')}
+                        ${fmtInp('data-tier-pessimistic', pessimisticAcq, 's-pess')}
                         <div class="scenario-rev" data-revenue-pessimistic>—</div>
                     </div>
 
                     <div class="scenario-box s-base">
                         <div class="scenario-label">${__('tier-units-base')}</div>
-                        ${fmtInp('data-tier-base', baseUnits, 's-base')}
+                        ${fmtInp('data-tier-base', baseAcq, 's-base')}
                         <div class="scenario-rev" data-revenue-base>—</div>
                     </div>
 
                     <div class="scenario-box s-opt">
                         <div class="scenario-label">${__('optimistic')}</div>
-                        ${fmtInp('data-tier-optimistic', optimisticUnits, 's-opt')}
+                        ${fmtInp('data-tier-optimistic', optimisticAcq, 's-opt')}
                         <div class="scenario-rev" data-revenue-optimistic>—</div>
                     </div>
                 </div>
@@ -190,6 +214,8 @@ export class RevenueItemsManager {
                 card.querySelectorAll('[data-tier-type-btn]').forEach(b =>
                     b.classList.toggle('active', b.dataset.tierTypeBtn === type)
                 );
+                const churnRow = card.querySelector('[data-churn-row]');
+                if (churnRow) churnRow.style.display = type === 'onetime' ? 'none' : '';
                 this.updateRecurringTier(id);
             })
         );
@@ -206,6 +232,19 @@ export class RevenueItemsManager {
         return tier.licenseType === 'onetime'
             ? tier.price - tier.commissionPerUnit
             : tier.price * 12 - tier.commissionPerUnit;
+    }
+
+    /**
+     * Active users at month M for a given tier (subscription only).
+     * One-time tiers: returns cumulative sold (acqPerMonth × M).
+     */
+    static #activeUsers(tier, month, field) {
+        const acq = tier[field] || 0;
+        const churn = tier.churnRate || 0;
+        if (tier.licenseType === 'onetime') return acq * month;
+        return churn > 0
+            ? (acq / (churn / 100)) * (1 - Math.pow(1 - churn / 100, month))
+            : acq * month;
     }
 
     static #updateCardRevenues(id) {
@@ -230,30 +269,50 @@ export class RevenueItemsManager {
         const commUnitEl = card.querySelector('[data-tier-commission-unit]');
         if (commUnitEl) commUnitEl.textContent = isOnetime ? __('per-license') : __('per-license-year');
 
-        const netForRev = Math.max(0, netAnnual);
-        const suffix = isOnetime ? '' : '/anno';
-        const set = (attr, units) => {
-            const el = card.querySelector(`[${attr}]`);
-            if (el) el.textContent = units > 0 ? `${fmt(netForRev * units)}${suffix}` : '—';
+        // Revenue projection at month 12 per scenario
+        const rev12 = (field) => {
+            const users = this.#activeUsers(tier, 12, field);
+            return Math.max(0, this.#netMonthly(tier)) * users;
         };
-        set('data-revenue-base', tier.baseUnits);
-        set('data-revenue-optimistic', tier.optimisticUnits);
-        set('data-revenue-pessimistic', tier.pessimisticUnits);
+        const suffix = isOnetime ? ' (12m)' : ' (a.1)';
+        const setRev = (attr, field) => {
+            const el = card.querySelector(`[${attr}]`);
+            if (!el) return;
+            const acq = tier[field] || 0;
+            el.textContent = acq > 0 ? `${fmt(rev12(field))}${suffix}` : '—';
+        };
+        setRev('data-revenue-base', 'baseAcqPerMonth');
+        setRev('data-revenue-optimistic', 'optimisticAcqPerMonth');
+        setRev('data-revenue-pessimistic', 'pessimisticAcqPerMonth');
+
+        // LTV
+        const ltvEl = card.querySelector('[data-tier-ltv]');
+        if (ltvEl && !isOnetime) {
+            const netMonthly = Math.max(0, this.#netMonthly(tier));
+            const churn = tier.churnRate || 0;
+            ltvEl.textContent = (churn > 0 && netMonthly > 0)
+                ? fmt(netMonthly / (churn / 100))
+                : '—';
+        }
     }
 
-    static addRecurringTier(label = '', price = '', commission = '', baseUnits = '', optimisticUnits = '', pessimisticUnits = '', elaborationsPerLicense = '', licenseType = 'monthly') {
+    static addRecurringTier(label = '', price = '', commission = '', baseAcq = '',
+                            optimisticAcq = '', pessimisticAcq = '',
+                            elaborationsPerLicense = '', licenseType = 'monthly', churnRate = '') {
         const id = `tier-${++this.#tierCounter}`;
-        const card = this.#createTierCard(id, label, price, commission, baseUnits, optimisticUnits, pessimisticUnits, elaborationsPerLicense, licenseType);
+        const card = this.#createTierCard(id, label, price, commission,
+            baseAcq, optimisticAcq, pessimisticAcq, elaborationsPerLicense, licenseType, churnRate);
         document.getElementById('recurring-tiers-container').appendChild(card);
         this.#recurringTiers.push({
             id, label,
             price: parseFloat(price) || 0,
             commissionPerUnit: parseFloat(commission) || 0,
-            baseUnits: parseInt(baseUnits) || 0,
-            optimisticUnits: parseInt(optimisticUnits) || 0,
-            pessimisticUnits: parseInt(pessimisticUnits) || 0,
+            baseAcqPerMonth: parseInt(baseAcq) || 0,
+            optimisticAcqPerMonth: parseInt(optimisticAcq) || 0,
+            pessimisticAcqPerMonth: parseInt(pessimisticAcq) || 0,
             elaborationsPerLicense: parseInt(elaborationsPerLicense) || 0,
-            licenseType
+            licenseType,
+            churnRate: parseFloat(churnRate) || 0
         });
         this.#updateCardRevenues(id);
         this.#refreshRecurring();
@@ -277,80 +336,173 @@ export class RevenueItemsManager {
             label: card.querySelector('[data-tier-label]').value,
             price: parseFloat(card.querySelector('[data-tier-price]').value) || 0,
             commissionPerUnit: parseFloat(card.querySelector('[data-tier-commission]').value) || 0,
-            baseUnits: parseInt(card.querySelector('[data-tier-base]').value) || 0,
-            optimisticUnits: parseInt(card.querySelector('[data-tier-optimistic]').value) || 0,
-            pessimisticUnits: parseInt(card.querySelector('[data-tier-pessimistic]').value) || 0,
+            baseAcqPerMonth: parseInt(card.querySelector('[data-tier-base]').value) || 0,
+            optimisticAcqPerMonth: parseInt(card.querySelector('[data-tier-optimistic]').value) || 0,
+            pessimisticAcqPerMonth: parseInt(card.querySelector('[data-tier-pessimistic]').value) || 0,
             elaborationsPerLicense: parseInt(card.querySelector('[data-tier-elaborations]').value) || 0,
-            licenseType: card.querySelector('[data-tier-license-type]').value || 'monthly'
+            licenseType: card.querySelector('[data-tier-license-type]').value || 'monthly',
+            churnRate: parseFloat(card.querySelector('[data-tier-churn]')?.value) || 0
         };
         this.#updateCardRevenues(id);
         this.#refreshRecurring();
         this.#dispatch();
     }
 
+    // ── Public query methods ─────────────────────────────────────────────────
+
     /**
-     * Total monthly net recurring revenue for given scenario (monthly-type tiers only).
-     * Net = price - commissionPerUnit/12 (commission is annual per license, amortized monthly).
+     * Monthly revenue at a given month using the growth model.
+     * Subscription tiers: activeUsers(month) × netMonthly.
+     * One-time tiers: acqPerMonth × netPrice (constant new sales each month).
      */
-    static getMonthlyRecurring(scenario = 'base') {
-        const field = scenario === 'optimistic' ? 'optimisticUnits'
-                    : scenario === 'pessimistic' ? 'pessimisticUnits'
-                    : 'baseUnits';
+    static getMonthlyRevenueAtMonth(month, scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => {
+            const users = this.#activeUsers(t, month, field);
+            const net = Math.max(0, this.#netMonthly(t));
+            // For subscription: activeUsers × netMonthly
+            // For one-time: acqPerMonth × netPrice (users = acq×month, but revenue is per new sale = acq×net)
+            if (t.licenseType === 'onetime') {
+                return sum + (t[field] || 0) * net;
+            }
+            return sum + users * net;
+        }, 0);
+    }
+
+    /**
+     * Active subscription users at month 12 (reference snapshot).
+     */
+    static getActiveUsers(month, scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
         return this.#recurringTiers
             .filter(t => t.licenseType !== 'onetime')
-            .reduce((sum, t) => {
-                const net = Math.max(0, this.#netMonthly(t));
-                return sum + net * t[field];
-            }, 0);
+            .reduce((sum, t) => sum + this.#activeUsers(t, month, field), 0);
     }
 
     /**
-     * Total one-time net revenue from una-tantum tiers for given scenario.
-     * Net = price - commissionPerUnit (both one-time per license).
+     * Monthly revenue at month 12 (used as "current MRR" reference for evaluations).
+     */
+    static getMonthlyRecurring(scenario = 'base') {
+        return this.getMonthlyRevenueAtMonth(12, scenario);
+    }
+
+    /**
+     * Total one-time upfront sales (commissioned revenues, not tier one-time).
+     * Tier one-time revenue is included in getMonthlyRevenueAtMonth.
      */
     static getOnetimeTierRevenue(scenario = 'base') {
-        const field = scenario === 'optimistic' ? 'optimisticUnits'
-                    : scenario === 'pessimistic' ? 'pessimisticUnits'
-                    : 'baseUnits';
-        return this.#recurringTiers
-            .filter(t => t.licenseType === 'onetime')
-            .reduce((sum, t) => {
-                const net = Math.max(0, this.#netMonthly(t));
-                return sum + net * (t[field] || 0);
-            }, 0);
-    }
-
-    static getTotalUnits(scenario = 'base') {
-        const field = scenario === 'optimistic' ? 'optimisticUnits'
-                    : scenario === 'pessimistic' ? 'pessimisticUnits'
-                    : 'baseUnits';
-        return this.#recurringTiers.reduce((sum, t) => sum + t[field], 0);
+        return 0; // Tier one-time revenue now flows through getMonthlyRevenueAtMonth
     }
 
     /**
-     * Total elaborations per month across all tiers for a given scenario.
-     * = Σ (tier_licenses[scenario] × tier_elaborationsPerLicense)
-     * @param {'base'|'optimistic'|'pessimistic'} scenario
-     * @returns {number}
+     * Active subscription users at month 12 (used as user-count reference).
+     */
+    static getTotalUnits(scenario = 'base') {
+        return this.getActiveUsers(12, scenario);
+    }
+
+    /**
+     * Average monthly elaborations over year 1, using month-6 active users as midpoint estimate.
      */
     static getTotalElaborations(scenario = 'base') {
-        const field = scenario === 'optimistic' ? 'optimisticUnits'
-                    : scenario === 'pessimistic' ? 'pessimisticUnits'
-                    : 'baseUnits';
-        return this.#recurringTiers.reduce((sum, t) =>
-            sum + (t[field] || 0) * (t.elaborationsPerLicense || 0), 0);
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => {
+            const users = this.#activeUsers(t, 6, field);
+            return sum + users * (t.elaborationsPerLicense || 0);
+        }, 0);
+    }
+
+    /**
+     * Total annual commissions at month-12 active users.
+     */
+    static getTotalCommissions(scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => {
+            const users12 = this.#activeUsers(t, 12, field);
+            return sum + t.commissionPerUnit * users12;
+        }, 0);
+    }
+
+    /**
+     * Gross annual revenues (before commissions) at month-12 active users.
+     */
+    static getTotalGrossRevenues(scenario = 'base') {
+        const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
+                    : scenario === 'pessimistic' ? 'pessimisticAcqPerMonth'
+                    : 'baseAcqPerMonth';
+        return this.#recurringTiers.reduce((sum, t) => {
+            const users12 = this.#activeUsers(t, 12, field);
+            const gross = t.licenseType === 'onetime'
+                ? t.price * users12           // one-time: price × cumulative sold
+                : t.price * 12 * users12;     // subscription: annual price × active users
+            return sum + gross;
+        }, 0);
+    }
+
+    /**
+     * Revenue concentration by tier (fraction of month-12 base revenue).
+     */
+    static getRevenueConcentration() {
+        const rev12 = (t) => {
+            const users = this.#activeUsers(t, 12, 'baseAcqPerMonth');
+            return Math.max(0, this.#netMonthly(t)) * (t.licenseType === 'onetime' ? (t.baseAcqPerMonth || 0) : users);
+        };
+        const total = this.#recurringTiers.reduce((s, t) => s + rev12(t), 0);
+        if (total <= 0) return [];
+        return this.#recurringTiers
+            .map(t => ({ id: t.id, label: t.label || t.id, fraction: rev12(t) / total }))
+            .sort((a, b) => b.fraction - a.fraction);
+    }
+
+    /**
+     * Weighted average LTV (weighted by acquisition rate).
+     */
+    static getWeightedLTV() {
+        const monthly = this.#recurringTiers.filter(t => t.licenseType !== 'onetime' && t.churnRate > 0);
+        const totalAcq = monthly.reduce((s, t) => s + (t.baseAcqPerMonth || 0), 0);
+        if (totalAcq === 0) return 0;
+        return monthly.reduce((s, t) => {
+            const net = Math.max(0, this.#netMonthly(t));
+            const ltv = net / (t.churnRate / 100);
+            return s + ltv * (t.baseAcqPerMonth || 0);
+        }, 0) / totalAcq;
+    }
+
+    /**
+     * Weighted average net monthly revenue per new user (base, monthly tiers).
+     */
+    static getWeightedMonthlyNetPerUnit() {
+        const monthly = this.#recurringTiers.filter(t => t.licenseType !== 'onetime' && t.baseAcqPerMonth > 0);
+        const totalAcq = monthly.reduce((s, t) => s + t.baseAcqPerMonth, 0);
+        if (totalAcq === 0) return 0;
+        return monthly.reduce((s, t) => s + Math.max(0, this.#netMonthly(t)) * t.baseAcqPerMonth, 0) / totalAcq;
     }
 
     static #refreshRecurring() {
         const fmt = v => CurrencyFormatter.format(v);
-        const base = this.getMonthlyRecurring('base');
-        const opt  = this.getMonthlyRecurring('optimistic');
-        const pes  = this.getMonthlyRecurring('pessimistic');
+
+        // Cumulative revenue over N months
+        const cumRev = (scenario, months) => {
+            let sum = 0;
+            for (let m = 1; m <= months; m++) sum += this.getMonthlyRevenueAtMonth(m, scenario);
+            return sum;
+        };
 
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
-        set('recurring-base-total', `<strong>${fmt(base)}</strong>/mese &nbsp;<span style="opacity:.65;font-size:11px;">${fmt(base * 12)}/anno</span>`);
-        set('recurring-opt-total',  `<strong>${fmt(opt)}</strong>/mese &nbsp;<span style="opacity:.65;font-size:11px;">${fmt(opt * 12)}/anno</span>`);
-        set('recurring-pes-total',  `<strong>${fmt(pes)}</strong>/mese &nbsp;<span style="opacity:.65;font-size:11px;">${fmt(pes * 12)}/anno</span>`);
+        for (const [scen, prefix] of [['base', 'base'], ['optimistic', 'opt'], ['pessimistic', 'pes']]) {
+            const y1 = cumRev(scen, 12);
+            const y2 = cumRev(scen, 24);
+            set(`recurring-${prefix}-total`,
+                `${fmt(y1)}<span class="scenario-strip-y2">${fmt(y2)} anno 2</span>`);
+        }
 
         const count = this.#recurringTiers.length;
         const emptyEl   = document.getElementById('recurring-empty-state');
@@ -371,7 +523,8 @@ export class RevenueItemsManager {
         this.#onetimeCounter = 0;
         items.forEach(i => {
             const id = `onetime-${++this.#onetimeCounter}`;
-            document.getElementById('onetime-items-body').appendChild(this.#createOnetimeRow(id, i.label || '', i.amount || ''));
+            document.getElementById('onetime-items-body').appendChild(
+                this.#createOnetimeRow(id, i.label || '', i.amount || ''));
             this.#onetimeItems.push({ id, label: i.label || '', amount: parseFloat(i.amount) || 0 });
         });
         this.#refreshOnetime();
@@ -385,21 +538,26 @@ export class RevenueItemsManager {
         tiers.forEach(t => {
             const id = `tier-${++this.#tierCounter}`;
             const licenseType = t.licenseType || 'monthly';
+            // Backward compat: old data used baseUnits/optimisticUnits/pessimisticUnits
+            const baseAcq       = t.baseAcqPerMonth       ?? t.baseUnits       ?? '';
+            const optimisticAcq = t.optimisticAcqPerMonth ?? t.optimisticUnits ?? '';
+            const pessimisticAcq= t.pessimisticAcqPerMonth?? t.pessimisticUnits?? '';
             const card = this.#createTierCard(
                 id, t.label || '', t.price || '', t.commissionPerUnit || 0,
-                t.baseUnits || '', t.optimisticUnits || '', t.pessimisticUnits || '',
-                t.elaborationsPerLicense || '', licenseType
+                baseAcq, optimisticAcq, pessimisticAcq,
+                t.elaborationsPerLicense || '', licenseType, t.churnRate || ''
             );
             document.getElementById('recurring-tiers-container').appendChild(card);
             this.#recurringTiers.push({
                 id, label: t.label || '',
                 price: parseFloat(t.price) || 0,
                 commissionPerUnit: parseFloat(t.commissionPerUnit) || 0,
-                baseUnits: parseInt(t.baseUnits) || 0,
-                optimisticUnits: parseInt(t.optimisticUnits) || 0,
-                pessimisticUnits: parseInt(t.pessimisticUnits) || 0,
+                baseAcqPerMonth: parseInt(baseAcq) || 0,
+                optimisticAcqPerMonth: parseInt(optimisticAcq) || 0,
+                pessimisticAcqPerMonth: parseInt(pessimisticAcq) || 0,
                 elaborationsPerLicense: parseInt(t.elaborationsPerLicense) || 0,
-                licenseType
+                licenseType,
+                churnRate: parseFloat(t.churnRate) || 0
             });
             this.#updateCardRevenues(id);
         });

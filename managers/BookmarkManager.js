@@ -1,4 +1,6 @@
 import { InputManager } from './InputManager.js';
+import { CostItemsManager } from './CostItemsManager.js';
+import { RevenueItemsManager } from './RevenueItemsManager.js';
 import { __ } from '../utils/I18n.js';
 
 /**
@@ -13,22 +15,26 @@ export class BookmarkManager {
         const inputs = InputManager.collectInputs();
         const params = new URLSearchParams();
 
-        // Aggiungi tutti i parametri all'URL
         Object.entries(inputs).forEach(([key, value]) => {
             if (value !== undefined && value !== null && value !== '') {
                 params.set(key, value.toString());
             }
         });
 
-        // Crea l'URL completo
+        const costItems = CostItemsManager.getCostItems();
+        if (costItems.length > 0) params.set('costItems', JSON.stringify(costItems));
+
+        const onetimeItems = RevenueItemsManager.getOnetimeItems();
+        if (onetimeItems.length > 0) params.set('onetimeRevenues', JSON.stringify(onetimeItems));
+
+        const recurringTiers = RevenueItemsManager.getRecurringTiers();
+        if (recurringTiers.length > 0) params.set('recurringTiers', JSON.stringify(recurringTiers));
+
         const url = new URL(window.location.href);
         url.search = params.toString();
 
-        // Aggiorna l'href del link di condivisione
         const shareButton = document.getElementById('share-button');
-        if (shareButton) {
-            shareButton.href = url.toString();
-        }
+        if (shareButton) shareButton.href = url.toString();
 
         return url.toString();
     }
@@ -38,31 +44,50 @@ export class BookmarkManager {
      */
     static restoreFromUrl() {
         const params = new URLSearchParams(window.location.search);
-        const inputs = document.querySelectorAll('input, select');
+        if (!params.toString()) return;
 
-        inputs.forEach(input => {
-            const paramName = this.#getParamNameFromId(input.id);
-            if (params.has(paramName)) {
-                const value = params.get(paramName);
-
-                if (input.type === 'number') {
-                    const numValue = parseFloat(value);
-                    if (!isNaN(numValue)) {
-                        input.value = numValue;
-                    }
-                } else {
-                    input.value = value;
-                }
-
-                // Trigger change event per aggiornare i calcoli
-                input.dispatchEvent(new Event('change'));
+        // Restore static inputs
+        document.querySelectorAll('input[id], select[id]').forEach(input => {
+            const paramName = this.#toParamName(input.id);
+            if (!params.has(paramName)) return;
+            const value = params.get(paramName);
+            if (input.type === 'number') {
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue)) input.value = numValue;
+            } else {
+                input.value = value;
             }
+            input.dispatchEvent(new Event('change'));
         });
+
+        // Restore cost items
+        const costItemsParam = params.get('costItems');
+        if (costItemsParam) {
+            try { CostItemsManager.loadCostItems(JSON.parse(costItemsParam)); } catch (e) {
+                console.error(__('bookmark-restore-error'), e);
+            }
+        }
+
+        // Restore one-time revenues
+        const onetimeParam = params.get('onetimeRevenues');
+        if (onetimeParam) {
+            try { RevenueItemsManager.loadOnetimeItems(JSON.parse(onetimeParam)); } catch (e) {
+                console.error(__('bookmark-restore-error'), e);
+            }
+        }
+
+        // Restore recurring tiers
+        const tiersParam = params.get('recurringTiers');
+        if (tiersParam) {
+            try { RevenueItemsManager.loadRecurringTiers(JSON.parse(tiersParam)); } catch (e) {
+                console.error(__('bookmark-restore-error'), e);
+            }
+        }
     }
 
     /**
      * Copies bookmark URL to clipboard
-     * @returns {Promise<boolean>} true if operation succeeded, false otherwise
+     * @returns {Promise<boolean>}
      */
     static async copyBookmarkUrl() {
         try {
@@ -76,13 +101,10 @@ export class BookmarkManager {
     }
 
     /**
-     * Converts element ID to corresponding parameter name
+     * Converts kebab-case element ID to camelCase parameter name
      * @private
-     * @param {string} id - Form element ID
-     * @returns {string} Parameter name for URL
      */
-    static #getParamNameFromId(id) {
-        // Converte da kebab-case a camelCase
-        return id.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+    static #toParamName(id) {
+        return id.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
     }
 }

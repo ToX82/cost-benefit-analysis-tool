@@ -2,13 +2,11 @@ import { CONFIG } from '../config.js';
 import { __ } from '../utils/I18n.js';
 
 /**
- * Analyzes project risks and provides assessment with mitigation strategies
+ * Analyzes project risks and provides assessment with mitigation strategies.
+ * Inputs must include: businessModel, devWeeks, devOccupation, onetimeRevenue,
+ * monthlyRecurring, expectedUsers, optimisticUsers, pessimisticUsers, annualizedCosts.
  */
 export class RiskAnalyzer {
-    /**
-     * @param {Object} inputs - Validated form inputs
-     * @param {Object} costs - Calculated project costs
-     */
     constructor(inputs, costs) {
         this.inputs = inputs;
         this.costs = costs;
@@ -17,10 +15,6 @@ export class RiskAnalyzer {
         this.mitigations = [];
     }
 
-    /**
-     * Performs complete risk analysis considering all factors
-     * @returns {Object} Analysis results with score, level, details and mitigations
-     */
     analyze() {
         this.calculateOccupationRisk();
         this.calculateDurationRisk();
@@ -37,13 +31,10 @@ export class RiskAnalyzer {
         };
     }
 
-    /**
-     * Calculates risk based on team occupation percentage
-     */
     calculateOccupationRisk() {
         const OCCUPATION_THRESHOLD = 50;
         const MAX_RISK = 25;
-        const RISK_THRESHOLD = 15;
+        const RISK_THRESHOLD = 20; // warn only at ≥90 % saturation
         const occupationFactor = (this.inputs.devOccupation - OCCUPATION_THRESHOLD) / OCCUPATION_THRESHOLD;
         const risk = Math.max(0, occupationFactor * MAX_RISK);
 
@@ -55,15 +46,12 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates risk based on project duration with exponential increase
-     */
     calculateDurationRisk() {
         const WEEK_THRESHOLD = 4;
         const BASE_RISK_PER_THRESHOLD = 10;
         const EXPONENTIAL_FACTOR_BASE = 1.05;
-        const HIGH_RISK = 20;
-        const MEDIUM_RISK = 10;
+        const HIGH_RISK = 28;   // "critical" triggers only at ~16+ weeks
+        const MEDIUM_RISK = 14; // "plan milestones" triggers at ~12+ weeks
 
         const weeksOver = Math.max(0, this.inputs.devWeeks - WEEK_THRESHOLD);
         const baseRisk = (weeksOver / WEEK_THRESHOLD) * BASE_RISK_PER_THRESHOLD;
@@ -84,32 +72,23 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Delegates financial risk calculation based on business model
-     */
     calculateFinancialRisk() {
         const strategies = {
-            saas: () => this.calculateSaaSFinancialRisk(),
+            saas:        () => this.calculateSaaSFinancialRisk(),
             commissioned: () => this.calculateCommissionedFinancialRisk(),
-            mixed: () => this.calculateMixedFinancialRisk()
+            mixed:       () => this.calculateMixedFinancialRisk()
         };
-
-        const strategy = strategies[this.inputs.businessModel];
-        if (strategy) {
-            strategy();
-        }
+        strategies[this.inputs.businessModel]?.();
     }
 
-    /**
-     * Calculates financial risk for SaaS model based on breakeven time
-     */
     calculateSaaSFinancialRisk() {
-        const BREAKEVEN_MONTHS = 12;
+        const BREAKEVEN_MONTHS = 18; // SaaS startups routinely need 12-18 months runway
         const MAX_RISK = 25;
         const RISK_THRESHOLD = 15;
 
-        const monthlyRevenue = this.inputs.recurringRevenue * this.inputs.expectedUsers;
-        const monthsToBreakeven = this.costs.totalCosts / monthlyRevenue;
+        if (this.inputs.monthlyRecurring <= 0) return;
+
+        const monthsToBreakeven = this.costs.totalCosts / this.inputs.monthlyRecurring;
         const risk = Math.min(MAX_RISK, Math.max(0, (monthsToBreakeven - BREAKEVEN_MONTHS) * 2));
 
         this.riskScore += risk;
@@ -121,15 +100,13 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates financial risk for commissioned model based on upfront payment ratio
-     */
     calculateCommissionedFinancialRisk() {
-        const MIN_UPFRONT_RATIO = 0.3;
         const MAX_RISK = 25;
         const RISK_THRESHOLD = 15;
 
-        const upfrontRatio = this.inputs.upfrontPayment / this.costs.totalCosts;
+        const upfrontRatio = this.costs.totalCosts > 0
+            ? this.inputs.onetimeRevenue / this.costs.totalCosts
+            : 0;
         const risk = Math.max(0, (1 - upfrontRatio) * MAX_RISK);
 
         this.riskScore += risk;
@@ -140,19 +117,19 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates financial risk for mixed model considering both upfront and recurring revenue
-     */
     calculateMixedFinancialRisk() {
         const BREAKEVEN_MONTHS = 12;
         const MAX_RISK = 25;
         const RISK_THRESHOLD = 15;
 
-        const upfrontRatio = this.inputs.upfrontPayment / this.costs.totalCosts;
-        const monthlyRevenue = this.inputs.recurringRevenue * this.inputs.expectedUsers;
+        const upfrontRatio = this.costs.totalCosts > 0
+            ? this.inputs.onetimeRevenue / this.costs.totalCosts
+            : 0;
 
         const upfrontRisk = Math.max(0, (1 - upfrontRatio) * MAX_RISK);
-        const recurringRisk = Math.min(MAX_RISK, Math.max(0, (this.costs.totalCosts / monthlyRevenue - BREAKEVEN_MONTHS) * 2));
+        const recurringRisk = this.inputs.monthlyRecurring > 0
+            ? Math.min(MAX_RISK, Math.max(0, (this.costs.totalCosts / this.inputs.monthlyRecurring - BREAKEVEN_MONTHS) * 2))
+            : MAX_RISK;
 
         const totalRisk = (upfrontRisk * 0.4) + (recurringRisk * 0.6);
         this.riskScore += totalRisk;
@@ -163,10 +140,9 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates risk based on user estimate variability
-     */
     calculateUserRisk() {
+        if (this.inputs.expectedUsers === 0) return;
+
         const MAX_BASE_RISK = 20;
         const RISK_THRESHOLD = 10;
         const VARIABILITY_FACTOR = 20;
@@ -187,16 +163,14 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates risk based on expected user base size
-     */
     calculateUserBaseRisk() {
-        const THRESHOLDS = { high: 50, low: 200 };
+        const THRESHOLDS = { high: 20, low: 100 }; // realistic early-stage SaaS numbers
         const BASE_RISK_COMMISSIONED = 5;
-        const RISK_THRESHOLD = 5;
+        const RISK_THRESHOLD = 8; // only warn when genuinely micro-scale (< 20 users)
 
         if (this.inputs.businessModel === 'commissioned') {
-            if (this.inputs.recurringRevenue > 0) {
+            // Warn if commissioned project has recurring revenue
+            if (this.inputs.monthlyRecurring > 0) {
                 this.details.push(__('commissioned-recurring-warning'));
                 this.mitigations.push(__('consider-one-time-payment'));
                 this.riskScore += BASE_RISK_COMMISSIONED;
@@ -220,30 +194,27 @@ export class RiskAnalyzer {
         }
     }
 
-    /**
-     * Calculates risk based on project margin
-     */
     calculateMarginRisk() {
         const totalCosts = this.costs.totalCosts;
-        const revenue = this.inputs.upfrontPayment + this.inputs.finalPayment +
-                       (this.inputs.recurringRevenue * this.inputs.expectedUsers * 12);
+        const revenue = this.inputs.onetimeRevenue + (this.inputs.monthlyRecurring * 12);
         const margin = revenue - totalCosts;
-        const marginPercentage = (margin / totalCosts) * 100;
+        const marginPercentage = totalCosts > 0 ? (margin / totalCosts) * 100 : 0;
 
         let risk = 0;
 
         if (margin < 0) {
-            risk = 35;
-            this.details.push(__('project-loss', marginPercentage.toFixed(1)));
+            // Scale proportionally: -5% → ~16, -30% → ~22, -80% → ~35
+            risk = Math.round(15 + Math.min(20, Math.abs(marginPercentage) / 4));
+            this.details.push(__('project-loss', Math.abs(marginPercentage).toFixed(1)));
             this.mitigations.push(__('review-costs-revenues'));
             this.mitigations.push(__('consider-contract-renegotiation'));
         } else if (marginPercentage < 15) {
-            risk = 25;
+            risk = 12;
             this.details.push(__('very-low-margin', marginPercentage.toFixed(1)));
             this.mitigations.push(__('identify-cost-optimization'));
             this.mitigations.push(__('evaluate-revenue-increase'));
         } else if (marginPercentage < 30) {
-            risk = 15;
+            risk = 6;
             this.details.push(__('below-average-margin', marginPercentage.toFixed(1)));
             this.mitigations.push(__('monitor-costs'));
         }
@@ -251,10 +222,6 @@ export class RiskAnalyzer {
         this.riskScore += risk;
     }
 
-    /**
-     * Maps risk score to descriptive risk level
-     * @returns {string} Risk level description
-     */
     determineRiskLevel() {
         if (this.riskScore > CONFIG.RISK_THRESHOLDS.VERY_HIGH) return __('risk-level-very-high');
         if (this.riskScore > CONFIG.RISK_THRESHOLDS.HIGH) return __('risk-level-high');

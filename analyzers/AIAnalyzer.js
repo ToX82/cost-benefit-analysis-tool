@@ -1,46 +1,33 @@
 import { __ } from '../utils/I18n.js';
+import { InputManager } from '../managers/InputManager.js';
+import { CostItemsManager } from '../managers/CostItemsManager.js';
+import { RevenueItemsManager } from '../managers/RevenueItemsManager.js';
+import { CurrencyFormatter } from '../utils/CurrencyFormatter.js';
 
 /**
- * Handles AI-based analysis of project data.
- * Prepares and processes form data for AI analysis and manages UI state during analysis.
+ * Handles AI-based analysis via Perplexity AI
  */
 export class AIAnalyzer {
-    /**
-     * Creates an instance of AIAnalyzer
-     * @param {Object} analyzer - The main analyzer instance
-     */
     constructor(analyzer) {
         this.analyzer = analyzer;
         this.button = document.getElementById('ai-analysis-btn');
         this.spinner = document.getElementById('ai-spinner');
         this.isAnalyzing = false;
-
         this.initializeEventListeners();
     }
 
-    /**
-     * Sets up event listeners for the AI analysis button
-     */
     initializeEventListeners() {
         this.button.addEventListener('click', () => this.requestAnalysis());
     }
 
-    /**
-     * Handles the AI analysis request
-     * Opens Perplexity AI in a new tab with the analysis query
-     */
     async requestAnalysis() {
         if (this.isAnalyzing) return;
 
         try {
             this.isAnalyzing = true;
             this.updateUIState(true);
-
-            const data = this.prepareAnalysisData();
-            const query = this.buildPerplexityQuery(data);
-
+            const query = this.buildQuery();
             window.open(`https://www.perplexity.ai/?q=${encodeURIComponent(query)}`, '_blank');
-
         } catch (error) {
             console.error('Error during AI analysis:', error);
         } finally {
@@ -49,78 +36,62 @@ export class AIAnalyzer {
         }
     }
 
-    /**
-     * Builds a structured query for Perplexity AI analysis
-     * @param {Object} data - The prepared form data
-     * @returns {string} The formatted query string
-     */
-    buildPerplexityQuery(data) {
-        let query = __('analyze-software-project') + '\n\n';
+    buildQuery() {
+        const inputs        = InputManager.collectInputs();
+        const costItems     = CostItemsManager.getCostItems();
+        const onetimeItems  = RevenueItemsManager.getOnetimeItems();
+        const recurringTiers = RevenueItemsManager.getRecurringTiers();
+        const fmt = v => CurrencyFormatter.format(v);
 
-        // Business model section
-        query += `${__('business-model')}: ${data.costs.businessModel.value}\n\n`;
+        let q = __('analyze-software-project') + '\n\n';
+        if (inputs.projectName) q += `Progetto: ${inputs.projectName}\n`;
+        q += `${__('business-model')}: ${inputs.businessModel}\n\n`;
 
-        // Costs section
-        query += __('costs').toUpperCase() + ':\n';
-        query += `- ${__('direct-costs')}: €${data.costs.directCosts.value}\n`;
-        query += `- ${__('indirect-costs')}: €${data.costs.indirectCosts.value}\n\n`;
+        // Costs
+        q += __('costs').toUpperCase() + ':\n';
+        if (costItems.length > 0) {
+            costItems.forEach(item => {
+                const ann = CostItemsManager.annualizedAmount(item);
+                q += `- [${__(`category-${item.category}`)}] ${item.label || '-'}: ${fmt(ann)} `;
+                q += `(${__(`freq-${item.frequency}`)})\n`;
+            });
+        }
+        q += `${__('total-annualized')}: ${fmt(CostItemsManager.getTotalCosts())}\n\n`;
 
-        // Revenue section
-        query += __('revenues').toUpperCase() + ':\n';
-        query += `- ${__('upfront-payment')}: €${data.revenues.upfrontPayment.value}\n`;
-        query += `- ${__('final-payment')}: €${data.revenues.finalPayment.value}\n`;
-        query += `- ${__('recurring-revenue')}: €${data.revenues.recurringRevenue.value}\n\n`;
+        // One-time revenues
+        if (onetimeItems.length > 0) {
+            q += __('onetime-revenues').toUpperCase() + ':\n';
+            onetimeItems.forEach(i => q += `- ${i.label || '-'}: ${fmt(i.amount)}\n`);
+            q += `Totale: ${fmt(RevenueItemsManager.getTotalOnetimeRevenue())}\n\n`;
+        }
 
-        // Development section
-        query += __('development').toUpperCase() + ':\n';
-        query += `- ${__('dev-weeks')}: ${data.resources.devWeeks.value}\n`;
-        query += `- ${__('dev-occupation')}: ${data.resources.devOccupation.value}%\n\n`;
+        // Recurring tiers
+        if (recurringTiers.length > 0) {
+            q += __('recurring-revenues').toUpperCase() + ':\n';
+            recurringTiers.forEach(t => {
+                q += `- ${t.label || '-'}: ${fmt(t.price)}/utente/mese`;
+                q += ` × ${t.baseUnits} base (ottimistico: ${t.optimisticUnits}, pessimistico: ${t.pessimisticUnits})\n`;
+            });
+            q += `${__('revenue-scenario-base')}: ${fmt(RevenueItemsManager.getMonthlyRecurring('base'))}/mese`;
+            q += ` (${fmt(RevenueItemsManager.getMonthlyRecurring('base') * 12)}/anno)\n\n`;
+        }
 
-        // Users section
-        query += __('users').toUpperCase() + ':\n';
-        query += `- ${__('expected-users')}: ${data.users.expectedUsers.value} ${__('users').toLowerCase()}\n`;
-        query += `- ${__('optimistic-scenario')}: ${data.users.optimisticUsers.value} ${__('users').toLowerCase()}\n`;
-        query += `- ${__('pessimistic-scenario')}: ${data.users.pessimisticUsers.value} ${__('users').toLowerCase()}\n\n`;
+        // Development
+        q += __('development').toUpperCase() + ':\n';
+        q += `- ${__('dev-weeks')}: ${inputs.devWeeks}\n`;
+        q += `- ${__('dev-occupation')}: ${inputs.devOccupation}%\n\n`;
 
         // Analysis requests
-        query += __('provide-detailed-analysis') + ':\n';
-        query += `1. ${__('economic-sustainability')}\n`;
-        query += `2. ${__('roi-analysis')}\n`;
-        query += `3. ${__('breakeven-estimate')}\n`;
-        query += `4. ${__('risks-and-mitigations')}\n`;
-        query += `5. ${__('cost-benefit-recommendations')}`;
+        q += __('provide-detailed-analysis') + ':\n';
+        q += `1. ${__('economic-sustainability')}\n`;
+        q += `2. ${__('roi-analysis')}\n`;
+        q += `3. ${__('breakeven-estimate')}\n`;
+        q += `4. ${__('risks-and-mitigations')}\n`;
+        q += `5. ${__('cost-benefit-recommendations')}`;
 
-        return query;
+        return q;
     }
 
-    /**
-     * Prepares form data for AI analysis by grouping fields by category
-     * @returns {Object} Structured data object with categorized form fields
-     */
-    prepareAnalysisData() {
-        const form = document.getElementById('analysis-form');
-        const data = {};
-
-        form.querySelectorAll('[data-category]').forEach(category => {
-            const categoryName = category.dataset.category;
-            data[categoryName] = {};
-
-            category.querySelectorAll('input, select').forEach(field => {
-                const fieldName = field.name.replace(/[^a-zA-Z]/g, '');
-                data[categoryName][fieldName] = {
-                    value: field.type === 'number' ? parseFloat(field.value) || 0 : field.value,
-                    description: field.previousElementSibling?.firstChild?.textContent || field.name
-                };
-            });
-        });
-
-        return data;
-    }
-
-    /**
-     * Updates UI elements to reflect the current analysis state
-     * @param {boolean} isLoading - Whether the analysis is currently running
-     */
     updateUIState(isLoading) {
         this.button.disabled = isLoading;
         this.spinner.classList.toggle('hidden', !isLoading);

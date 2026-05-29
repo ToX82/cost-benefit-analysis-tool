@@ -4,178 +4,558 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="tool-title">Cost-Benefit Analysis Tool</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 L95 50 L50 95 L5 50 Z' fill='%234f46e5'/><path d='M35 35 L65 35 L65 65 L35 65 Z' fill='white'/><path d='M45 25 L55 25 L55 75 L45 75 Z' fill='white'/><circle cx='50' cy='50' r='10' fill='%234f46e5'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 5 L95 50 L50 95 L5 50 Z' fill='%234f46e5'/><circle cx='50' cy='50' r='20' fill='white'/></svg>">
 
     <style>
-    h2 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #4f46e5;
-        margin-top: 1rem;
+    /* ── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f1f5f9;
+        color: #1e293b;
+        min-height: 100vh;
+        padding: 24px 16px 48px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
     }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .page { max-width: 1200px; margin: 0 auto; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 768px) {
+        .grid-2 { grid-template-columns: 1fr; }
+        .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ─────────────────────────────────────────────── */
+    .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.03);
+    }
+    .card-body { padding: 20px 24px; }
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px 0;
+    }
+
+    /* ── Typography ────────────────────────────────────────── */
+    .page-title {
+        font-size: 20px; font-weight: 800;
+        color: #0f172a; letter-spacing: -0.4px;
+    }
+    .section-title {
+        font-size: 15px; font-weight: 700;
+        color: #1e293b; letter-spacing: -0.2px;
+    }
+    .overline {
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #94a3b8;
+    }
+    .label-text {
+        font-size: 13px; font-weight: 500; color: #475569;
+        display: block; margin-bottom: 6px;
+    }
+    .hint-text { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .stat-value {
+        font-size: 26px; font-weight: 800;
+        letter-spacing: -0.8px; line-height: 1;
+    }
+    .stat-sub { font-size: 12px; color: #64748b; margin-top: 6px; }
+
+    /* ── Inputs ────────────────────────────────────────────── */
+    .inp {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1e293b;
+        background: #fff;
+        font-family: inherit;
+        transition: border-color .15s, box-shadow .15s;
+        outline: none;
+        appearance: none;
+    }
+    .inp:hover { border-color: #cbd5e1; }
+    .inp:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+    .inp-danger:focus { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.1); }
+
+    /* Bare input (no border, just underline — used in tier cards) */
+    .inp-bare {
+        background: transparent; border: none;
+        border-bottom: 1.5px solid #e2e8f0;
+        border-radius: 0; padding: 4px 2px;
+        width: 100%; text-align: center;
+        font-weight: 700; font-family: inherit;
+        outline: none; color: inherit;
+        transition: border-color .15s;
+    }
+    .inp-bare:focus { border-color: #4f46e5; }
+    .inp-bare.inp-orange:focus { border-color: #f97316; }
+    .inp-bare.inp-green:focus  { border-color: #10b981; }
+
+    /* ── Buttons ────────────────────────────────────────────── */
+    .btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 13px; font-weight: 600;
+        font-family: inherit;
+        cursor: pointer; transition: all .15s;
+        border: none; text-decoration: none; white-space: nowrap;
+        line-height: 1.4;
+    }
+    .btn-primary    { background: #4f46e5; color: #fff; }
+    .btn-primary:hover { background: #4338ca; box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+    .btn-primary-lg { padding: 12px 24px; font-size: 14px; border-radius: 12px; gap: 8px; }
+
+    .btn-ghost { background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; }
+    .btn-ghost:hover { background: #e0e7ff; }
+    .btn-ghost-green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .btn-ghost-green:hover { background: #d1fae5; }
+    .btn-ghost-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .btn-ghost-blue:hover { background: #dbeafe; }
+
+    .btn-icon {
+        width: 30px; height: 30px; padding: 0;
+        border-radius: 8px; background: transparent;
+        border: none; color: #cbd5e1; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: all .15s; font-size: 18px; font-weight: 700;
+        font-family: inherit;
+    }
+    .btn-icon:hover { background: #fef2f2; color: #ef4444; }
+
+    /* ── Tables ─────────────────────────────────────────────── */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead th {
+        padding: 0 12px 10px;
+        font-size: 10px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 1.2px;
+        color: #94a3b8; text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .data-table thead th.right { text-align: right; }
+    .data-table thead th.center { text-align: center; }
+    .data-table tbody tr { transition: background .1s; }
+    .data-table tbody tr:hover { background: #fafafa; }
+    .data-table tbody td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f8fafc;
+        vertical-align: middle;
+    }
+    .data-table tbody td.right { text-align: right; }
+
+    /* ── Cost row annualized hint ───────────────────────────── */
+    .annualized-hint { font-size: 11px; color: #94a3b8; margin-top: 3px; text-align: right; }
+
+    /* ── Tier card ──────────────────────────────────────────── */
+    .tier-card {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 16px; overflow: hidden; background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+        display: flex; flex-direction: column;
+    }
+    .tier-card:hover {
+        border-color: #a5b4fc;
+        box-shadow: 0 4px 12px rgba(79,70,229,.1);
+    }
+    .tier-head {
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .tier-head input[type=text] {
+        flex: 1; font-size: 14px; font-weight: 700;
+        color: #1e293b; background: transparent;
+        border: none; border-bottom: 1.5px solid transparent;
+        padding: 2px 0; outline: none;
+        font-family: inherit; transition: border-color .15s;
+    }
+    .tier-head input[type=text]:hover  { border-bottom-color: #e2e8f0; }
+    .tier-head input[type=text]:focus  { border-bottom-color: #4f46e5; }
+
+    .tier-pricing {
+        display: grid; grid-template-columns: repeat(3,1fr);
+        background: #f8fafc;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .tier-pricing-col { padding: 12px 10px; text-align: center; }
+    .tier-pricing-col + .tier-pricing-col { border-left: 1px solid #e2e8f0; }
+    .tier-pricing-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .tier-pricing-unit { font-size: 10px; color: #94a3b8; margin-top: 6px; }
+
+    .tier-scenarios { padding: 12px; flex: 1; }
+    .tier-scenarios-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; margin-bottom: 10px; }
+
+    .scenario-box { padding: 10px 8px; border-radius: 10px; text-align: center; }
+    .s-pess { background: #fff7ed; border: 1.5px solid #fed7aa; }
+    .s-base { background: #eef2ff; border: 1.5px solid #c7d2fe; }
+    .s-opt  { background: #ecfdf5; border: 1.5px solid #a7f3d0; }
+    .scenario-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; }
+    .s-pess .scenario-label { color: #f97316; }
+    .s-base .scenario-label { color: #4f46e5; }
+    .s-opt  .scenario-label { color: #10b981; }
+    .scenario-rev { font-size: 11px; font-weight: 600; margin-top: 8px; }
+    .s-pess .scenario-rev { color: #ea580c; }
+    .s-base .scenario-rev { color: #4338ca; }
+    .s-opt  .scenario-rev { color: #059669; }
+    .scenario-units-inp {
+        font-size: 18px; font-weight: 800; font-family: inherit;
+        background: transparent; border: none;
+        border-bottom: 1.5px solid transparent;
+        width: 100%; text-align: center; outline: none;
+        padding: 2px 0; transition: border-color .15s;
+    }
+    .s-pess .scenario-units-inp { color: #c2410c; }
+    .s-pess .scenario-units-inp:focus { border-bottom-color: #f97316; }
+    .s-base .scenario-units-inp { color: #3730a3; }
+    .s-base .scenario-units-inp:focus { border-bottom-color: #4f46e5; }
+    .s-opt  .scenario-units-inp { color: #065f46; }
+    .s-opt  .scenario-units-inp:focus { border-bottom-color: #10b981; }
+
+    /* ── Tier grid ──────────────────────────────────────────── */
+    #recurring-tiers-container { display: none; }
+    #recurring-tiers-container.show {
+        display: grid; grid-template-columns: 1fr; gap: 16px;
+        margin-bottom: 16px;
+    }
+    @media (min-width: 768px)  { #recurring-tiers-container.show { grid-template-columns: repeat(2,1fr); } }
+    @media (min-width: 1100px) { #recurring-tiers-container.show { grid-template-columns: repeat(3,1fr); } }
+
+    /* ── Category badges ────────────────────────────────────── */
+    .cat-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 999px;
+        font-size: 11px; font-weight: 600; border: 1px solid;
+    }
+    .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Stat result cards ──────────────────────────────────── */
+    .result-card {
+        background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.05);
+        padding: 18px 20px; border-top: 3px solid transparent;
+    }
+    .result-card-green  { border-top-color: #10b981; }
+    .result-card-red    { border-top-color: #ef4444; }
+    .result-card-blue   { border-top-color: #3b82f6; }
+    .result-card-amber  { border-top-color: #f59e0b; }
+
+    /* ── Evaluation card ────────────────────────────────────── */
+    .eval-card {
+        background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+        border: 1px solid #c7d2fe;
+        border-radius: 16px;
+        padding: 20px 24px;
+    }
+
+    /* ── Empty states ───────────────────────────────────────── */
+    .empty-state {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 8px; padding: 40px 20px; color: #94a3b8; text-align: center;
+    }
+    .empty-icon { width: 44px; height: 44px; opacity: .35; }
+    .empty-title { font-size: 14px; font-weight: 600; color: #64748b; }
+    .empty-desc { font-size: 12px; }
+
+    /* ── Divider ────────────────────────────────────────────── */
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+
+    /* ── Scenario summary strip ─────────────────────────────── */
+    .scenario-strip { border-radius: 12px; padding: 12px 14px; border: 1px solid; }
+    .scenario-strip-pess { background: #fff7ed; border-color: #fed7aa; }
+    .scenario-strip-base { background: #eef2ff; border-color: #c7d2fe; }
+    .scenario-strip-opt  { background: #ecfdf5; border-color: #a7f3d0; }
+
+    /* ── Misc ───────────────────────────────────────────────── */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { opacity: .2; }
+
+    .section-divider {
+        display: flex; align-items: center; gap: 12px;
+        margin: 20px 0 16px;
+    }
+    .section-divider-line { flex: 1; height: 1px; background: #f1f5f9; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen p-4">
-    <div class="container mx-auto bg-white rounded-xl shadow-lg p-4 max-w-6xl">
-        <h1 class="text-2xl font-bold mb-4 text-indigo-700 text-center" data-i18n="tool-title">Cost-Benefit Analysis Tool</h1>
+<body>
+<div class="page">
 
-        <!-- Input Section -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="analysis-form">
-            <!-- Costs -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="costs">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="costs">Costs</h2>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700" for="business-model">
-                        <span data-i18n="business-model">Business Model</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="select-project-type">Select project type</span>
-                    </label>
-                    <select name="businessModel" id="business-model" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm">
-                        <option value="saas" data-i18n="saas">SaaS</option>
-                        <option value="commissioned" data-i18n="commissioned">Commissioned</option>
-                        <option value="mixed" data-i18n="mixed">Mixed (SaaS + Commissioned)</option>
-                    </select>
+    <!-- ── Page Header ──────────────────────────────────────── -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+        <div>
+            <h1 class="page-title" data-i18n="tool-title">Cost-Benefit Analysis Tool</h1>
+            <p class="overline" style="margin-top:4px; color:#94a3b8;">Project Financial Assessment</p>
+        </div>
+        <a href="#" id="share-button"
+            class="btn btn-ghost"
+            style="position:relative; border-radius:10px;"
+            title="">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+            <span data-i18n="share-analysis">Condividi</span>
+            <span class="sr-only" data-i18n="bookmark-tooltip">Trascina nei preferiti o clicca per copiare</span>
+        </a>
+    </div>
 
-                    <label class="block text-sm font-medium text-gray-700" for="direct-costs">
-                        <span data-i18n="direct-costs">Direct Costs (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="direct-costs-help">Direct costs like salaries and licenses</span>
-                    </label>
-                    <input type="number" name="directCosts" id="direct-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-1000" placeholder="Ex: 1000">
+    <!-- ── Config Row ────────────────────────────────────────── -->
+    <div class="grid-2" id="analysis-form" style="margin-bottom:16px;">
 
-                    <label class="block text-sm font-medium text-gray-700" for="indirect-costs">
-                        <span data-i18n="indirect-costs">Indirect Costs over 12 months (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="indirect-costs-help">Other expenses not directly related to development</span>
-                    </label>
-                    <input type="number" name="indirectCosts" id="indirect-costs" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-500" placeholder="Ex: 500">
-                </div>
+        <!-- Business Model -->
+        <div class="card">
+            <div class="card-header" style="padding-bottom:16px;">
+                <span class="section-title" data-i18n="business-model">Business Model</span>
             </div>
-
-            <!-- Revenues -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="revenues">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="revenues">Revenues</h2>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700" for="upfront-payment">
-                        <span data-i18n="upfront-payment">Upfront Payment (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="upfront-payment-help">Advance payment at contract signing</span>
-                    </label>
-                    <input type="number" name="upfrontPayment" id="upfront-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-2000" placeholder="Ex: 2000">
-
-                    <label class="block text-sm font-medium text-gray-700" for="final-payment">
-                        <span data-i18n="final-payment">Final Payment (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="final-payment-help">Final balance at project delivery</span>
-                    </label>
-                    <input type="number" name="finalPayment" id="final-payment" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-3000" placeholder="Ex: 3000">
-
-                    <label class="block text-sm font-medium text-gray-700" for="recurring-revenue">
-                        <span data-i18n="recurring-revenue">Monthly Revenue (€)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="recurring-revenue-help">Monthly fee per user</span>
-                    </label>
-                    <input type="number" name="recurringRevenue" id="recurring-revenue" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Ex: 100">
-                </div>
-            </div>
-
-            <!-- Time and Resources -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="resources">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="time-resources">Time and Resources</h2>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700" for="dev-weeks">
-                        <span data-i18n="dev-weeks">Development Weeks</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="dev-weeks-help">Development duration in weeks</span>
-                    </label>
-                    <input type="number" name="devWeeks" id="dev-weeks" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-8" placeholder="Ex: 8">
-
-                    <label class="block text-sm font-medium text-gray-700" for="dev-occupation">
-                        <span data-i18n="dev-occupation">Occupation (%)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="dev-occupation-help">Workforce saturation %</span>
-                    </label>
-                    <input type="number" name="devOccupation" id="dev-occupation" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-80" placeholder="Ex: 80" min="0" max="100" value="80">
-                </div>
-            </div>
-
-            <!-- Expected Users -->
-            <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100" data-category="users">
-                <h2 class="text-lg font-bold mb-2 text-indigo-600" data-i18n="expected-users-title">Expected Users</h2>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700" for="expected-users">
-                        <span data-i18n="expected-users">Expected Users</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="expected-users-help">Estimated number of software users</span>
-                    </label>
-                    <input type="number" name="expectedUsers" id="expected-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Ex: 100">
-
-                    <label class="block text-sm font-medium text-gray-700" for="optimistic-users">
-                        <span data-i18n="optimistic-users">Utenti (Scenario Ottimistico)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="optimistic-users-help">Stima ottimistica del numero di utenti</span>
-                    </label>
-                    <input type="number" name="optimisticUsers" id="optimistic-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Es: 100">
-
-                    <label class="block text-sm font-medium text-gray-700" for="pessimistic-users">
-                        <span data-i18n="pessimistic-users">Utenti (Scenario Pessimistico)</span><br>
-                        <span class="text-xs text-gray-500" data-i18n="pessimistic-users-help">Stima pessimistica del numero di utenti</span>
-                    </label>
-                    <input type="number" name="pessimisticUsers" id="pessimistic-users" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" data-i18n-placeholder="example-100" placeholder="Es: 100">
-                </div>
+            <div class="card-body" style="padding-top:0;" data-category="costs">
+                <label class="label-text" for="project-name" data-i18n="project-name">Nome Progetto</label>
+                <input type="text" id="project-name" class="inp" style="margin-bottom:14px;"
+                    data-i18n-placeholder="project-name-placeholder" placeholder="Es: App di gestione magazzino">
+                <label class="label-text" for="business-model" data-i18n="select-project-type">Seleziona il tipo di progetto</label>
+                <select name="businessModel" id="business-model" class="inp">
+                    <option value="saas" data-i18n="saas">SaaS</option>
+                    <option value="commissioned" data-i18n="commissioned">Commissionato</option>
+                    <option value="mixed" data-i18n="mixed">Misto (SaaS + Commissionato)</option>
+                </select>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mt-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-indigo-600" data-i18n="results">Results</h2>
-                <a href="#" id="share-button" class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors no-underline inline-flex items-center justify-center group relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                    </svg>
-                    <span class="sr-only" data-i18n="share-analysis">Share analysis</span>
-                    <span class="absolute -bottom-12 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" data-i18n="bookmark-tooltip">
-                        Trascina nei preferiti
-                    </span>
-                </a>
+        <!-- Time & Resources -->
+        <div class="card" data-category="resources">
+            <div class="card-header" style="padding-bottom:16px;">
+                <span class="section-title" data-i18n="time-resources">Tempo e Risorse</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg shadow-sm border border-green-100">
-                    <h3 class="text-lg font-bold text-green-700 mb-2" data-i18n="roi-12-months">12-month ROI</h3>
-                    <div id="roi" class="text-2xl font-bold text-green-600">€0.00</div>
-                </div>
-
-                <div class="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg shadow-sm border border-blue-100">
-                    <h3 class="text-lg font-bold text-blue-700 mb-2" data-i18n="breakeven-time">Breakeven Time</h3>
-                    <p id="breakeven" class="text-2xl font-bold text-blue-600" data-i18n="zero-months">0 months</p>
-                </div>
-
-                <div class="p-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg shadow-sm border border-amber-100">
-                    <h3 class="text-lg font-bold text-amber-700 mb-2" data-i18n="financial-details">Financial Details</h3>
-                    <div class="text-sm space-y-1">
-                        <p><span data-i18n="costs">Costs</span>: <span id="total-costs-detail" class="font-semibold">€0.00</span></p>
-                        <p><span data-i18n="direct-revenues">Direct revenues</span>: <span id="direct-revenue-detail" class="font-semibold">€0.00</span></p>
-                        <p><span data-i18n="recurring-annual-revenues">Annual recurring revenues</span>: <span id="yearly-revenue-detail" class="font-semibold">€0.00</span></p>
-                        <p id="users-scenarios" class="mt-2 text-gray-600"></p>
+            <div class="card-body" style="padding-top:0;">
+                <div class="grid-2" style="gap:16px;">
+                    <div>
+                        <label class="label-text" for="dev-weeks" data-i18n="dev-weeks">Settimane di sviluppo</label>
+                        <input type="number" name="devWeeks" id="dev-weeks" class="inp"
+                            data-i18n-placeholder="example-8" placeholder="Es: 8">
+                        <p class="hint-text" data-i18n="dev-weeks-help">Durata in settimane</p>
+                    </div>
+                    <div>
+                        <label class="label-text" for="dev-occupation" data-i18n="dev-occupation">Occupazione (%)</label>
+                        <input type="number" name="devOccupation" id="dev-occupation" class="inp"
+                            min="0" max="100" value="80"
+                            data-i18n-placeholder="example-80" placeholder="Es: 80">
+                        <p class="hint-text" data-i18n="dev-occupation-help">Saturazione % del team</p>
                     </div>
                 </div>
-            </div>
-
-            <!-- Overall Evaluation -->
-            <div class="mt-4 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg shadow-sm border border-indigo-100">
-                <h3 class="text-lg font-bold text-indigo-700 mb-3" data-i18n="overall-evaluation">Overall Evaluation</h3>
-                <div id="overall-evaluation" class="prose prose-indigo max-w-none"></div>
-            </div>
-        </div>
-
-        <!-- AI Analysis Section -->
-        <div class="mt-6">
-            <div class="flex justify-center mb-4">
-                <button id="ai-analysis-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                    <span data-i18n="request-ai-analysis">Request AI Analysis</span>
-                    <div id="ai-spinner" class="hidden">
-                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </div>
-                </button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <!-- ── Costs Section ─────────────────────────────────────── -->
+    <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+            <span class="section-title" data-i18n="project-costs-title">Costi del Progetto</span>
+            <button type="button" id="add-cost-btn" class="btn btn-ghost">
+                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                <span data-i18n="add-cost-item">Aggiungi Voce</span>
+            </button>
+        </div>
+        <div class="card-body">
+
+            <!-- Empty state -->
+            <div id="cost-empty-state" class="empty-state">
+                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                </svg>
+                <span class="empty-title" data-i18n="no-costs-message">Nessuna voce di costo</span>
+                <span class="empty-desc">Aggiungi le voci per avviare l'analisi</span>
+            </div>
+
+            <!-- Table -->
+            <div id="cost-items-table-wrapper" class="hidden" style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="padding-left:16px; width:150px;" data-i18n="cost-category">Categoria</th>
+                            <th data-i18n="description">Descrizione</th>
+                            <th style="width:155px;" data-i18n="cost-frequency-label">Frequenza</th>
+                            <th class="right" style="width:150px;" data-i18n="amount">Importo</th>
+                            <th class="center" style="width:40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-items-body"></tbody>
+                </table>
+            </div>
+
+            <!-- Category totals + grand total -->
+            <div id="cost-footer" style="margin-top:16px; padding-top:14px; border-top:1px solid #f1f5f9;">
+                <div id="cost-category-totals" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; min-height:22px;"></div>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <span class="overline" data-i18n="total-annualized">Totale Annualizzato</span>
+                    <span id="cost-grand-total" style="font-size:20px; font-weight:800; color:#4f46e5; letter-spacing:-0.5px;">€ 0,00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Revenues Section ──────────────────────────────────── -->
+    <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+            <span class="section-title" data-i18n="revenues">Ricavi</span>
+        </div>
+        <div class="card-body">
+
+            <!-- One-time revenues (commissioned / mixed) -->
+            <div id="onetime-revenues-section" class="hidden">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <span class="overline" data-i18n="onetime-revenues">Ricavi Una Tantum</span>
+                    <button type="button" id="add-onetime-btn" class="btn btn-ghost-green" style="padding:6px 10px; font-size:12px;">
+                        <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        <span data-i18n="add-onetime-revenue">Aggiungi</span>
+                    </button>
+                </div>
+
+                <div id="onetime-empty-state" class="hidden" style="text-align:center; padding:16px 0; color:#94a3b8; font-size:12px;" data-i18n="no-onetime-message">Nessun ricavo una tantum.</div>
+
+                <div id="onetime-table-wrapper" class="hidden" style="overflow-x:auto; margin-bottom:4px;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="description">Descrizione</th>
+                                <th class="right" style="width:150px;" data-i18n="amount">Importo</th>
+                                <th class="center" style="width:40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="onetime-items-body"></tbody>
+                    </table>
+                </div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid #f1f5f9; margin-top:4px;">
+                    <span class="overline" data-i18n="total-onetime">Totale Una Tantum</span>
+                    <span id="onetime-grand-total" style="font-size:16px; font-weight:800; color:#059669; letter-spacing:-0.3px;">€ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Divider for mixed -->
+            <hr id="revenue-divider" class="divider hidden">
+
+            <!-- Recurring tiers -->
+            <div id="recurring-revenues-section">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                    <span class="overline" data-i18n="recurring-revenues">Abbonamenti / Licenze</span>
+                    <button type="button" id="add-tier-btn" class="btn btn-ghost-blue" style="padding:6px 10px; font-size:12px;">
+                        <svg style="width:12px;height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        <span data-i18n="add-revenue-tier">Aggiungi Piano</span>
+                    </button>
+                </div>
+
+                <!-- Empty state -->
+                <div id="recurring-empty-state" class="empty-state" style="padding:32px 20px;">
+                    <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="empty-title" data-i18n="no-recurring-message">Nessun piano ricorrente</span>
+                    <span class="empty-desc">Aggiungi i tuoi piani SaaS con prezzo e utenti previsti</span>
+                </div>
+
+                <!-- Card grid -->
+                <div id="recurring-tiers-container"></div>
+
+                <!-- Scenario summary -->
+                <div id="recurring-summary" class="hidden">
+                    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+                        <div class="scenario-strip scenario-strip-pess">
+                            <div class="overline" style="color:#f97316; margin-bottom:6px;" data-i18n="revenue-scenario-pessimistic">Pessimistico</div>
+                            <div id="recurring-pes-total" style="font-size:13px; color:#c2410c; font-weight:700; line-height:1.4;">—</div>
+                        </div>
+                        <div class="scenario-strip scenario-strip-base">
+                            <div class="overline" style="color:#4f46e5; margin-bottom:6px;" data-i18n="revenue-scenario-base">Base</div>
+                            <div id="recurring-base-total" style="font-size:13px; color:#3730a3; font-weight:700; line-height:1.4;">—</div>
+                        </div>
+                        <div class="scenario-strip scenario-strip-opt">
+                            <div class="overline" style="color:#10b981; margin-bottom:6px;" data-i18n="revenue-scenario-optimistic">Ottimistico</div>
+                            <div id="recurring-opt-total" style="font-size:13px; color:#065f46; font-weight:700; line-height:1.4;">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Results ───────────────────────────────────────────── -->
+    <div class="grid-3" style="margin-bottom:16px;">
+
+        <div class="result-card result-card-green">
+            <div class="overline" style="color:#10b981; margin-bottom:10px;" data-i18n="roi-12-months">ROI 12 mesi</div>
+            <div id="roi" style="font-size:22px; font-weight:800; color:#059669; letter-spacing:-0.5px; line-height:1.3;">€ 0,00</div>
+        </div>
+
+        <div class="result-card result-card-blue">
+            <div class="overline" style="color:#3b82f6; margin-bottom:10px;" data-i18n="breakeven-time">Tempo di pareggio</div>
+            <p id="breakeven" style="font-size:22px; font-weight:800; color:#2563eb; letter-spacing:-0.5px; line-height:1.3;" data-i18n="zero-months">0 mesi</p>
+        </div>
+
+        <div class="result-card result-card-amber">
+            <div class="overline" style="color:#f59e0b; margin-bottom:10px;" data-i18n="financial-details">Dettagli finanziari</div>
+            <div style="display:flex; flex-direction:column; gap:6px; font-size:13px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                    <span style="color:#64748b;" data-i18n="costs">Costi</span>
+                    <span id="total-costs-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                    <span style="color:#64748b;" data-i18n="direct-revenues">Ricavi diretti</span>
+                    <span id="direct-revenue-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                    <span style="color:#64748b;" data-i18n="recurring-annual-revenues">Ricorrenti/anno</span>
+                    <span id="yearly-revenue-detail" style="font-weight:700; color:#1e293b;">€ 0,00</span>
+                </div>
+                <p id="users-scenarios" style="font-size:11px; color:#94a3b8; margin-top:4px; padding-top:6px; border-top:1px solid #fef3c7; line-height:1.6;"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluation -->
+    <div class="eval-card" style="margin-bottom:16px;">
+        <div class="overline" style="color:#6366f1; margin-bottom:12px;" data-i18n="overall-evaluation">Valutazione complessiva</div>
+        <div id="overall-evaluation" style="font-size:13px; line-height:1.7; color:#374151;"></div>
+    </div>
+
+    <!-- ── AI Analysis ───────────────────────────────────────── -->
+    <div style="display:flex; justify-content:center; padding-top:8px;">
+        <button id="ai-analysis-btn" class="btn btn-primary btn-primary-lg" disabled>
+            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            <span data-i18n="request-ai-analysis">Analisi AI</span>
+            <div id="ai-spinner" class="hidden">
+                <svg style="width:16px;height:16px; animation:spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+                    <circle style="opacity:.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path style="opacity:.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+            </div>
+        </button>
+    </div>
+
+</div>
+
+<style>
+@keyframes spin { to { transform:rotate(360deg); } }
+.hidden { display: none !important; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+</style>
+
+<script type="module" src="script.js"></script>
 </body>
 </html>

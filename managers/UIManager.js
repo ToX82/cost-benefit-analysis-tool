@@ -25,82 +25,66 @@ export class UIManager {
      * @param {Object} revenues - Revenue details
      */
     static updateFinancialDetails(costs, revenues) {
-        if (!costs || !revenues) {
-            console.error('Invalid financial data provided');
-            return;
-        }
-
+        if (!costs || !revenues) return;
         this.updateElement('total-costs-detail', CurrencyFormatter.format(costs.totalCosts));
-        this.updateElement('direct-revenue-detail', CurrencyFormatter.format(revenues.direct));
+        this.updateElement('direct-revenue-detail', CurrencyFormatter.format(revenues.onetime));
         this.updateElement('yearly-revenue-detail', CurrencyFormatter.format(revenues.yearly));
     }
 
     /**
-     * Updates user scenarios in the UI
-     * @param {Object} scenarios - User scenarios data
+     * Updates the revenue scenario summary (monthly recurring per scenario)
+     * @param {Object} revenues - Revenue data
      */
-    static updateUserScenarios(scenarios) {
-        if (!scenarios) {
-            console.error('Invalid scenarios data provided');
-            return;
-        }
-
+    static updateRevenueSummary(revenues) {
         const element = document.getElementById('users-scenarios');
         const businessModel = document.getElementById('business-model')?.value;
 
-        if (!element) {
-            console.warn('Users scenarios element not found');
-            return;
-        }
+        if (!element) return;
 
-        // Only show scenarios for SaaS and mixed models
         if (businessModel === 'commissioned') {
             element.classList.add('hidden');
             return;
         }
 
         element.classList.remove('hidden');
+        const optMonthly = revenues.scenarios.optimistic / 12;
+        const pesMonthly = revenues.scenarios.pessimistic / 12;
+
         element.innerHTML = `
-            ${__('base-scenario')}: ${scenarios.base} ${__('users')}<br>
-            ${__('optimistic-scenario')}: ${scenarios.optimistic} ${__('users')}<br>
-            ${__('pessimistic-scenario')}: ${scenarios.pessimistic} ${__('users')}
+            ${__('base-scenario')}: ${CurrencyFormatter.format(revenues.monthly)}/mese<br>
+            ${__('optimistic-scenario')}: ${CurrencyFormatter.format(optMonthly)}/mese<br>
+            ${__('pessimistic-scenario')}: ${CurrencyFormatter.format(pesMonthly)}/mese
         `;
     }
 
     /**
      * Updates ROI information in the UI
      * @param {Object} roi - ROI data
+     * @param {string} businessModel - Current business model
      */
-    static updateROI(roi) {
-        if (!roi || !roi.base) {
-            console.error('Invalid ROI data provided');
-            return;
-        }
+    static updateROI(roi, businessModel) {
+        if (!roi?.base) return;
 
         const element = document.getElementById('roi');
-        const businessModelSelect = document.getElementById('business-model');
+        if (!element) return;
 
-        if (!element || !businessModelSelect) {
-            console.warn('Required elements not found');
-            return;
-        }
+        const fmt = (value, pct) =>
+            `${CurrencyFormatter.format(value)} (${pct.toFixed(1)}%)`;
 
-        const formatROI = (value, percentage) =>
-            `${CurrencyFormatter.format(value)} (${percentage.toFixed(1)}%)`;
-
-        if (businessModelSelect.value === 'commissioned') {
-            element.innerHTML = formatROI(roi.base.value, roi.base.percentage);
+        if (businessModel === 'commissioned') {
+            element.innerHTML = fmt(roi.base.value, roi.base.percentage);
         } else {
             element.innerHTML = `
-                ${formatROI(roi.base.value, roi.base.percentage)}<br>
+                ${fmt(roi.base.value, roi.base.percentage)}<br>
                 <span class="text-sm text-gray-600">
-                    ${__('optimistic')}: ${formatROI(roi.optimistic.value, roi.optimistic.percentage)}<br>
-                    ${__('pessimistic')}: ${formatROI(roi.pessimistic.value, roi.pessimistic.percentage)}
-                </span>
-            `;
+                    ${__('optimistic')}: ${fmt(roi.optimistic.value, roi.optimistic.percentage)}<br>
+                    ${__('pessimistic')}: ${fmt(roi.pessimistic.value, roi.pessimistic.percentage)}
+                </span>`;
         }
 
-        element.className = this.getROIClassName(roi.base.value);
+        element.className = roi.base.value >= 0
+            ? 'text-2xl font-bold text-green-500'
+            : 'text-2xl font-bold text-red-500';
     }
 
     /**
@@ -108,35 +92,25 @@ export class UIManager {
      * @param {number} breakeven - Breakeven period in months
      */
     static updateBreakeven(breakeven) {
-        if (typeof breakeven !== 'number') {
-            console.error('Invalid breakeven value provided');
-            return;
-        }
-
+        if (typeof breakeven !== 'number') return;
         this.updateElement(
             'breakeven',
-            breakeven !== Infinity ?
-                `${Math.ceil(breakeven)} ${__('months')}` :
-                __('not-reachable')
+            breakeven !== Infinity
+                ? `${Math.ceil(breakeven)} ${__('months')}`
+                : __('not-reachable')
         );
     }
 
     /**
      * Updates evaluation and risk index in the UI
-     * @param {string} evaluation - Evaluation text
+     * @param {string} evaluation - Evaluation HTML
      * @param {Object} riskIndex - Risk index data
      */
     static updateEvaluation(evaluation, riskIndex) {
-        if (!evaluation || !riskIndex) {
-            console.error('Invalid evaluation data provided');
-            return;
-        }
+        if (!evaluation || !riskIndex) return;
 
         const element = document.getElementById('overall-evaluation');
-        if (!element) {
-            console.warn('Evaluation element not found');
-            return;
-        }
+        if (!element) return;
 
         element.innerHTML = `${evaluation}
             <br><br><span class="font-bold">${__('risk-index')}: ${riskIndex.level} (${riskIndex.score}/100)</span>`;
@@ -147,50 +121,32 @@ export class UIManager {
      * @param {string} message - Error message to display
      */
     static displayError(message) {
-        if (!message) {
-            console.warn('Empty error message provided');
-            return;
-        }
-
+        if (!message) return;
         const element = document.getElementById('overall-evaluation');
-        if (element) {
-            element.innerHTML = `<span class="text-red-600">${message}</span>`;
-        }
+        if (element) element.innerHTML = `<span class="text-red-600">${message}</span>`;
         console.error(message);
     }
 
     /**
-     * Gets the appropriate CSS class for ROI display
-     * @private
-     * @param {number} roiValue - ROI value
-     * @returns {string} CSS class name
-     */
-    static getROIClassName(roiValue) {
-        return roiValue >= 0 ?
-            'text-2xl font-bold text-green-500' :
-            'text-2xl font-bold text-red-500';
-    }
-
-    /**
-     * Shows a temporary message to the user
-     * @param {string} message - The message to display
-     * @param {string} type - The message type ('success' or 'error')
+     * Shows a temporary toast message
+     * @param {string} message
+     * @param {string} type - 'success' or 'error'
      */
     static displayTemporaryMessage(message, type = 'success') {
         const container = document.createElement('div');
-        container.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
-            type === 'success' ? 'bg-green-600' : 'bg-red-600'
-        } text-white z-50 transition-opacity duration-300`;
-        container.textContent = message;
-
-        document.body.appendChild(container);
-
-        // Fade in
-        requestAnimationFrame(() => {
-            container.style.opacity = '1';
+        Object.assign(container.style, {
+            position: 'fixed', top: '20px', right: '20px',
+            padding: '14px 20px', borderRadius: '12px',
+            background: type === 'success' ? '#059669' : '#dc2626',
+            color: '#fff', fontSize: '13px', fontWeight: '600',
+            fontFamily: 'inherit',
+            boxShadow: '0 10px 25px rgba(0,0,0,.15)',
+            zIndex: '9999', opacity: '0',
+            transition: 'opacity .25s'
         });
-
-        // Fade out and remove after 3 seconds
+        container.textContent = message;
+        document.body.appendChild(container);
+        requestAnimationFrame(() => { container.style.opacity = '1'; });
         setTimeout(() => {
             container.style.opacity = '0';
             setTimeout(() => container.remove(), 300);

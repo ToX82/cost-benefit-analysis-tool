@@ -19,14 +19,14 @@ export const CONFIG = {
      * @type {Object}
      */
     ROI_THRESHOLDS: {
-        /** Excellent ROI threshold (>=100%) */
-        EXCELLENT: 100,
-        /** Good ROI threshold (>=60%) */
-        GOOD: 60,
-        /** Moderate ROI threshold (>=30%) */
-        MODERATE: 30,
-        /** Low ROI threshold (>=10%) */
-        LOW: 10
+        /** Excellent ROI threshold (>=80%) */
+        EXCELLENT: 80,
+        /** Good ROI threshold (>=40%) */
+        GOOD: 40,
+        /** Moderate ROI threshold (>=20%) */
+        MODERATE: 20,
+        /** Low ROI threshold (>0%) — any positive ROI qualifies as "low" rather than "loss" */
+        LOW: 0
     },
 
     /**
@@ -35,12 +35,12 @@ export const CONFIG = {
      * @type {Object}
      */
     RISK_THRESHOLDS: {
-        /** Very high risk threshold (>=60) */
-        VERY_HIGH: 60,
-        /** High risk threshold (>=40) */
-        HIGH: 40,
-        /** Medium risk threshold (>=20) */
-        MEDIUM: 20,
+        /** Very high risk threshold (>=70) */
+        VERY_HIGH: 70,
+        /** High risk threshold (>=48) */
+        HIGH: 48,
+        /** Medium risk threshold (>=25) */
+        MEDIUM: 25,
         /** Low risk threshold (>=10) */
         LOW: 10
     }

@@ -3,6 +3,14 @@
         "it": "Strumento di Analisi Costi-Benefici",
         "en": "Cost Benefit Analysis Tool"
     },
+    "project-name": {
+        "it": "Nome Progetto",
+        "en": "Project Name"
+    },
+    "project-name-placeholder": {
+        "it": "Es: App di gestione magazzino",
+        "en": "Ex: Warehouse management app"
+    },
     "costs": {
         "it": "Costi",
         "en": "Costs"
@@ -666,5 +674,193 @@
     "pessimistic-users-help": {
         "it": "Stima pessimistica del numero di utenti",
         "en": "Pessimistic estimate of user count"
+    },
+    "additional-costs": {
+        "it": "Costi Aggiuntivi",
+        "en": "Additional Costs"
+    },
+    "add-cost": {
+        "it": "Aggiungi costo",
+        "en": "Add cost"
+    },
+    "remove-cost": {
+        "it": "Rimuovi costo",
+        "en": "Remove cost"
+    },
+    "cost-label": {
+        "it": "Etichetta costo",
+        "en": "Cost label"
+    },
+    "cost-amount": {
+        "it": "Importo (€)",
+        "en": "Amount (€)"
+    },
+    "custom-cost": {
+        "it": "Costo personalizzato",
+        "en": "Custom cost"
+    },
+    "project-costs-title": {
+        "it": "Costi del Progetto",
+        "en": "Project Costs"
+    },
+    "add-cost-item": {
+        "it": "Aggiungi Voce",
+        "en": "Add Item"
+    },
+    "no-costs-message": {
+        "it": "Nessuna voce di costo. Clicca \"Aggiungi Voce\" per iniziare.",
+        "en": "No cost items. Click \"Add Item\" to start."
+    },
+    "cost-category": {
+        "it": "Categoria",
+        "en": "Category"
+    },
+    "description": {
+        "it": "Descrizione",
+        "en": "Description"
+    },
+    "cost-frequency-label": {
+        "it": "Frequenza",
+        "en": "Frequency"
+    },
+    "amount": {
+        "it": "Importo",
+        "en": "Amount"
+    },
+    "total-annualized": {
+        "it": "Totale Annualizzato",
+        "en": "Annualized Total"
+    },
+    "category-personnel": {
+        "it": "Personale",
+        "en": "Personnel"
+    },
+    "category-hardware": {
+        "it": "Hardware",
+        "en": "Hardware"
+    },
+    "category-licenses": {
+        "it": "Licenze",
+        "en": "Licenses"
+    },
+    "category-ai": {
+        "it": "AI / Cloud",
+        "en": "AI / Cloud"
+    },
+    "category-support": {
+        "it": "Assistenza",
+        "en": "Support"
+    },
+    "category-other": {
+        "it": "Altro",
+        "en": "Other"
+    },
+    "freq-monthly": {
+        "it": "Mensile (×12)",
+        "en": "Monthly (×12)"
+    },
+    "freq-onetime": {
+        "it": "Una Tantum",
+        "en": "One-time"
+    },
+    "cost-description-placeholder": {
+        "it": "Es: Sviluppatori junior",
+        "en": "Ex: Junior developers"
+    },
+    "onetime-revenues": {
+        "it": "Ricavi Una Tantum",
+        "en": "One-time Revenues"
+    },
+    "recurring-revenues": {
+        "it": "Abbonamenti / Licenze",
+        "en": "Subscriptions / Licenses"
+    },
+    "add-onetime-revenue": {
+        "it": "Aggiungi",
+        "en": "Add"
+    },
+    "add-revenue-tier": {
+        "it": "Aggiungi Piano",
+        "en": "Add Tier"
+    },
+    "no-onetime-message": {
+        "it": "Nessun ricavo una tantum.",
+        "en": "No one-time revenues."
+    },
+    "no-recurring-message": {
+        "it": "Nessun piano ricorrente.",
+        "en": "No recurring plans."
+    },
+    "total-onetime": {
+        "it": "Totale Una Tantum",
+        "en": "One-time Total"
+    },
+    "onetime-label-placeholder": {
+        "it": "Es: Acconto iniziale",
+        "en": "Ex: Upfront payment"
+    },
+    "tier-plan": {
+        "it": "Piano",
+        "en": "Plan"
+    },
+    "tier-price-month": {
+        "it": "€/utente/mese",
+        "en": "€/user/month"
+    },
+    "tier-units-base": {
+        "it": "Base",
+        "en": "Base"
+    },
+    "tier-units-optimistic": {
+        "it": "Ottimistico",
+        "en": "Optimistic"
+    },
+    "tier-units-pessimistic": {
+        "it": "Pessimistico",
+        "en": "Pessimistic"
+    },
+    "tier-name-placeholder": {
+        "it": "Es: Licenza Base",
+        "en": "Ex: Basic License"
+    },
+    "revenue-scenario-base": {
+        "it": "Scenario Base",
+        "en": "Base Scenario"
+    },
+    "revenue-scenario-optimistic": {
+        "it": "Ottimistico",
+        "en": "Optimistic"
+    },
+    "revenue-scenario-pessimistic": {
+        "it": "Pessimistico",
+        "en": "Pessimistic"
+    },
+    "cost-items-required": {
+        "it": "Inserire almeno una voce di costo per procedere con l'analisi",
+        "en": "Enter at least one cost item to proceed with the analysis"
+    },
+    "bookmark-restore-error": {
+        "it": "Errore nel ripristino dei dati dal bookmark",
+        "en": "Error restoring data from bookmark"
+    },
+    "tier-price-label": {
+        "it": "Prezzo",
+        "en": "Price"
+    },
+    "tier-commission-label": {
+        "it": "Commissione",
+        "en": "Commission"
+    },
+    "tier-net-label": {
+        "it": "Netto",
+        "en": "Net"
+    },
+    "per-user-month": {
+        "it": "/ utente / mese",
+        "en": "/ user / month"
+    },
+    "per-license": {
+        "it": "/ licenza",
+        "en": "/ license"
     }
 }

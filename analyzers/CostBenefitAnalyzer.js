@@ -4,47 +4,44 @@ import { UIManager } from '../managers/UIManager.js';
 import { StorageManager } from '../managers/StorageManager.js';
 import { EvaluationManager } from '../managers/EvaluationManager.js';
 import { RiskAnalyzer } from './RiskAnalyzer.js';
+import { CostItemsManager } from '../managers/CostItemsManager.js';
+import { RevenueItemsManager } from '../managers/RevenueItemsManager.js';
 import { __ } from '../utils/I18n.js';
 
 /**
- * Main analyzer class that handles cost-benefit calculations and analysis
+ * Main analyzer class that orchestrates cost-benefit calculations.
+ *
+ * Costs are now scenario-dependent when 'scaling' cost items are present:
+ *   costs.base / costs.optimistic / costs.pessimistic may differ.
  */
 export class CostBenefitAnalyzer {
-    /**
-     * Initializes the analyzer, sets up event listeners and loads saved data
-     */
     constructor() {
         this.initializeEventListeners();
         this.loadSavedData();
         this.handleBusinessModelChange();
     }
 
-    /**
-     * Sets up event listeners for input changes and business model selection
-     */
     initializeEventListeners() {
         try {
-            document.querySelectorAll('input, select').forEach(element => {
-                element.addEventListener('change', () => this.handleInputChange());
-            });
+            document.querySelectorAll('input, select').forEach(el =>
+                el.addEventListener('change', () => this.handleInputChange())
+            );
 
-            const businessModelSelect = document.getElementById('business-model');
-            if (!businessModelSelect) {
-                throw new Error('Business model select element not found');
-            }
+            const bm = document.getElementById('business-model');
+            if (!bm) throw new Error('Business model select not found');
+            bm.addEventListener('change', () => this.handleBusinessModelChange());
 
-            businessModelSelect.addEventListener('change', () => {
-                this.handleBusinessModelChange();
-            });
+            CostItemsManager.initialize();
+            RevenueItemsManager.initialize();
+
+            document.addEventListener('costitemschange',   () => this.handleInputChange());
+            document.addEventListener('revenueitemschange', () => this.handleInputChange());
         } catch (e) {
             console.error('Failed to initialize event listeners:', e);
             UIManager.displayError(__('initialization-error'));
         }
     }
 
-    /**
-     * Loads previously saved data and recalculates results
-     */
     loadSavedData() {
         try {
             StorageManager.loadFromStorage();
@@ -55,9 +52,6 @@ export class CostBenefitAnalyzer {
         }
     }
 
-    /**
-     * Handles input change events by recalculating results and saving data
-     */
     handleInputChange() {
         try {
             this.calculateResults();
@@ -68,23 +62,36 @@ export class CostBenefitAnalyzer {
         }
     }
 
-    /**
-     * Main calculation method that processes all inputs and updates UI
-     */
     calculateResults() {
         const inputs = this.getValidatedInputs();
         if (!inputs) return;
 
         try {
-            const costs = this.calculateCosts(inputs);
-            const revenues = this.calculateRevenues(inputs);
-            const userScenarios = this.calculateUserScenarios(inputs);
-            const roi = this.calculateROI(costs, revenues);
-            const breakeven = this.calculateBreakeven(costs, revenues, inputs);
-            const evaluation = this.calculateEvaluation(roi, breakeven, inputs);
-            const riskIndex = this.calculateRiskIndex(inputs, costs);
+            const userCounts = {
+                base:        inputs.expectedUsers,
+                optimistic:  inputs.optimisticUsers,
+                pessimistic: inputs.pessimisticUsers
+            };
 
-            this.updateUI(costs, revenues, userScenarios, roi, breakeven, evaluation, riskIndex);
+            // Update scaling cost previews (B/O/P labels in table rows)
+            CostItemsManager.updateScenarioDisplays(userCounts);
+
+            const costs    = this.calculateCosts(userCounts);
+            const revenues = this.calculateRevenues();
+            const roi      = this.calculateROI(costs, revenues);
+            const breakeven = this.calculateBreakeven(costs, revenues, inputs);
+            const evaluation = EvaluationManager.getROIEvaluation(roi.base.percentage);
+            const fullEval   = EvaluationManager.addOverallEvaluation(evaluation, roi, breakeven, inputs);
+            const riskIndex  = new RiskAnalyzer(inputs, { totalCosts: costs.base }).analyze();
+
+            UIManager.updateFinancialDetails(costs, revenues);
+            UIManager.updateROI(roi, inputs.businessModel);
+            UIManager.updateBreakeven(breakeven);
+            UIManager.updateEvaluation(fullEval, riskIndex);
+            UIManager.updateRevenueSummary(revenues);
+
+            const aiBtn = document.getElementById('ai-analysis-btn');
+            if (aiBtn) aiBtn.disabled = false;
         } catch (e) {
             console.error('Error in calculations:', e);
             UIManager.displayError(__('calculation-error'));
@@ -92,31 +99,39 @@ export class CostBenefitAnalyzer {
     }
 
     /**
-     * Collects and validates all input values
-     * @returns {Object|null} Validated inputs or null if validation fails
+     * Collects and enriches inputs with aggregated manager data.
+     * annualizedCosts uses minimum-scale values for scaling items
+     * (suitable for validation and business-model evaluation ratios).
      */
     getValidatedInputs() {
-        const inputs = InputManager.collectInputs();
-        return this.validateInputs(inputs) ? inputs : null;
+        const base = InputManager.collectInputs();
+        if (!this.validateInputs()) return null;
+
+        return {
+            ...base,
+            onetimeRevenue:   RevenueItemsManager.getTotalOnetimeRevenue(),
+            monthlyRecurring: RevenueItemsManager.getMonthlyRecurring('base'),
+            expectedUsers:    RevenueItemsManager.getTotalUnits('base'),
+            optimisticUsers:  RevenueItemsManager.getTotalUnits('optimistic'),
+            pessimisticUsers: RevenueItemsManager.getTotalUnits('pessimistic'),
+            annualizedCosts:  CostItemsManager.getTotalCosts()
+        };
     }
 
-    /**
-     * Validates input values against business rules
-     * @param {Object} inputs - Input values to validate
-     * @returns {boolean} True if inputs are valid
-     */
-    validateInputs(inputs) {
-        if (inputs.directCosts + inputs.indirectCosts === 0) {
-            UIManager.displayError(__('costs-required'));
+    validateInputs() {
+        if (CostItemsManager.getTotalCosts() === 0) {
+            UIManager.displayError(__('cost-items-required'));
             return false;
         }
 
-        if (inputs.devWeeks < CONFIG.MIN_DEV_WEEKS) {
+        const devWeeks = parseFloat(document.getElementById('dev-weeks')?.value) || 0;
+        if (devWeeks < CONFIG.MIN_DEV_WEEKS) {
             UIManager.displayError(__('invalid-dev-weeks'));
             return false;
         }
 
-        if (inputs.devOccupation < 0 || inputs.devOccupation > 100) {
+        const devOccupation = parseFloat(document.getElementById('dev-occupation')?.value) || 0;
+        if (devOccupation < 0 || devOccupation > 100) {
             UIManager.displayError(__('invalid-occupation'));
             return false;
         }
@@ -125,222 +140,73 @@ export class CostBenefitAnalyzer {
     }
 
     /**
-     * Calculates total costs considering occupation multiplier
-     * @param {Object} inputs - Input values
-     * @returns {Object} Calculated costs and multiplier
+     * Returns per-scenario annualized costs.
+     * For projects with no scaling costs the three values are identical.
+     * @returns {{ base: number, optimistic: number, pessimistic: number }}
      */
-    calculateCosts(inputs) {
-        const occupationMultiplier = 1 + Math.max(0, (inputs.devOccupation - 50) / 100);
-        const totalCosts = (inputs.directCosts + inputs.indirectCosts) * occupationMultiplier;
-        return { totalCosts, occupationMultiplier };
+    calculateCosts(userCounts) {
+        return CostItemsManager.getTotalCostsForScenario(userCounts);
     }
 
-    /**
-     * Calculates all revenue scenarios
-     * @param {Object} inputs - Input values
-     * @returns {Object} Revenue calculations for all scenarios
-     */
-    calculateRevenues(inputs) {
-        const directRevenue = inputs.upfrontPayment + inputs.finalPayment;
-        const monthlyRecurringRevenue = inputs.recurringRevenue * inputs.expectedUsers;
-        const yearlyRecurringRevenue = monthlyRecurringRevenue * CONFIG.MONTHS_PERIOD;
+    calculateRevenues() {
+        const onetime  = RevenueItemsManager.getTotalOnetimeRevenue();
+        const monthly  = RevenueItemsManager.getMonthlyRecurring('base');
+        const monthOpt = RevenueItemsManager.getMonthlyRecurring('optimistic');
+        const monthPes = RevenueItemsManager.getMonthlyRecurring('pessimistic');
 
         return {
-            direct: directRevenue,
-            monthly: monthlyRecurringRevenue,
-            yearly: yearlyRecurringRevenue,
+            onetime,
+            monthly,
+            yearly: monthly * CONFIG.MONTHS_PERIOD,
             scenarios: {
-                base: this.calculateTotalRevenue(inputs, inputs.expectedUsers),
-                optimistic: this.calculateTotalRevenue(inputs, inputs.optimisticUsers),
-                pessimistic: this.calculateTotalRevenue(inputs, inputs.pessimisticUsers)
+                base:        onetime + monthly  * CONFIG.MONTHS_PERIOD,
+                optimistic:  onetime + monthOpt * CONFIG.MONTHS_PERIOD,
+                pessimistic: onetime + monthPes * CONFIG.MONTHS_PERIOD
             }
         };
     }
 
     /**
-     * Calculates total revenue for a given number of users
-     * @param {Object} inputs - Input values
-     * @param {number} users - Number of users
-     * @returns {number} Total revenue
-     */
-    calculateTotalRevenue(inputs, users) {
-        return inputs.upfrontPayment + inputs.finalPayment +
-               (inputs.recurringRevenue * CONFIG.MONTHS_PERIOD * users);
-    }
-
-    /**
-     * Calculates user scenarios based on input values
-     * @param {Object} inputs - Input values
-     * @returns {Object} User scenarios calculations
-     */
-    calculateUserScenarios(inputs) {
-        return {
-            base: inputs.expectedUsers,
-            optimistic: inputs.optimisticUsers,
-            pessimistic: inputs.pessimisticUsers
-        };
-    }
-
-    /**
-     * Calculates ROI for all scenarios
-     * @param {Object} costs - Cost calculations
-     * @param {Object} revenues - Revenue calculations
-     * @returns {Object} ROI calculations for all scenarios
+     * ROI uses scenario-specific costs so optimistic revenue is weighed against
+     * the (potentially higher) optimistic personnel costs.
      */
     calculateROI(costs, revenues) {
-        const calculateRoiValue = (revenue) => revenue - costs.totalCosts;
-        const calculateRoiPercentage = (revenue) =>
-            costs.totalCosts > 0 ? ((revenue / costs.totalCosts) - 1) * 100 : 0;
-
+        const calc = (rev, cost) => ({
+            value:      rev - cost,
+            percentage: cost > 0 ? Math.round(((rev / cost) - 1) * 1000) / 10 : 0
+        });
         return {
-            base: {
-                value: calculateRoiValue(revenues.scenarios.base),
-                percentage: calculateRoiPercentage(revenues.scenarios.base)
-            },
-            optimistic: {
-                value: calculateRoiValue(revenues.scenarios.optimistic),
-                percentage: calculateRoiPercentage(revenues.scenarios.optimistic)
-            },
-            pessimistic: {
-                value: calculateRoiValue(revenues.scenarios.pessimistic),
-                percentage: calculateRoiPercentage(revenues.scenarios.pessimistic)
-            }
+            base:        calc(revenues.scenarios.base,        costs.base),
+            optimistic:  calc(revenues.scenarios.optimistic,  costs.optimistic),
+            pessimistic: calc(revenues.scenarios.pessimistic, costs.pessimistic)
         };
     }
 
-    /**
-     * Calculates breakeven point in months
-     * @param {Object} costs - Cost calculations
-     * @param {Object} revenues - Revenue calculations
-     * @param {Object} inputs - Input values
-     * @returns {number} Breakeven point in months
-     */
+    /** Breakeven uses base scenario costs. */
     calculateBreakeven(costs, revenues, inputs) {
         const devMonths = inputs.devWeeks / 4;
-        const remainingCosts = costs.totalCosts - inputs.upfrontPayment;
-
-        if (inputs.finalPayment >= remainingCosts) {
-            return devMonths;
-        }
-
-        const costsAfterFinal = remainingCosts - inputs.finalPayment;
-
-        if (revenues.monthly <= 0) {
-            return Infinity;
-        }
-
-        return devMonths + (costsAfterFinal / revenues.monthly);
+        const remaining = costs.base - revenues.onetime;
+        if (remaining <= 0) return devMonths;
+        if (revenues.monthly <= 0) return Infinity;
+        return devMonths + (remaining / revenues.monthly);
     }
 
-    /**
-     * Calculates overall evaluation based on ROI and breakeven
-     * @param {Object} roi - ROI calculations
-     * @param {number} breakeven - Breakeven point
-     * @param {Object} inputs - Input values
-     * @returns {string} Evaluation text
-     */
-    calculateEvaluation(roi, breakeven, inputs) {
-        let evaluation = EvaluationManager.getROIEvaluation(roi.base.percentage);
-        evaluation = EvaluationManager.addOverallEvaluation(evaluation, roi, breakeven, inputs);
-        return evaluation;
-    }
-
-    /**
-     * Calculates risk index using RiskAnalyzer
-     * @param {Object} inputs - Input values
-     * @param {Object} costs - Cost calculations
-     * @returns {Object} Risk index calculation
-     */
-    calculateRiskIndex(inputs, costs) {
-        return new RiskAnalyzer(inputs, costs).analyze();
-    }
-
-    /**
-     * Updates all UI components with calculation results
-     * @param {Object} costs - Cost calculations
-     * @param {Object} revenues - Revenue calculations
-     * @param {Object} userScenarios - User scenarios calculations
-     * @param {Object} roi - ROI calculations
-     * @param {number} breakeven - Breakeven point
-     * @param {string} evaluation - Evaluation text
-     * @param {Object} riskIndex - Risk index calculation
-     */
-    updateUI(costs, revenues, userScenarios, roi, breakeven, evaluation, riskIndex) {
-        UIManager.updateFinancialDetails(costs, revenues);
-        UIManager.updateUserScenarios(userScenarios);
-        UIManager.updateROI(roi);
-        UIManager.updateBreakeven(breakeven);
-        UIManager.updateEvaluation(evaluation, riskIndex);
-    }
-
-    /**
-     * Handles business model changes and updates UI accordingly
-     */
     handleBusinessModelChange() {
         try {
-            const businessModel = document.getElementById('business-model')?.value;
-            const usersCard = document.querySelector('[data-category="users"]');
+            const bm = document.getElementById('business-model')?.value;
+            if (!bm) throw new Error('Business model not found');
 
-            if (!businessModel || !usersCard) {
-                throw new Error('Required elements not found');
-            }
+            const showOnetime   = bm === 'commissioned' || bm === 'mixed';
+            const showRecurring = bm === 'saas'         || bm === 'mixed';
 
-            if (businessModel === 'commissioned') {
-                this.setCommissionedMode(usersCard);
-            } else {
-                this.setSaaSMode(usersCard);
-            }
+            document.getElementById('onetime-revenues-section')?.classList.toggle('hidden', !showOnetime);
+            document.getElementById('recurring-revenues-section')?.classList.toggle('hidden', !showRecurring);
+            document.getElementById('revenue-divider')?.classList.toggle('hidden', bm !== 'mixed');
 
             this.calculateResults();
         } catch (e) {
             console.error('Error handling business model change:', e);
             UIManager.displayError(__('business-model-error'));
         }
-    }
-
-    /**
-     * Sets up UI for commissioned business model
-     * @param {HTMLElement} usersCard - Users section element
-     */
-    setCommissionedMode(usersCard) {
-        usersCard.classList.add('hidden');
-        this.setInputValue('expected-users', '1');
-        this.setInputValue('optimistic-users', '1');
-        this.setInputValue('pessimistic-users', '1');
-    }
-
-    /**
-     * Sets up UI for SaaS business model
-     * @param {HTMLElement} usersCard - Users section element
-     */
-    setSaaSMode(usersCard) {
-        usersCard.classList.remove('hidden');
-        if (this.getInputValue('expected-users') === '1') {
-            const defaultExpected = 100;
-            this.setInputValue('expected-users', defaultExpected.toString());
-            this.setInputValue('optimistic-users', Math.round(defaultExpected * 1.2).toString());
-            this.setInputValue('pessimistic-users', Math.round(defaultExpected * 0.8).toString());
-        }
-    }
-
-    /**
-     * Sets value for an input element
-     * @param {string} id - Input element ID
-     * @param {string} value - Value to set
-     */
-    setInputValue(id, value) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = value;
-        }
-    }
-
-    /**
-     * Gets value from an input element
-     * @param {string} id - Input element ID
-     * @returns {string} Input value or empty string if not found
-     */
-    getInputValue(id) {
-        return document.getElementById(id)?.value || '';
     }
 }

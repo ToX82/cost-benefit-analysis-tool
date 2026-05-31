@@ -8,7 +8,7 @@ import { CurrencyFormatter } from '../utils/CurrencyFormatter.js';
  *   'onetime'   – one-time cost
  *   'scaling'   – cost that grows step-wise with total users
  *                 (costPerUnit, usersPerUnit, minUnits)
- *   'per-elab'  – cost per elaboration; total = costPerElab × Σ(tier_licenses × tier_elaborations) × 12
+ *   'per-elab'  – cost per elaboration; total = costPerElab × Σ(tier_licenses × tier_elaborations_annual/12) × 12
  *
  * Scaling and per-elab items contribute different amounts per scenario.
  * Call updateScenarioDisplays(userCounts, elaborationCounts) after revenue tiers change.

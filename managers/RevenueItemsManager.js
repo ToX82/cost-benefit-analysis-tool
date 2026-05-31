@@ -399,6 +399,7 @@ export class RevenueItemsManager {
 
     /**
      * Total elaborations per month at a given month and scenario.
+     * elaborationsPerLicense is annual, so divide by 12 to get monthly.
      */
     static getElaborationsAtMonth(month, scenario = 'base') {
         const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
@@ -406,7 +407,7 @@ export class RevenueItemsManager {
                     : 'baseAcqPerMonth';
         return this.#recurringTiers.reduce((sum, t) => {
             const users = this.#activeUsers(t, month, field);
-            return sum + users * (t.elaborationsPerLicense || 0);
+            return sum + users * ((t.elaborationsPerLicense || 0) / 12);
         }, 0);
     }
 
@@ -434,6 +435,7 @@ export class RevenueItemsManager {
 
     /**
      * Average monthly elaborations over year 1, using month-6 active users as midpoint estimate.
+     * elaborationsPerLicense is annual, so divide by 12 to get monthly.
      */
     static getTotalElaborations(scenario = 'base') {
         const field = scenario === 'optimistic' ? 'optimisticAcqPerMonth'
@@ -441,7 +443,7 @@ export class RevenueItemsManager {
                     : 'baseAcqPerMonth';
         return this.#recurringTiers.reduce((sum, t) => {
             const users = this.#activeUsers(t, 6, field);
-            return sum + users * (t.elaborationsPerLicense || 0);
+            return sum + users * ((t.elaborationsPerLicense || 0) / 12);
         }, 0);
     }
 
